@@ -10,6 +10,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // ── New design system ───────────────────────────────
+        ink:    '#0b1220',
+        royal:  '#1e40af',
+        royald: '#1e3a8a',
+        royall: '#3b82f6',
+        ruby:   '#e11d48',
+        rubyd:  '#be123c',
+        paper:  '#fafbff',
+        line:   '#e6e8ef',
+        mute:   '#5b6478',
+        // ── Legacy brand (used by tool pages) ───────────────
         primary: {
           DEFAULT: '#E84A4A',
           light: '#FF6B6B',
@@ -39,17 +50,20 @@ const config: Config = {
         },
       },
       fontFamily: {
-        syne: ['var(--font-syne)', 'sans-serif'],
-        sans: ['var(--font-dm-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
+        // font-syne class used by tool pages maps to same Space Grotesk variable
+        syne:    ['var(--font-display)', 'sans-serif'],
+        sans:    ['var(--font-sans)', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         '2xl': '1rem',
         '3xl': '1.5rem',
       },
       boxShadow: {
-        card: '0 4px 24px rgba(0, 0, 0, 0.06)',
-        'card-hover': '0 8px 40px rgba(0, 0, 0, 0.12)',
-        'red-glow': '0 0 30px rgba(232, 74, 74, 0.3)',
+        card:        '0 1px 0 rgba(15,23,42,0.04), 0 8px 24px -12px rgba(30,64,175,0.18)',
+        'card-hover':'0 2px 0 rgba(15,23,42,0.04), 0 22px 42px -18px rgba(30,64,175,0.30)',
+        lift:        '0 2px 0 rgba(15,23,42,0.04), 0 22px 42px -18px rgba(30,64,175,0.30)',
+        'red-glow':  '0 0 30px rgba(232, 74, 74, 0.3)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',

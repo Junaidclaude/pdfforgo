@@ -1,24 +1,25 @@
 import type { Metadata, Viewport } from 'next'
-import { Syne, DM_Sans } from 'next/font/google'
+import { Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google'
 import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import './globals.css'
 
-const syne = Syne({
+const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
-  weight: ['800'],
-  variable: '--font-syne',
+  weight: ['500', '600', '700'],
+  variable: '--font-display',
   display: 'swap',
 })
 
-const dmSans = DM_Sans({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-dm-sans',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-sans',
   display: 'swap',
 })
+
 
 export const viewport: Viewport = {
   themeColor: '#E84A4A',
@@ -98,7 +99,7 @@ export default function RootLayout({
   const adSensePubId = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID
 
   return (
-    <html lang="en" className={`${syne.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${spaceGrotesk.variable} ${plusJakarta.variable}`}>
       <head>
         {adSensePubId && (
           <Script

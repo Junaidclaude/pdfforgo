@@ -30,25 +30,30 @@ export default function ResizeImagePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
-      <section className="bg-dark text-white py-10 px-4">
+      <section className="hero-bg py-12 px-4 border-b border-line">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-3 py-1.5 mb-4 text-xs text-violet-300">
-            Client-side · Files stay on your device
+          <div className="inline-flex items-center gap-2 bg-violet-100 border border-violet-200 rounded-full px-3 py-1.5 mb-4 text-xs text-violet-700 font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-violet-500 inline-block" />
+            100% private · Files never leave your browser
           </div>
-          <h1 className="font-syne text-3xl md:text-5xl font-extrabold mb-4 leading-tight">Resize Images Online</h1>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">Set exact pixel dimensions or scale by percentage. Lock the aspect ratio to avoid distortion. Resize multiple images at once.</p>
+          <h1 className="font-display text-3xl md:text-5xl font-bold mb-4 leading-tight text-ink">
+            Resize Images <span className="text-violet-600">Online Free</span>
+          </h1>
+          <p className="text-mute text-lg max-w-xl mx-auto">
+            Set exact pixel dimensions or scale by percentage. Pick from presets (HD, 4K, Instagram) or enter custom sizes. Batch resize multiple images at once.
+          </p>
         </div>
       </section>
       <ResizeImageTool />
-      <section className="py-16 px-4 bg-bg-dark">
+      <section className="py-16 px-4 bg-paper">
         <div className="max-w-4xl mx-auto">
-          <h2 className="font-syne text-2xl md:text-3xl font-extrabold text-dark text-center mb-10">How to Resize Images</h2>
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">How to Resize Images</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {HOW_TO_STEPS.map((s, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 shadow-card">
-                <div className="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center mb-4"><span className="font-syne font-extrabold text-violet-500 text-lg">{i + 1}</span></div>
-                <h3 className="font-syne font-bold text-dark mb-2">{s.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{s.body}</p>
+              <div key={i} className="bg-white rounded-2xl p-6 border border-line">
+                <div className="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center mb-4"><span className="font-display font-bold text-violet-600 text-lg">{i + 1}</span></div>
+                <h3 className="font-display font-bold text-ink mb-2">{s.title}</h3>
+                <p className="text-mute text-sm leading-relaxed">{s.body}</p>
               </div>
             ))}
           </div>
@@ -56,25 +61,25 @@ export default function ResizeImagePage() {
       </section>
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
-          <h2 className="font-syne text-2xl md:text-3xl font-extrabold text-dark text-center mb-10">Frequently Asked Questions</h2>
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>
           <div className="space-y-4">
             {FAQS.map((f, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 shadow-card">
-                <h3 className="font-syne font-bold text-dark mb-2 text-base">{f.q}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{f.a}</p>
+              <div key={i} className="bg-white rounded-2xl p-6 border border-line">
+                <h3 className="font-display font-bold text-ink mb-2 text-base">{f.q}</h3>
+                <p className="text-mute text-sm leading-relaxed">{f.a}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
-      <section className="py-12 px-4 bg-bg-dark">
+      <section className="py-12 px-4 bg-paper">
         <div className="max-w-4xl mx-auto">
-          <h2 className="font-syne text-xl font-extrabold text-dark mb-6 text-center">You Might Also Need</h2>
+          <h2 className="font-display text-xl font-bold text-ink mb-6 text-center">You Might Also Need</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {related.map((tool) => (
-              <Link key={tool.slug} href={`/${tool.slug}`} className="group bg-white rounded-2xl p-5 shadow-card hover:shadow-card-hover transition-all hover:-translate-y-1 block">
-                <p className="font-syne font-bold text-dark group-hover:text-violet-500 transition-colors">{tool.name}</p>
-                <p className="text-gray-500 text-sm mt-1">{tool.shortDesc}</p>
+              <Link key={tool.slug} href={`/${tool.slug}`} className="group bg-white rounded-2xl p-5 border border-line hover:border-violet-300 transition-all hover:-translate-y-1 block">
+                <p className="font-display font-bold text-ink group-hover:text-violet-600 transition-colors">{tool.name}</p>
+                <p className="text-mute text-sm mt-1">{tool.shortDesc}</p>
               </Link>
             ))}
           </div>

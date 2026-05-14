@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react'
 import AdSlot from '@/components/AdSlot'
 
-type Status = 'idle' | 'uploading' | 'converting' | 'done' | 'error'
+type Status = 'idle' | 'converting' | 'done' | 'error'
 
 export default function ExcelToPdfTool() {
   const [status, setStatus] = useState<Status>('idle')
@@ -14,7 +14,6 @@ export default function ExcelToPdfTool() {
   const [errorMsg, setErrorMsg] = useState('')
   const [downloadUrl, setDownloadUrl] = useState('')
   const [outputFileName, setOutputFileName] = useState('')
-
   const fileInputRef = useRef<HTMLInputElement>(null)
   const downloadRef = useRef<string>('')
 
@@ -25,44 +24,114 @@ export default function ExcelToPdfTool() {
       setStatus('error')
       return
     }
-    if (file.size > 4 * 1024 * 1024) {
-      setErrorMsg('File too large. Maximum size is 4 MB on the free plan.')
+    if (file.size > 50 * 1024 * 1024) {
+      setErrorMsg('File too large. Maximum size is 50 MB.')
       setStatus('error')
       return
     }
 
     setFileName(file.name)
     setFileSize(file.size)
-    setStatus('uploading')
+    setStatus('converting')
     setProgress(10)
     setErrorMsg('')
     if (downloadRef.current) { URL.revokeObjectURL(downloadRef.current); downloadRef.current = '' }
 
     try {
-      const form = new FormData()
-      form.append('tool', 'excel-to-pdf')
-      form.append('file', file)
+      const arrayBuffer = await file.arrayBuffer()
+      setProgress(20)
 
-      setStatus('converting')
-      setProgress(30)
+      // Parse spreadsheet with SheetJS
+      const XLSX = await import('xlsx')
+      const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' })
+      setProgress(35)
 
-      const res = await fetch('/api/convert', { method: 'POST', body: form })
-      setProgress(90)
+      // Convert each sheet to an HTML table
+      let combinedHtml = ''
+      for (const sheetName of workbook.SheetNames) {
+        const sheet = workbook.Sheets[sheetName]
+        const tableHtml = XLSX.utils.sheet_to_html(sheet, { id: `sheet-${sheetName}` })
+        combinedHtml += `
+          <div class="sheet-wrapper">
+            <div class="sheet-name">${sheetName}</div>
+            ${tableHtml}
+          </div>
+        `
+      }
+      setProgress(45)
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({ error: 'Conversion failed.' }))
-        throw new Error(data.error ?? 'Conversion failed.')
+      const [{ jsPDF }, { default: html2canvas }] = await Promise.all([
+        import('jspdf'),
+        import('html2canvas'),
+      ])
+      setProgress(55)
+
+      // Render in hidden container at A4 landscape width for wide tables
+      const container = document.createElement('div')
+      container.style.cssText = [
+        'position:fixed', 'left:-9999px', 'top:0',
+        'width:1122px', 'background:#fff',
+        'font-family:Arial,sans-serif', 'font-size:10pt',
+        'line-height:1.4', 'color:#000',
+        'padding:32px', 'box-sizing:border-box',
+      ].join(';')
+      container.innerHTML = `
+        <style>
+          .sheet-wrapper{margin-bottom:32px}
+          .sheet-name{font-size:13pt;font-weight:bold;margin-bottom:10px;color:#333;
+            padding-bottom:6px;border-bottom:2px solid #1e40af}
+          table{border-collapse:collapse;width:100%;table-layout:auto}
+          td,th{border:1px solid #d1d5db;padding:5px 8px;font-size:9.5pt;
+            vertical-align:top;word-break:break-word;max-width:200px}
+          th,thead td{background:#1e40af;color:#fff;font-weight:bold;text-align:left}
+          tr:nth-child(even) td{background:#f8faff}
+          tr:hover td{background:#e8f0fe}
+        </style>
+        ${combinedHtml}
+      `
+      document.body.appendChild(container)
+      setProgress(65)
+
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        width: 1122,
+      })
+      document.body.removeChild(container)
+      setProgress(78)
+
+      // Use landscape A4 for wide spreadsheets
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
+      const pageW = 297
+      const pageH = 210
+      const pxPerPageH = Math.floor((canvas.width * pageH) / pageW)
+
+      let y = 0
+      let page = 0
+      while (y < canvas.height) {
+        if (page > 0) pdf.addPage()
+        const sliceH = Math.min(pxPerPageH, canvas.height - y)
+        const slice = document.createElement('canvas')
+        slice.width = canvas.width
+        slice.height = pxPerPageH
+        const ctx = slice.getContext('2d')!
+        ctx.fillStyle = '#fff'
+        ctx.fillRect(0, 0, slice.width, slice.height)
+        ctx.drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH)
+        pdf.addImage(slice.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, pageW, pageH, undefined, 'FAST')
+        y += pxPerPageH
+        page++
       }
 
-      const blob = await res.blob()
-      const contentDisposition = res.headers.get('Content-Disposition') ?? ''
-      const match = contentDisposition.match(/filename="([^"]+)"/)
-      const outName = match?.[1] ?? file.name.replace(/\.(xlsx?|csv)$/i, '.pdf')
-
+      setProgress(92)
+      const blob = pdf.output('blob')
       const url = URL.createObjectURL(blob)
       downloadRef.current = url
       setDownloadUrl(url)
-      setOutputFileName(outName)
+      setOutputFileName(file.name.replace(/\.(xlsx?|csv)$/i, '.pdf'))
       setProgress(100)
       setStatus('done')
     } catch (err) {
@@ -88,6 +157,7 @@ export default function ExcelToPdfTool() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
+      {/* AD_SLOT: header_banner */}
       <AdSlot position="header" />
 
       {(status === 'idle' || status === 'error') && (
@@ -114,57 +184,56 @@ export default function ExcelToPdfTool() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h1.5C5.496 19.5 6 18.996 6 18.375m-3.75.125v-7.5C2.25 9.871 2.871 9 3.75 9H6V6.375A3.375 3.375 0 0 1 9.375 3h5.25A3.375 3.375 0 0 1 18 6.375V9h2.25a1.5 1.5 0 0 1 1.5 1.5v7.5m-16.5 0H18" />
             </svg>
           </div>
-          <p className="font-syne font-bold text-dark text-lg mb-1">Drop your spreadsheet here</p>
-          <p className="text-gray-500 text-sm">.xlsx, .xls, or .csv · Max 4 MB</p>
+          <p className="font-display font-bold text-ink text-lg mb-1">Drop your spreadsheet here</p>
+          <p className="text-mute text-sm">.xlsx, .xls, or .csv · Max 50 MB</p>
           <div className="mt-4 inline-flex items-center gap-1.5 bg-green-50 border border-green-100 rounded-full px-3 py-1 text-xs text-green-700">
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
-            Powered by CloudConvert
+            Your file never leaves your browser
           </div>
           {status === 'error' && <p className="text-red-500 text-sm mt-4">{errorMsg}</p>}
         </div>
       )}
 
-      {(status === 'uploading' || status === 'converting') && (
-        <div className="bg-white rounded-2xl shadow-card p-8 text-center">
+      {status === 'converting' && (
+        <div className="bg-white rounded-2xl border border-line p-8 text-center">
           <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
           </div>
-          <p className="font-syne font-bold text-dark mb-1">
-            {status === 'uploading' ? 'Uploading…' : 'Converting spreadsheet to PDF…'}
-          </p>
-          <p className="text-gray-500 text-sm mb-4">{fileName} · {(fileSize / 1024).toFixed(0)} KB</p>
+          <p className="font-display font-bold text-ink mb-1">Converting spreadsheet to PDF…</p>
+          <p className="text-mute text-sm mb-4">{fileName} · {(fileSize / 1024).toFixed(0)} KB</p>
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden max-w-xs mx-auto">
             <div className="h-full bg-green-500 rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
           </div>
-          <p className="text-xs text-gray-400 mt-3">This usually takes 5–20 seconds depending on spreadsheet size</p>
+          <p className="text-xs text-mute mt-3">Processing entirely in your browser — no uploads</p>
         </div>
       )}
 
       {status === 'done' && downloadUrl && (
-        <div className="bg-white rounded-2xl shadow-card p-8 text-center">
+        <div className="bg-white rounded-2xl border border-line p-8 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
             </svg>
           </div>
-          <p className="font-syne font-bold text-dark text-xl mb-1">Conversion complete!</p>
-          <p className="text-gray-500 text-sm mb-6">{fileName} → PDF</p>
+          <p className="font-display font-bold text-ink text-xl mb-1">Conversion complete!</p>
+          <p className="text-mute text-sm mb-6">{fileName} → PDF</p>
 
+          {/* AD_SLOT: pre_download_interstitial */}
           <AdSlot position="pre_download" />
 
           <div className="flex flex-col sm:flex-row gap-3 mt-6">
             <a
               href={downloadUrl}
               download={outputFileName}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-syne font-bold py-3 px-6 rounded-xl text-center transition-colors"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-display font-bold py-3 px-6 rounded-xl text-center transition-colors"
             >
               Download PDF
             </a>
             <button
               onClick={reset}
-              className="flex-1 bg-gray-100 hover:bg-gray-200 text-dark font-semibold py-3 px-6 rounded-xl transition-colors"
+              className="flex-1 bg-gray-100 hover:bg-gray-200 text-ink font-semibold py-3 px-6 rounded-xl transition-colors"
             >
               Convert Another
             </button>
@@ -173,11 +242,11 @@ export default function ExcelToPdfTool() {
       )}
 
       <div className="mt-6 bg-green-50 border border-green-100 rounded-2xl p-4 text-sm text-green-700 space-y-1">
-        <p><strong>Note:</strong> Excel to PDF conversion is powered by CloudConvert. Formatting, formulas, charts, and merged cells are preserved in the output.</p>
-        <p>All sheets are included in the PDF by default. Your file is securely transmitted and automatically deleted from CloudConvert servers after conversion.</p>
-        <p className="text-green-500">Maximum file size: 4 MB · 25 free conversions per day.</p>
+        <p><strong>100% private:</strong> Your spreadsheet is converted entirely in your browser using SheetJS. Nothing is uploaded to any server.</p>
+        <p>All sheets are included in the PDF. Output is landscape A4 format for optimal table display. Charts and conditional formatting are not rendered.</p>
       </div>
 
+      {/* AD_SLOT: footer_banner */}
       <AdSlot position="footer" />
     </div>
   )

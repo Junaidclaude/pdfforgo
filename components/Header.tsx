@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { TOOLS, NAV_CATEGORIES } from '@/lib/tools'
 
 // Tools shown directly in the top nav bar (most popular)
-const TOP_NAV_TOOLS = ['merge-pdf', 'split-pdf', 'compress-pdf']
+const TOP_NAV_TOOLS = ['merge-pdf', 'split-pdf', 'compress-pdf', 'resize-image']
 
 const PDF_CATEGORIES = NAV_CATEGORIES.filter((c) => c.key !== 'image')
 
@@ -44,20 +44,20 @@ export default function Header() {
   const topNavTools = TOOLS.filter((t) => TOP_NAV_TOOLS.includes(t.slug))
 
   return (
-    <header className="bg-dark border-b border-white/5 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-line">
+      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2.5 group shrink-0"
+          className="flex items-center gap-2.5 shrink-0"
           aria-label="PDFForge home"
         >
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center group-hover:opacity-90 transition-opacity">
-            <FileIcon />
-          </div>
-          <span className="font-syne font-extrabold text-xl text-white">
-            PDF<span className="text-primary">Forge</span>
+          <span className="relative inline-flex w-7 h-7 rounded-lg overflow-hidden flex-shrink-0">
+            <span className="absolute inset-0 bg-royal" />
+            <span className="absolute -right-1 -bottom-1 w-4 h-4 rounded-md bg-ruby" />
+            <span className="relative m-auto font-display font-bold text-white text-[13px] z-10">P</span>
           </span>
+          <span className="font-display font-bold text-ink tracking-tight">PDFForge</span>
         </Link>
 
         {/* Desktop nav */}
@@ -69,8 +69,8 @@ export default function Header() {
               href={`/${tool.slug}`}
               className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                 pathname === `/${tool.slug}`
-                  ? 'text-white bg-white/10'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? 'text-ink bg-line'
+                  : 'text-mute hover:text-ink hover:bg-line/60'
               }`}
             >
               {tool.name}
@@ -82,7 +82,7 @@ export default function Header() {
             <button
               onClick={openPdf}
               className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
-                pdfOpen ? 'text-white bg-white/10' : 'text-gray-400 hover:text-white hover:bg-white/5'
+                pdfOpen ? 'text-ink bg-line' : 'text-mute hover:text-ink hover:bg-line/60'
               }`}
               aria-expanded={pdfOpen}
               aria-haspopup="true"
@@ -122,7 +122,7 @@ export default function Header() {
             <button
               onClick={openImg}
               className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
-                imgOpen ? 'text-white bg-white/10' : 'text-gray-400 hover:text-white hover:bg-white/5'
+                imgOpen ? 'text-ink bg-line' : 'text-mute hover:text-ink hover:bg-line/60'
               }`}
               aria-expanded={imgOpen}
               aria-haspopup="true"
@@ -155,12 +155,12 @@ export default function Header() {
             <button
               onClick={openMega}
               className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
-                megaOpen ? 'text-white bg-white/10' : 'text-gray-400 hover:text-white hover:bg-white/5'
+                megaOpen ? 'text-ink bg-line' : 'text-mute hover:text-ink hover:bg-line/60'
               }`}
               aria-expanded={megaOpen}
               aria-haspopup="true"
             >
-              <span className="text-primary font-bold">ALL TOOLS</span>
+              <span className="text-royal font-bold">ALL TOOLS</span>
               <ChevronIcon open={megaOpen} />
             </button>
 
@@ -209,10 +209,10 @@ export default function Header() {
         {/* Right side */}
         <div className="hidden lg:flex items-center gap-3 shrink-0">
           <Link
-            href="/"
-            className="text-sm text-gray-400 hover:text-white transition-colors font-medium"
+            href="#tools"
+            className="btn-royal text-xs px-4 py-2 rounded-lg"
           >
-            All Tools
+            Get started
           </Link>
         </div>
 
@@ -220,7 +220,7 @@ export default function Header() {
         <button
           type="button"
           onClick={() => setMobileOpen((v) => !v)}
-          className="lg:hidden text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors"
+          className="lg:hidden text-mute hover:text-ink p-2 rounded-lg hover:bg-line/60 transition-colors"
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileOpen}
         >
@@ -230,12 +230,12 @@ export default function Header() {
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="lg:hidden bg-[#0d1117] border-t border-white/5 overflow-y-auto max-h-[80vh]">
+        <div className="lg:hidden bg-white border-t border-line overflow-y-auto max-h-[80vh]">
           {NAV_CATEGORIES.map((cat) => {
             const catTools = TOOLS.filter((t) => t.category === cat.key)
             const isExpanded = mobileExpanded === cat.key
             return (
-              <div key={cat.key} className="border-b border-white/5">
+              <div key={cat.key} className="border-b border-line">
                 <button
                   onClick={() => setMobileExpanded(isExpanded ? null : cat.key)}
                   className="w-full flex items-center justify-between px-5 py-4"
@@ -255,7 +255,7 @@ export default function Header() {
                         key={tool.slug}
                         href={`/${tool.slug}`}
                         onClick={() => setMobileOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors"
+                        className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-line/50 transition-colors"
                       >
                         <span
                           className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -263,7 +263,7 @@ export default function Header() {
                         >
                           <ToolIcon slug={tool.slug} size={12} />
                         </span>
-                        <span className="text-sm text-gray-300 font-medium">{tool.name}</span>
+                        <span className="text-sm text-ink font-medium">{tool.name}</span>
                       </Link>
                     ))}
                   </div>
