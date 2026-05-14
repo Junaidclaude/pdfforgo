@@ -172,10 +172,10 @@ export default function HomePage() {
             <div className="pf-rise-3 mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="#tools"
-                className="pf-btn-primary inline-flex items-center justify-center gap-1.5 rounded-xl px-6 py-3.5 text-sm font-semibold"
+                className="pf-btn-primary inline-flex items-center justify-center gap-1.5 rounded-xl px-6 py-4.5 text-sm font-semibold"
               >
                 Browse all tools
-                <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <svg className="w-5.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path
                     fillRule="evenodd"
                     d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
@@ -183,17 +183,6 @@ export default function HomePage() {
                   />
                 </svg>
               </Link>
-              <Link
-                href="/merge-pdf"
-                className="pf-btn-ghost inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--line)] bg-white px-6 py-3.5 text-sm font-semibold text-[var(--ink)]"
-              >
-                <svg className="w-4 h-4 text-[var(--ruby)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                  <path d="M14 2v6h6" />
-                </svg>
-                Merge PDF
-              </Link>
-            </div>
 
             {/* Trust marquee */}
             <div className="pf-rise-4 mt-14">

@@ -219,6 +219,16 @@ export const TOOLS: Tool[] = [
     iconBg: '#FDF2F8',
   },
 
+  {
+    slug: 'pdf-editor',
+    name: 'PDF Editor',
+    description: 'Edit PDF files online. Add text, freehand drawings, shapes, arrows, highlights, and whiteout boxes. No uploads, 100% browser-based.',
+    shortDesc: 'Add text, shapes & annotations',
+    category: 'edit',
+    iconColor: '#7C3AED',
+    iconBg: '#EDE9FE',
+  },
+
   // ── PDF SECURITY ─────────────────────────────────────────
   {
     slug: 'protect-pdf',

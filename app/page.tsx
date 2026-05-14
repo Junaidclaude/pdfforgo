@@ -146,12 +146,13 @@ export default function HomePage() {
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
               </svg>
             </Link>
-            <Link href="/merge-pdf" className="btn-ghost">
-              <svg className="w-4 h-4 text-ruby" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <Link href="/pdf-editor" className="btn-ghost">
+              <svg className="w-4 h-4 text-violet-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <path d="M14 2v6h6"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <path d="M10.42 12.61a2.1 2.1 0 1 1 2.97 2.97L7.95 21 4 22l.99-3.95 5.43-5.44Z"/>
               </svg>
-              Merge PDF
+              Edit PDF
             </Link>
           </div>
 
