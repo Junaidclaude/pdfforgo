@@ -1,0 +1,237 @@
+import type { Metadata } from 'next'
+import dynamic from 'next/dynamic'
+import Link from 'next/link'
+import AdSlot from '@/components/AdSlot'
+import { TOOLS } from '@/lib/tools'
+
+const CompressTool = dynamic(() => import('./CompressTool'), {
+  ssr: false,
+  loading: () => (
+    <div className="max-w-6xl mx-auto px-4 py-10">
+      <div className="h-52 bg-gray-100 rounded-2xl animate-pulse" />
+    </div>
+  ),
+})
+
+export const metadata: Metadata = {
+  title: 'Compress PDF – Free Online',
+  description:
+    'Compress PDF files online for free. Reduce PDF file size without losing quality. Choose lossless or image-based compression. No signup — 100% browser-based, private.',
+  alternates: {
+    canonical: '/compress-pdf',
+  },
+  openGraph: {
+    title: 'Compress PDF – Reduce PDF Size Free Online | PDFForge',
+    description:
+      'Reduce PDF file size instantly. Lossless or image-based compression. Free, no signup, files stay in your browser.',
+    url: '/compress-pdf',
+    type: 'website',
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Compress PDF – Free Online | PDFForge',
+    description:
+      'Reduce PDF file size instantly. Choose compression level. No signup required.',
+  },
+}
+
+const RELATED_SLUGS = ['merge-pdf', 'split-pdf', 'pdf-to-word']
+
+export default function CompressPdfPage() {
+  const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug))
+
+  return (
+    <>
+      {/* ── Structured data ──────────────────────────────── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }}
+      />
+
+      {/* ── Hero ─────────────────────────────────────────── */}
+      <section className="bg-dark text-white py-10 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-3 py-1.5 mb-4 text-xs text-blue-300">
+            Client-side · Files stay on your device
+          </div>
+          <h1 className="font-syne text-3xl md:text-5xl font-extrabold mb-4 leading-tight">
+            Compress PDF Files Online
+          </h1>
+          <p className="text-gray-400 text-lg max-w-xl mx-auto">
+            Reduce PDF file size without losing quality. Choose lossless
+            structure optimization or image-based compression for maximum
+            savings.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Tool ─────────────────────────────────────────── */}
+      <CompressTool />
+
+      {/* ── How It Works ──────────────────────────────────── */}
+      <section className="py-16 px-4 bg-bg-dark">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="font-syne text-2xl md:text-3xl font-extrabold text-dark text-center mb-10">
+            How to Compress a PDF
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {HOW_TO_STEPS.map((step, i) => (
+              <div key={i} className="bg-white rounded-2xl p-6 shadow-card">
+                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-4">
+                  <span className="font-syne font-extrabold text-blue-500 text-lg">
+                    {i + 1}
+                  </span>
+                </div>
+                <h3 className="font-syne font-bold text-dark mb-2">
+                  {step.title}
+                </h3>
+                <p className="text-gray-500 text-sm leading-relaxed">
+                  {step.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ───────────────────────────────────────────── */}
+      <section className="py-16 px-4">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-syne text-2xl md:text-3xl font-extrabold text-dark text-center mb-10">
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-4">
+            {FAQS.map((faq, i) => (
+              <div key={i} className="bg-white rounded-2xl p-6 shadow-card">
+                <h3 className="font-syne font-bold text-dark mb-2 text-base">
+                  {faq.q}
+                </h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Related tools ─────────────────────────────────── */}
+      <section className="py-12 px-4 bg-bg-dark">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="font-syne text-xl font-extrabold text-dark mb-6 text-center">
+            You Might Also Need
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {related.map((tool) => (
+              <Link
+                key={tool.slug}
+                href={`/${tool.slug}`}
+                className="group bg-white rounded-2xl p-5 shadow-card hover:shadow-card-hover transition-all hover:-translate-y-1 block"
+              >
+                <p className="font-syne font-bold text-dark group-hover:text-blue-500 transition-colors">
+                  {tool.name}
+                </p>
+                <p className="text-gray-500 text-sm mt-1">{tool.shortDesc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* AD_SLOT: footer_banner */}
+      <div className="max-w-6xl mx-auto px-4">
+        <AdSlot position="footer" />
+      </div>
+    </>
+  )
+}
+
+// ── Static data ────────────────────────────────────────────────────────────
+
+const HOW_TO_STEPS = [
+  {
+    title: 'Upload Your PDF',
+    body: 'Click the upload area or drag and drop your PDF. The tool reads the page count instantly — no waiting for a server.',
+  },
+  {
+    title: 'Choose Compression Level',
+    body: 'Pick Lossless (preserves text), Balanced (good quality, big savings), or Maximum (smallest file possible).',
+  },
+  {
+    title: 'Download Compressed PDF',
+    body: 'See the before/after file size, then download your optimized PDF immediately. No email or signup needed.',
+  },
+]
+
+const FAQS = [
+  {
+    q: 'How much can I reduce a PDF file size?',
+    a: 'It depends on the PDF content. Lossless compression typically saves 5–20%. Image-based compression (Balanced/Maximum) can reduce file size by 50–90%, especially for scanned documents or PDFs with many images.',
+  },
+  {
+    q: 'What is the difference between lossless and image compression?',
+    a: 'Lossless compression removes redundant PDF structure data — text stays searchable and quality is identical. Image-based compression renders each page as a JPEG, which is much smaller but text becomes non-selectable.',
+  },
+  {
+    q: 'Will compressing a PDF reduce its quality?',
+    a: 'Lossless compression has zero quality impact. Balanced and Maximum modes render pages as JPEG images — visual quality is very good at Balanced, lower at Maximum. Choose based on your use case.',
+  },
+  {
+    q: 'Is it safe to compress PDFs online with PDFForge?',
+    a: 'Yes — completely safe. All processing runs locally in your browser using WebAssembly and the Canvas API. Your PDF is never uploaded to any server. We have no access to your files.',
+  },
+  {
+    q: 'Why is my compressed PDF larger than the original?',
+    a: 'This can happen with very small or already-optimized PDFs. If lossless compression increases the size, that PDF is already well-compressed. Try Balanced compression instead, or if the original is already tiny, no action is needed.',
+  },
+  {
+    q: 'Can I compress a password-protected PDF?',
+    a: 'PDFs with owner passwords (editing/printing restrictions) can usually be compressed. PDFs requiring a password to open must be unlocked first — use our free Unlock PDF tool.',
+  },
+  {
+    q: 'Does compression work on scanned PDFs?',
+    a: 'Yes! Scanned PDFs are image-heavy and often compress very well with Balanced or Maximum mode, sometimes achieving 70–85% size reduction.',
+  },
+]
+
+const SCHEMA = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SoftwareApplication',
+      name: 'Compress PDF — PDFForge',
+      applicationCategory: 'UtilitiesApplication',
+      operatingSystem: 'Web Browser',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      description:
+        'Free online PDF compressor. Lossless and image-based compression. No signup, browser-based.',
+      url: 'https://pdfforge.io/compress-pdf',
+    },
+    {
+      '@type': 'HowTo',
+      name: 'How to Compress a PDF File Online',
+      description:
+        'Reduce PDF file size using PDFForge — free, private, no signup.',
+      totalTime: 'PT1M',
+      step: [
+        {
+          '@type': 'HowToStep',
+          position: 1,
+          name: 'Upload PDF',
+          text: 'Drop your PDF onto the upload area or click to browse.',
+        },
+        {
+          '@type': 'HowToStep',
+          position: 2,
+          name: 'Choose Level',
+          text: 'Select Lossless, Balanced, or Maximum compression.',
+        },
+        {
+          '@type': 'HowToStep',
+          position: 3,
+          name: 'Download',
+          text: 'See the size reduction and download your compressed PDF.',
+        },
+      ],
+    },
+  ],
+}

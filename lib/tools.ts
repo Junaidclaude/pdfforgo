@@ -1,0 +1,258 @@
+export interface Tool {
+  slug: string
+  name: string
+  description: string
+  shortDesc: string
+  category: 'organize' | 'optimize' | 'convert-to' | 'convert-from' | 'edit' | 'security' | 'image'
+  iconColor: string
+  iconBg: string
+}
+
+export const TOOLS: Tool[] = [
+  // ── ORGANIZE PDF ────────────────────────────────────────
+  {
+    slug: 'merge-pdf',
+    name: 'Merge PDF',
+    description: 'Combine multiple PDF files into a single document. Drag to reorder before merging.',
+    shortDesc: 'Combine multiple PDFs into one',
+    category: 'organize',
+    iconColor: '#E84A4A',
+    iconBg: '#FEF2F2',
+  },
+  {
+    slug: 'split-pdf',
+    name: 'Split PDF',
+    description: 'Extract specific pages or split your PDF into multiple separate files instantly.',
+    shortDesc: 'Extract pages into separate files',
+    category: 'organize',
+    iconColor: '#F97316',
+    iconBg: '#FFF7ED',
+  },
+  {
+    slug: 'remove-pages',
+    name: 'Remove Pages',
+    description: 'Delete specific pages from your PDF. Preview thumbnails and select pages to remove.',
+    shortDesc: 'Delete pages from a PDF',
+    category: 'organize',
+    iconColor: '#EF4444',
+    iconBg: '#FEF2F2',
+  },
+  {
+    slug: 'organize-pdf',
+    name: 'Organize PDF',
+    description: 'Drag and drop to reorder PDF pages. Delete unwanted pages and save the result.',
+    shortDesc: 'Reorder and delete PDF pages',
+    category: 'organize',
+    iconColor: '#8B5CF6',
+    iconBg: '#EDE9FE',
+  },
+  {
+    slug: 'extract-pages',
+    name: 'Extract Pages',
+    description: 'Select specific pages to extract from your PDF. Save as a single document or download each page separately.',
+    shortDesc: 'Extract selected pages from a PDF',
+    category: 'organize',
+    iconColor: '#10B981',
+    iconBg: '#ECFDF5',
+  },
+
+  // ── OPTIMIZE PDF ─────────────────────────────────────────
+  {
+    slug: 'compress-pdf',
+    name: 'Compress PDF',
+    description: 'Reduce your PDF file size while maintaining quality. Perfect for email and uploads.',
+    shortDesc: 'Reduce file size, keep quality',
+    category: 'optimize',
+    iconColor: '#3B82F6',
+    iconBg: '#EFF6FF',
+  },
+  {
+    slug: 'grayscale-pdf',
+    name: 'Grayscale PDF',
+    description: 'Convert a color PDF to black and white. Reduces file size by up to 60% — ideal for printing and archiving.',
+    shortDesc: 'Convert color PDF to black & white',
+    category: 'optimize',
+    iconColor: '#6B7280',
+    iconBg: '#F9FAFB',
+  },
+  {
+    slug: 'repair-pdf',
+    name: 'Repair PDF',
+    description: 'Fix corrupted or damaged PDF files. Cleans invalid objects, malformed structure, and xref errors.',
+    shortDesc: 'Fix corrupted PDF files',
+    category: 'optimize',
+    iconColor: '#F59E0B',
+    iconBg: '#FFFBEB',
+  },
+
+  // ── CONVERT TO PDF ───────────────────────────────────────
+  {
+    slug: 'html-to-pdf',
+    name: 'HTML to PDF',
+    description: 'Convert HTML files to PDF using a real browser engine. CSS, fonts, and layout are preserved perfectly.',
+    shortDesc: 'Convert HTML files to PDF',
+    category: 'convert-to',
+    iconColor: '#F97316',
+    iconBg: '#FFF7ED',
+  },
+  {
+    slug: 'excel-to-pdf',
+    name: 'Excel to PDF',
+    description: 'Convert Excel spreadsheets (.xlsx, .xls, .csv) to PDF. Formatting, charts, and merged cells preserved.',
+    shortDesc: 'Convert Excel spreadsheets to PDF',
+    category: 'convert-to',
+    iconColor: '#16A34A',
+    iconBg: '#F0FDF4',
+  },
+  {
+    slug: 'jpg-to-pdf',
+    name: 'JPG to PDF',
+    description: 'Convert one or multiple images (JPG, PNG, WebP) into a single PDF document.',
+    shortDesc: 'Convert images to PDF',
+    category: 'convert-to',
+    iconColor: '#EC4899',
+    iconBg: '#FDF2F8',
+  },
+  {
+    slug: 'word-to-pdf',
+    name: 'Word to PDF',
+    description: 'Convert Word documents (.docx, .doc) to PDF while preserving formatting perfectly.',
+    shortDesc: 'Convert Word to PDF',
+    category: 'convert-to',
+    iconColor: '#2563EB',
+    iconBg: '#EFF6FF',
+  },
+
+  // ── CONVERT FROM PDF ─────────────────────────────────────
+  {
+    slug: 'pdf-to-jpg',
+    name: 'PDF to JPG',
+    description: 'Convert each PDF page to a high-quality JPG image. Download all at once as a ZIP.',
+    shortDesc: 'Convert PDF pages to JPG images',
+    category: 'convert-from',
+    iconColor: '#A855F7',
+    iconBg: '#FAF5FF',
+  },
+  {
+    slug: 'pdf-to-png',
+    name: 'PDF to PNG',
+    description: 'Convert PDF pages to lossless PNG images. Perfect for sharp text, diagrams, and screenshots.',
+    shortDesc: 'Convert PDF pages to lossless PNG',
+    category: 'convert-from',
+    iconColor: '#14B8A6',
+    iconBg: '#F0FDFA',
+  },
+  {
+    slug: 'pdf-to-word',
+    name: 'PDF to Word',
+    description: 'Convert your PDF to an editable Word document (.docx) while preserving formatting.',
+    shortDesc: 'Convert to editable DOCX',
+    category: 'convert-from',
+    iconColor: '#16A34A',
+    iconBg: '#F0FDF4',
+  },
+
+  // ── EDIT PDF ─────────────────────────────────────────────
+  {
+    slug: 'rotate-pdf',
+    name: 'Rotate PDF',
+    description: 'Rotate PDF pages by 90, 180, or 270 degrees. Rotate all pages or specific ones.',
+    shortDesc: 'Rotate pages in your PDF',
+    category: 'edit',
+    iconColor: '#EAB308',
+    iconBg: '#FEFCE8',
+  },
+  {
+    slug: 'watermark-pdf',
+    name: 'Watermark PDF',
+    description: 'Add a custom text or image watermark to your PDF. Control opacity, position, and size.',
+    shortDesc: 'Add text watermarks to PDF',
+    category: 'edit',
+    iconColor: '#06B6D4',
+    iconBg: '#ECFEFF',
+  },
+  {
+    slug: 'page-numbers',
+    name: 'Add Page Numbers',
+    description: 'Add page numbers to your PDF. Choose position, font size, and starting number.',
+    shortDesc: 'Add page numbers to PDF',
+    category: 'edit',
+    iconColor: '#0EA5E9',
+    iconBg: '#F0F9FF',
+  },
+
+  // ── IMAGE TOOLS ──────────────────────────────────────────
+  {
+    slug: 'compress-image',
+    name: 'Compress Image',
+    description: 'Reduce JPG, PNG, and WebP image file size. Adjust quality and choose output format. Batch compress multiple images at once.',
+    shortDesc: 'Reduce image file size',
+    category: 'image',
+    iconColor: '#3B82F6',
+    iconBg: '#EFF6FF',
+  },
+  {
+    slug: 'resize-image',
+    name: 'Resize Image',
+    description: 'Resize images by exact pixel dimensions or percentage. Lock aspect ratio or set custom width and height.',
+    shortDesc: 'Resize images by pixels or %',
+    category: 'image',
+    iconColor: '#8B5CF6',
+    iconBg: '#EDE9FE',
+  },
+  {
+    slug: 'crop-image',
+    name: 'Crop Image',
+    description: 'Crop images with an interactive drag-and-resize selection box. Choose freeform or fixed aspect ratios.',
+    shortDesc: 'Crop images with drag selection',
+    category: 'image',
+    iconColor: '#F97316',
+    iconBg: '#FFF7ED',
+  },
+  {
+    slug: 'convert-image',
+    name: 'Convert Image',
+    description: 'Convert images between JPG, PNG, and WebP formats. Rotate and flip in the same step.',
+    shortDesc: 'Convert, rotate & flip images',
+    category: 'image',
+    iconColor: '#EC4899',
+    iconBg: '#FDF2F8',
+  },
+
+  // ── PDF SECURITY ─────────────────────────────────────────
+  {
+    slug: 'protect-pdf',
+    name: 'Protect PDF',
+    description: 'Password protect your PDF to prevent unauthorized access, copying, or editing.',
+    shortDesc: 'Password protect your PDF',
+    category: 'security',
+    iconColor: '#22C55E',
+    iconBg: '#F0FDF4',
+  },
+  {
+    slug: 'unlock-pdf',
+    name: 'Unlock PDF',
+    description: 'Remove password protection from a PDF you own. Requires the current password.',
+    shortDesc: 'Remove PDF password protection',
+    category: 'security',
+    iconColor: '#F97316',
+    iconBg: '#FFF7ED',
+  },
+]
+
+export const NAV_CATEGORIES: {
+  label: string
+  key: Tool['category']
+  color: string
+}[] = [
+  { label: 'Organize PDF', key: 'organize', color: '#E84A4A' },
+  { label: 'Optimize PDF', key: 'optimize', color: '#3B82F6' },
+  { label: 'Convert to PDF', key: 'convert-to', color: '#EC4899' },
+  { label: 'Convert from PDF', key: 'convert-from', color: '#A855F7' },
+  { label: 'Edit PDF', key: 'edit', color: '#EAB308' },
+  { label: 'PDF Security', key: 'security', color: '#22C55E' },
+  { label: 'Image Tools', key: 'image', color: '#EC4899' },
+]
+
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://pdfforge.io'
