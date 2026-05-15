@@ -64,6 +64,7 @@ export default function RemoveBackgroundTool() {
         })
 
         const blob = await removeBackground(file, {
+          publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/',
           progress: (key, current, total) => {
             const fileBase = (i / valid.length) * 100
             const fileChunk = (1 / valid.length) * 100
