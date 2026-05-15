@@ -713,7 +713,8 @@ export default function PdfEditorTool() {
             }
             const base = FONTS.find(f => f.css === a.fontFamily)?.pdf ?? 'Helvetica'
             const key = `${base}${a.bold && a.italic ? '-BoldOblique' : a.bold ? '-Bold' : a.italic ? '-Italic' : ''}`
-            const font = (fonts[key] ?? fonts[base]) as Parameters<typeof page.drawText>[1]['font']
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const font = (fonts[key] ?? fonts[base]) as any
             // Use original PDF point size if available, otherwise convert from CSS px
             const sz = a.fontSizePdf ?? (a.fontSize ?? 16) * 0.75
             let ly = toY(a.y) - sz * 0.2  // slight baseline offset
