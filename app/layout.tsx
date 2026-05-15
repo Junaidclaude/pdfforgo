@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google'
 import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/react'
+import { ClerkProvider } from '@clerk/nextjs'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import './globals.css'
@@ -99,23 +100,25 @@ export default function RootLayout({
   const adSensePubId = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID
 
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${plusJakarta.variable}`}>
-      <head>
-        {adSensePubId && (
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adSensePubId}`}
-            crossOrigin="anonymous"
-            strategy="lazyOnload"
-          />
-        )}
-      </head>
-      <body className="min-h-screen flex flex-col font-sans">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <Analytics />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className={`${spaceGrotesk.variable} ${plusJakarta.variable}`}>
+        <head>
+          {adSensePubId && (
+            <Script
+              async
+              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adSensePubId}`}
+              crossOrigin="anonymous"
+              strategy="lazyOnload"
+            />
+          )}
+        </head>
+        <body className="min-h-screen flex flex-col font-sans">
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <Analytics />
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }

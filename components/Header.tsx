@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useUser, SignInButton, UserButton } from '@clerk/nextjs'
 import { TOOLS, NAV_CATEGORIES } from '@/lib/tools'
 
 // Tools shown directly in the top nav bar (most popular)
@@ -14,6 +15,7 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null)
   const pathname = usePathname()
+  const { isSignedIn, isLoaded } = useUser()
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -162,10 +164,26 @@ export default function Header() {
         </nav>
 
         {/* Right side */}
-        <div className="hidden lg:flex items-center gap-3 shrink-0">
-          <Link href="#tools" className="btn-royal text-xs px-4 py-2 rounded-lg">
-            Get started
+        <div className="hidden lg:flex items-center gap-2 shrink-0">
+          <Link
+            href="/pricing"
+            className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+              pathname === '/pricing' ? 'text-ink bg-line' : 'text-mute hover:text-ink hover:bg-line/60'
+            }`}
+          >
+            Pricing
           </Link>
+          {isLoaded && (
+            isSignedIn ? (
+              <UserButton />
+            ) : (
+              <SignInButton mode="modal">
+                <button className="btn-royal text-xs px-4 py-2 rounded-lg">
+                  Sign in
+                </button>
+              </SignInButton>
+            )
+          )}
         </div>
 
         {/* Mobile hamburger */}
