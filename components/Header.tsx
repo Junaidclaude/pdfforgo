@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { TOOLS, NAV_CATEGORIES } from '@/lib/tools'
 
 // Tools shown directly in the top nav bar (most popular)
-const TOP_NAV_TOOLS = ['pdf-editor']
+const TOP_NAV_TOOLS = ['pdf-editor', 'resize-image']
 
 const PDF_CATEGORIES = NAV_CATEGORIES.filter((c) => c.key !== 'image')
 
