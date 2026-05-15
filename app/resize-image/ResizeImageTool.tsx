@@ -162,6 +162,7 @@ export default function ResizeImageTool() {
     setResults(out)
     setStatus(out.length ? 'done' : 'error')
     if (!out.length) setError('Could not resize any of the provided files.')
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, targetW, targetH, percent, lockAspect, quality, outputFmt])
 
   const onDrop = useCallback((e: React.DragEvent) => {
