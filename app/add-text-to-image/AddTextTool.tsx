@@ -312,7 +312,7 @@ export default function AddTextTool() {
           <div className="bg-white border border-line rounded-2xl p-4">
             <p className="text-xs font-bold uppercase tracking-widest text-mute mb-3">Text Layers ({layers.length})</p>
             {layers.length === 0 ? (
-              <p className="text-xs text-mute text-center py-3">Click "+ Add Text" and click on the image</p>
+              <p className="text-xs text-mute text-center py-3">Click &quot;+ Add Text&quot; and click on the image</p>
             ) : (
               <div className="space-y-1.5">
                 {layers.map((l) => (
