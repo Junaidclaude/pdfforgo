@@ -16,7 +16,7 @@ const HtmlToPdfTool = dynamic(() => import('./HtmlToPdfTool'), {
 export const metadata: Metadata = {
   title: 'HTML to PDF – Convert HTML Files to PDF Free Online | PDFForge',
   description:
-    'Convert HTML files to PDF using a real browser engine. CSS, fonts, flexbox, and layout are preserved perfectly. Free, no signup, no watermarks.',
+    'Hi. Convert HTML files to PDF using a real browser engine. CSS, fonts, flexbox, and layout are preserved perfectly. Free, no signup, no watermarks.',
   alternates: { canonical: '/html-to-pdf' },
   openGraph: {
     title: 'HTML to PDF – Free Online Converter | PDFForge',
