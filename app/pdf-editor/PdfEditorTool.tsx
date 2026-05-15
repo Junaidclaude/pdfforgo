@@ -725,7 +725,7 @@ export default function PdfEditorTool() {
         }
       }
       const out = await doc.save()
-      const url = URL.createObjectURL(new Blob([out], { type: 'application/pdf' }))
+      const url = URL.createObjectURL(new Blob([new Uint8Array(out).buffer as ArrayBuffer], { type: 'application/pdf' }))
       const link = document.createElement('a'); link.href = url; link.download = fileName.replace('.pdf', '-edited.pdf'); link.click()
       setTimeout(() => URL.revokeObjectURL(url), 5000)
     } catch (err) { setExportError(err instanceof Error ? err.message : 'Export failed') }
