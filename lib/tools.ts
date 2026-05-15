@@ -183,6 +183,24 @@ export const TOOLS: Tool[] = [
 
   // ── IMAGE TOOLS ──────────────────────────────────────────
   {
+    slug: 'meme-generator',
+    name: 'Meme Generator',
+    description: 'Create memes with popular templates or your own image. Add unlimited text layers, drag to reposition, customize font, color, size, and outline.',
+    shortDesc: 'Make memes with popular templates',
+    category: 'image',
+    iconColor: '#EAB308',
+    iconBg: '#FEFCE8',
+  },
+  {
+    slug: 'add-text-to-image',
+    name: 'Add Text to Image',
+    description: 'Place text anywhere on your photo. Multiple layers, 10 fonts, custom colors, rotation, shadows, and background boxes. 100% browser-based.',
+    shortDesc: 'Add multi-layer text to photos',
+    category: 'image',
+    iconColor: '#7C3AED',
+    iconBg: '#EDE9FE',
+  },
+  {
     slug: 'blur-face',
     name: 'Blur Face',
     description: 'Automatically detect and blur faces using on-device AI, or manually draw over any region — license plates, documents, or any sensitive area.',
