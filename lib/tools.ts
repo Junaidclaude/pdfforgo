@@ -183,6 +183,15 @@ export const TOOLS: Tool[] = [
 
   // ── IMAGE TOOLS ──────────────────────────────────────────
   {
+    slug: 'blur-face',
+    name: 'Blur Face',
+    description: 'Automatically detect and blur faces using on-device AI, or manually draw over any region — license plates, documents, or any sensitive area.',
+    shortDesc: 'Auto-blur faces & sensitive areas',
+    category: 'image',
+    iconColor: '#3B82F6',
+    iconBg: '#EFF6FF',
+  },
+  {
     slug: 'remove-background',
     name: 'Remove Background',
     description: 'Remove image backgrounds instantly with AI. Runs 100% in your browser — no uploads, no signup, no watermarks. Supports batch processing.',
