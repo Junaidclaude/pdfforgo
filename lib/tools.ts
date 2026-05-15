@@ -183,6 +183,15 @@ export const TOOLS: Tool[] = [
 
   // ── IMAGE TOOLS ──────────────────────────────────────────
   {
+    slug: 'remove-background',
+    name: 'Remove Background',
+    description: 'Remove image backgrounds instantly with AI. Runs 100% in your browser — no uploads, no signup, no watermarks. Supports batch processing.',
+    shortDesc: 'AI background remover, runs in browser',
+    category: 'image',
+    iconColor: '#10B981',
+    iconBg: '#ECFDF5',
+  },
+  {
     slug: 'compress-image',
     name: 'Compress Image',
     description: 'Reduce JPG, PNG, and WebP image file size. Adjust quality and choose output format. Batch compress multiple images at once.',
