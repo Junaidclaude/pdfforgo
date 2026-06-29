@@ -3,10 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 export const maxDuration = 60
 export const runtime = 'nodejs'
 
-export const config = {
-  api: { bodyParser: { sizeLimit: '20mb' } },
-}
-
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
