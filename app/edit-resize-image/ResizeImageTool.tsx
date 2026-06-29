@@ -4,6 +4,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react'
 import AdSlot from '@/components/AdSlot'
 
 type Mode = 'pixels' | 'percent'
+type ResizeUnit = 'px' | 'cm' | 'mm' | 'in'
 type OutputFmt = 'original' | 'jpg' | 'png' | 'webp'
 type EditTool = 'adjust' | 'filters' | 'crop' | 'transform' | 'blur' | 'removebg'
 type CropHandle = 'move' | 'nw' | 'ne' | 'sw' | 'se' | 'n' | 's' | 'e' | 'w'
@@ -90,6 +91,7 @@ export default function ResizeImageTool() {
   const [exportOpen,  setExportOpen]  = useState(true)
 
   const [mode,       setMode]       = useState<Mode>('pixels')
+  const [unit,       setUnit]       = useState<ResizeUnit>('px')
   const [targetW,    setTargetW]    = useState('')
   const [targetH,    setTargetH]    = useState('')
   const [lockAspect, setLockAspect] = useState(true)
@@ -386,6 +388,11 @@ export default function ResizeImageTool() {
     setError(''); setProgress(0); cancelEditing()
   }
 
+  // px per unit at 96 DPI (screen standard)
+  const UNIT_TO_PX: Record<ResizeUnit, number> = { px: 1, cm: 96 / 2.54, mm: 96 / 25.4, in: 96 }
+  const toPx   = (v: number) => Math.round(v * UNIT_TO_PX[unit])
+  const fromPx = (px: number) => unit === 'px' ? px : +(px / UNIT_TO_PX[unit]).toFixed(2)
+
   const getMime = (fileType: string): string => {
     if (outputFmt === 'jpg')  return 'image/jpeg'
     if (outputFmt === 'png')  return 'image/png'
@@ -404,12 +411,12 @@ export default function ResizeImageTool() {
           const p = Math.max(1, Math.min(2000, Number(percent) || 50)) / 100
           dw = Math.round(nw * p); dh = Math.round(nh * p)
         } else if (lockAspect) {
-          const w = Number(targetW), h = Number(targetH)
+          const w = toPx(Number(targetW)), h = toPx(Number(targetH))
           if (w) { dw = w; dh = Math.round(dw * nh / nw) }
           else if (h) { dh = h; dw = Math.round(dh * nw / nh) }
           else { dw = nw; dh = nh }
         } else {
-          dw = Math.max(1, Number(targetW) || nw); dh = Math.max(1, Number(targetH) || nh)
+          dw = Math.max(1, toPx(Number(targetW)) || nw); dh = Math.max(1, toPx(Number(targetH)) || nh)
         }
         const canvas = document.createElement('canvas')
         canvas.width = dw; canvas.height = dh
@@ -469,14 +476,14 @@ export default function ResizeImageTool() {
   const liveOut = (() => {
     if (!files.length || mode === 'percent') return null
     if (lockAspect) {
-      const w = Number(targetW), h = Number(targetH)
+      const w = toPx(Number(targetW)), h = toPx(Number(targetH))
       if (files.length === 1) {
         const { origW: nw, origH: nh } = files[0]
         if (w) return `${w} × ${Math.round(w * nh / nw)} px`
         if (h) return `${Math.round(h * nw / nh)} × ${h} px`
       }
     } else {
-      const w = Number(targetW), h = Number(targetH)
+      const w = toPx(Number(targetW)), h = toPx(Number(targetH))
       if (w && h) return `${w} × ${h} px`
     }
     return null
@@ -836,26 +843,47 @@ export default function ResizeImageTool() {
 
                 <div>
                   <p className="font-display font-bold text-ink text-sm mb-3">Resize Settings</p>
-                  <div className="flex rounded-lg border border-line overflow-hidden mb-3">
-                    <button onClick={() => setMode('pixels')}
-                      className={`flex-1 py-1.5 text-xs font-semibold transition-colors ${mode === 'pixels' ? 'bg-violet-600 text-white' : 'text-mute hover:bg-gray-50'}`}>
-                      Pixels
-                    </button>
-                    <button onClick={() => setMode('percent')}
-                      className={`flex-1 py-1.5 text-xs font-semibold transition-colors border-l border-line ${mode === 'percent' ? 'bg-violet-600 text-white' : 'text-mute hover:bg-gray-50'}`}>
-                      Percent
-                    </button>
+
+                  {/* Mode toggle + unit selector */}
+                  <div className="flex gap-2 mb-3 items-stretch">
+                    <div className="flex flex-1 rounded-lg border border-line overflow-hidden">
+                      <button onClick={() => setMode('pixels')}
+                        className={`flex-1 py-1.5 text-xs font-semibold transition-colors ${mode === 'pixels' ? 'bg-violet-600 text-white' : 'text-mute hover:bg-gray-50'}`}>
+                        Dimensions
+                      </button>
+                      <button onClick={() => setMode('percent')}
+                        className={`flex-1 py-1.5 text-xs font-semibold transition-colors border-l border-line ${mode === 'percent' ? 'bg-violet-600 text-white' : 'text-mute hover:bg-gray-50'}`}>
+                        Percent
+                      </button>
+                    </div>
+                    {mode === 'pixels' && (
+                      <select
+                        value={unit}
+                        onChange={e => { setUnit(e.target.value as ResizeUnit); setTargetW(''); setTargetH('') }}
+                        className="border border-line rounded-lg px-2.5 text-xs font-bold text-ink bg-white focus:outline-none focus:border-violet-400 cursor-pointer min-w-[52px]"
+                      >
+                        <option value="px">px</option>
+                        <option value="cm">cm</option>
+                        <option value="mm">mm</option>
+                        <option value="in">in</option>
+                      </select>
+                    )}
                   </div>
 
                   {mode === 'pixels' && (
                     <>
                       <div className="flex gap-2 items-end">
+                        {/* Width */}
                         <div className="flex-1">
                           <label className="text-[11px] font-semibold text-mute block mb-1">Width</label>
-                          <input type="number" min={1} max={9999} value={targetW} placeholder="Auto"
-                            onChange={e => setTargetW(e.target.value)}
-                            className="w-full border border-line rounded-lg px-2.5 py-2 text-sm text-ink placeholder:text-gray-300 focus:outline-none focus:border-violet-400" />
+                          <div className="relative">
+                            <input type="number" min={0.01} step={unit === 'px' ? 1 : 0.01} value={targetW} placeholder="Auto"
+                              onChange={e => setTargetW(e.target.value)}
+                              className="w-full border border-line rounded-lg pl-2.5 pr-8 py-2 text-sm text-ink placeholder:text-gray-300 focus:outline-none focus:border-violet-400" />
+                            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 pointer-events-none select-none">{unit}</span>
+                          </div>
                         </div>
+                        {/* Lock aspect ratio */}
                         <button onClick={() => setLockAspect(v => !v)} title={lockAspect ? 'Unlock' : 'Lock'}
                           className={`w-8 h-8 mb-0.5 rounded-lg border flex items-center justify-center transition-colors shrink-0 ${lockAspect ? 'border-violet-300 bg-violet-50 text-violet-600' : 'border-line text-gray-300 hover:text-gray-500'}`}>
                           {lockAspect
@@ -863,19 +891,28 @@ export default function ResizeImageTool() {
                             : <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 0 1 4.5-4.5 4.5 4.5 0 0 1 4.5 4.5v3.75M3.75 10.5H20.25a2.25 2.25 0 0 1 2.25 2.25v6.75a2.25 2.25 0 0 1-2.25 2.25H3.75a2.25 2.25 0 0 1-2.25-2.25v-6.75a2.25 2.25 0 0 1 2.25-2.25Z" /></svg>
                           }
                         </button>
+                        {/* Height */}
                         <div className="flex-1">
                           <label className="text-[11px] font-semibold text-mute block mb-1">Height</label>
-                          <input type="number" min={1} max={9999} value={targetH}
-                            placeholder={lockAspect && targetW ? 'Auto' : 'Auto'}
-                            disabled={lockAspect && !!targetW && !targetH}
-                            onChange={e => setTargetH(e.target.value)}
-                            className="w-full border border-line rounded-lg px-2.5 py-2 text-sm text-ink placeholder:text-gray-300 focus:outline-none focus:border-violet-400 disabled:bg-gray-50 disabled:text-gray-300" />
+                          <div className="relative">
+                            <input type="number" min={0.01} step={unit === 'px' ? 1 : 0.01} value={targetH}
+                              placeholder="Auto"
+                              disabled={lockAspect && !!targetW && !targetH}
+                              onChange={e => setTargetH(e.target.value)}
+                              className="w-full border border-line rounded-lg pl-2.5 pr-8 py-2 text-sm text-ink placeholder:text-gray-300 focus:outline-none focus:border-violet-400 disabled:bg-gray-50 disabled:text-gray-300" />
+                            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 pointer-events-none select-none">{unit}</span>
+                          </div>
                         </div>
                       </div>
                       <label className="flex items-center gap-2 mt-2.5 cursor-pointer select-none">
                         <input type="checkbox" checked={lockAspect} onChange={e => setLockAspect(e.target.checked)} className="w-4 h-4 accent-violet-600 rounded" />
                         <span className="text-sm text-ink">Lock Aspect Ratio</span>
                       </label>
+                      {liveOut && (
+                        <p className="mt-2 text-xs text-mute bg-violet-50 border border-violet-100 rounded-lg px-2.5 py-1.5">
+                          Output: <span className="font-bold text-violet-600">{liveOut}</span>
+                        </p>
+                      )}
                       <div className="relative mt-3" ref={presetsRef}>
                         <button onClick={() => setShowPresets(v => !v)}
                           className="w-full flex items-center justify-between border border-line rounded-lg px-3 py-2 text-sm text-mute hover:text-ink hover:border-gray-300 transition-colors">
@@ -886,16 +923,15 @@ export default function ResizeImageTool() {
                           <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-line rounded-xl shadow-lg py-1 z-20 max-h-56 overflow-y-auto">
                             {RESIZE_PRESETS.map(p => (
                               <button key={p.label}
-                                onClick={() => { setTargetW(String(p.w)); setTargetH(String(p.h)); setLockAspect(false); setShowPresets(false) }}
+                                onClick={() => { setTargetW(String(fromPx(p.w))); setTargetH(String(fromPx(p.h))); setLockAspect(false); setShowPresets(false) }}
                                 className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-gray-50 transition-colors">
                                 <span className="text-ink font-medium">{p.label}</span>
-                                <span className="text-mute text-xs">{p.w}×{p.h}</span>
+                                <span className="text-mute text-xs">{fromPx(p.w)}×{fromPx(p.h)} {unit}</span>
                               </button>
                             ))}
                           </div>
                         )}
                       </div>
-                      {liveOut && <p className="mt-2 text-xs text-mute">Output: <span className="font-semibold text-violet-600">{liveOut}</span></p>}
                     </>
                   )}
 
