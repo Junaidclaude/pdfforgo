@@ -90,47 +90,56 @@ export default function BlurFaceTool() {
     }
   }, [regions, blurRadius])
 
-  useEffect(() => { redrawImage() }, [redrawImage])
+  // When status flips to 'ready', the canvas mounts for the first time — initialise its size then draw
+  useEffect(() => {
+    if (status !== 'ready') return
+    const canvas = canvasRef.current
+    const img = imageRef.current
+    if (!canvas || !img) return
+    canvas.width = img.naturalWidth
+    canvas.height = img.naturalHeight
+    if (overlayRef.current) {
+      overlayRef.current.width = img.naturalWidth
+      overlayRef.current.height = img.naturalHeight
+    }
+    redrawImage()
+  }, [status]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Re-draw whenever regions or blur radius change (canvas already sized)
+  useEffect(() => {
+    if (status === 'ready') redrawImage()
+  }, [redrawImage, status])
 
   const loadImage = useCallback(async (file: File) => {
     if (!file.type.startsWith('image/')) { setError('Please upload a JPG, PNG, or WebP image.'); return }
     fileNameRef.current = file.name
-    setError('')
-    setRegions([])
-    setFaceCount(0)
+    setError(''); setRegions([]); setFaceCount(0)
 
     if (urlRef.current) URL.revokeObjectURL(urlRef.current)
     const url = URL.createObjectURL(file)
     urlRef.current = url
 
+    // Load image into memory first (before touching the canvas which isn't mounted yet)
     const img = new Image()
-    img.onload = async () => {
-      imageRef.current = img
-      const canvas = canvasRef.current!
-      canvas.width = img.naturalWidth
-      canvas.height = img.naturalHeight
-      const ctx = canvas.getContext('2d')!
-      ctx.drawImage(img, 0, 0)
+    await new Promise<void>(res => { img.onload = () => res(); img.src = url })
+    imageRef.current = img
 
-      if (mode === 'auto') {
-        setStatus('loading-model')
-        try {
-          const tf = await import('@tensorflow/tfjs')
-          await tf.ready()
-          const blazeface = await import('@tensorflow-models/blazeface')
-          const model = await blazeface.load()
-          setStatus('detecting')
+    if (mode === 'auto') {
+      setStatus('loading-model')
+      try {
+        const tf = await import('@tensorflow/tfjs')
+        await tf.ready()
+        const blazeface = await import('@tensorflow-models/blazeface')
+        const model = await blazeface.load()
+        setStatus('detecting')
 
-          const predictions = await model.estimateFaces(canvas, false)
-          if (predictions.length === 0) {
-            setStatus('ready')
-            setError('No faces detected. Switch to Manual mode to blur regions manually.')
-            return
-          }
+        // Pass img element directly — no canvas needed for detection
+        const predictions = await model.estimateFaces(img, false)
 
-          const detected: BlurRegion[] = predictions.map((p, i) => {
-            const [x1, y1] = p.topLeft as [number, number]
-            const [x2, y2] = p.bottomRight as [number, number]
+        const detected: BlurRegion[] = (predictions as Array<{ topLeft: [number,number], bottomRight: [number,number] }>)
+          .map((p, i) => {
+            const [x1, y1] = p.topLeft
+            const [x2, y2] = p.bottomRight
             const pad = (x2 - x1) * 0.15
             return {
               id: `face-${i}`,
@@ -141,19 +150,17 @@ export default function BlurFaceTool() {
             }
           })
 
-          setRegions(detected)
-          setFaceCount(detected.length)
-          setStatus('ready')
-        } catch (err) {
-          console.error(err)
-          setError('AI detection failed. Switch to Manual mode to blur regions manually.')
-          setStatus('ready')
-        }
-      } else {
-        setStatus('ready')
+        setRegions(detected)
+        setFaceCount(detected.length)
+        if (detected.length === 0) setError('No faces detected. Switch to Manual mode to blur regions manually.')
+      } catch (err) {
+        console.error(err)
+        setError('AI detection failed. Switch to Manual mode to blur regions manually.')
       }
     }
-    img.src = url
+
+    // Status → ready causes the canvas to mount; useEffect below draws the image
+    setStatus('ready')
   }, [mode])
 
   const onDrop = useCallback((e: React.DragEvent) => {

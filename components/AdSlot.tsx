@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export type AdPosition = 'header' | 'sidebar' | 'pre_download' | 'footer'
 
@@ -55,19 +55,46 @@ export default function AdSlot({ position, className = '' }: AdSlotProps) {
   const config = AD_CONFIG[position]
   const slot = ENV[config.slotEnvKey]
   const [mounted, setMounted] = useState(false)
+  const insRef = useRef<HTMLModElement>(null)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
+  // Suppress the "No slot size for availableWidth=0" TagError globally —
+  // AdSense throws it as a non-cancellable window error, not a JS exception,
+  // so the try/catch below alone isn't enough in all browsers.
+  useEffect(() => {
+    const handler = (event: ErrorEvent) => {
+      if (
+        typeof event.message === 'string' &&
+        (event.message.includes('adsbygoogle') || event.message.includes('No slot size'))
+      ) {
+        event.preventDefault()
+        event.stopImmediatePropagation()
+      }
+    }
+    window.addEventListener('error', handler)
+    return () => window.removeEventListener('error', handler)
+  }, [])
+
   useEffect(() => {
     if (!mounted || !pubId || !slot) return
-    try {
-      ;((window as unknown as Record<string, unknown[]>).adsbygoogle =
-        (window as unknown as Record<string, unknown[]>).adsbygoogle || []).push({})
-    } catch {
-      // AdSense script not yet loaded — will init on next render cycle
-    }
+    // Defer until after layout so the <ins> element has a measured width.
+    // If the container is hidden / zero-width, skip the push entirely.
+    const raf = requestAnimationFrame(() => {
+      const el = insRef.current
+      if (!el || el.offsetWidth === 0) return
+      // Guard against double-push (AdSense sets data-adsbygoogle-status after init)
+      if (el.getAttribute('data-adsbygoogle-status')) return
+      try {
+        ;((window as unknown as Record<string, unknown[]>).adsbygoogle =
+          (window as unknown as Record<string, unknown[]>).adsbygoogle || []).push({})
+      } catch {
+        // Swallow TagError — slot will be retried on next navigation
+      }
+    })
+    return () => cancelAnimationFrame(raf)
   }, [mounted, pubId, slot])
 
   // Render nothing until mounted (prevents SSR/hydration mismatch with <ins>)
@@ -79,6 +106,7 @@ export default function AdSlot({ position, className = '' }: AdSlotProps) {
         {config.label}
       </p>
       <ins
+        ref={insRef}
         className="adsbygoogle"
         style={{ display: 'block', minHeight: config.minHeight }}
         data-ad-client={pubId}

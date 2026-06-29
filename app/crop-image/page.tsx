@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title: 'Crop Image – Free Online | PDFForge', description: 'Crop photos with drag selection. Aspect ratio presets. No signup.' },
 }
 
-const RELATED_SLUGS = ['resize-image', 'compress-image', 'convert-image']
+const RELATED_SLUGS = ['edit-resize-image', 'compress-image', 'convert-image']
 
 export default function CropImagePage() {
   const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug))

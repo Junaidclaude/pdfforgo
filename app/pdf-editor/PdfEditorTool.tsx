@@ -7,7 +7,7 @@ import { getPdfjs } from '@/lib/pdfjs'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type EditorTool = 'select' | 'text' | 'draw' | 'rect' | 'ellipse' | 'line' | 'arrow' | 'highlight' | 'whitebox'
+type EditorTool = 'select' | 'text' | 'draw' | 'rect' | 'ellipse' | 'line' | 'arrow' | 'highlight' | 'whitebox' | 'erase'
 
 interface Annot {
   id: string; page: number
@@ -41,9 +41,24 @@ interface TextBubble {
 // ── Constants ──────────────────────────────────────────────────────────────────
 
 const FONTS = [
-  { label: 'Sans-serif', css: 'Arial, Helvetica, sans-serif', pdf: 'Helvetica' },
-  { label: 'Serif', css: 'Georgia, "Times New Roman", serif', pdf: 'TimesRoman' },
-  { label: 'Monospace', css: '"Courier New", Courier, monospace', pdf: 'Courier' },
+  // Built-in system fonts (map 1-to-1 with pdf-lib StandardFonts)
+  { label: 'Sans-serif',  css: 'Arial, Helvetica, sans-serif',       pdf: 'Helvetica',  google: null },
+  { label: 'Serif',       css: 'Georgia, "Times New Roman", serif',   pdf: 'TimesRoman', google: null },
+  { label: 'Monospace',   css: '"Courier New", Courier, monospace',   pdf: 'Courier',    google: null },
+  // Google Fonts (rendered in browser; fall back to nearest PDF built-in on export)
+  { label: 'Inter',           css: "'Inter', sans-serif",            pdf: 'Helvetica',  google: 'Inter:ital,wght@0,400;0,700;1,400;1,700' },
+  { label: 'Roboto',          css: "'Roboto', sans-serif",           pdf: 'Helvetica',  google: 'Roboto:ital,wght@0,400;0,700;1,400;1,700' },
+  { label: 'Open Sans',       css: "'Open Sans', sans-serif",        pdf: 'Helvetica',  google: 'Open+Sans:ital,wght@0,400;0,700;1,400;1,700' },
+  { label: 'Lato',            css: "'Lato', sans-serif",             pdf: 'Helvetica',  google: 'Lato:ital,wght@0,400;0,700;1,400;1,700' },
+  { label: 'Montserrat',      css: "'Montserrat', sans-serif",       pdf: 'Helvetica',  google: 'Montserrat:ital,wght@0,400;0,700;1,400;1,700' },
+  { label: 'Poppins',         css: "'Poppins', sans-serif",          pdf: 'Helvetica',  google: 'Poppins:ital,wght@0,400;0,700;1,400;1,700' },
+  { label: 'Oswald',          css: "'Oswald', sans-serif",           pdf: 'Helvetica',  google: 'Oswald:wght@400;700' },
+  { label: 'Raleway',         css: "'Raleway', sans-serif",          pdf: 'Helvetica',  google: 'Raleway:ital,wght@0,400;0,700;1,400;1,700' },
+  { label: 'Nunito',          css: "'Nunito', sans-serif",           pdf: 'Helvetica',  google: 'Nunito:ital,wght@0,400;0,700;1,400;1,700' },
+  { label: 'Playfair Display',css: "'Playfair Display', serif",      pdf: 'TimesRoman', google: 'Playfair+Display:ital,wght@0,400;0,700;1,400;1,700' },
+  { label: 'Merriweather',    css: "'Merriweather', serif",          pdf: 'TimesRoman', google: 'Merriweather:ital,wght@0,400;0,700;1,400;1,700' },
+  { label: 'Dancing Script',  css: "'Dancing Script', cursive",      pdf: 'TimesRoman', google: 'Dancing+Script:wght@400;700' },
+  { label: 'Pacifico',        css: "'Pacifico', cursive",            pdf: 'Helvetica',  google: 'Pacifico' },
 ]
 
 const PALETTE = [
@@ -65,11 +80,20 @@ const TOOL_LIST: { id: EditorTool; label: string; shortcut: string; icon: React.
   { id: 'line', label: 'Line', shortcut: 'L', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="5" y1="19" x2="19" y2="5"/></svg> },
   { id: 'arrow', label: 'Arrow', shortcut: 'A', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="19" x2="19" y2="5"/><polyline points="9 5 19 5 19 15"/></svg> },
   { id: 'whitebox', label: 'Whiteout', shortcut: 'W', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" fill="white"/><path d="M9 9h6M9 12h6M9 15h4"/></svg> },
+  { id: 'erase',    label: 'Eraser',   shortcut: 'X', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 20H7L3 16l11-11 6 6-3.5 3.5"/><path d="M6.5 17.5l3-3"/></svg> },
 ]
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function uid() { return Math.random().toString(36).slice(2, 9) }
+
+function pointToSegmentDist(px: number, py: number, ax: number, ay: number, bx: number, by: number): number {
+  const dx = bx - ax, dy = by - ay
+  const lenSq = dx * dx + dy * dy
+  if (lenSq === 0) return Math.hypot(px - ax, py - ay)
+  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lenSq))
+  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy))
+}
 
 function arrowHeadPts(x1: number, y1: number, x2: number, y2: number, size: number): string {
   const ang = Math.atan2(y2 - y1, x2 - x1)
@@ -104,7 +128,7 @@ export default function PdfEditorTool() {
   const [fileName, setFileName] = useState('')
   const [numPages, setNumPages] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
-  const [zoom, setZoom] = useState(1.2)
+  const [zoom, setZoom] = useState(1.0)
   const [annots, setAnnots] = useState<Annot[]>([])
   const [history, setHistory] = useState<Annot[][]>([[]])
   const [historyIdx, setHistoryIdx] = useState(0)
@@ -127,12 +151,19 @@ export default function PdfEditorTool() {
   const [exportError, setExportError] = useState('')
   const [textBubble, setTextBubble] = useState<TextBubble | null>(null)
   const [extracting, setExtracting] = useState(false)
-  const [extractMsg, setExtractMsg] = useState('')
+  const [ocring, setOcring] = useState(false)
+  const [extractMsg, setExtractMsg] = useState<{ text: string; type: 'success' | 'error' | 'warn' } | null>(null)
   const [showExtractMenu, setShowExtractMenu] = useState(false)
+  const [showOcrPrompt, setShowOcrPrompt] = useState(false)
+  const [pdfTextSel, setPdfTextSel] = useState<{
+    hits: PdfTextHit[]
+    rect: { x: number; y: number; w: number; h: number }
+  } | null>(null)
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const drawCanvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const extractMenuRef = useRef<HTMLDivElement>(null)
   const pdfDocRef = useRef<unknown>(null)
   const renderTaskRef = useRef<{ cancel: () => void } | null>(null)
   const isDown = useRef(false)
@@ -143,6 +174,13 @@ export default function PdfEditorTool() {
   const dragOrigin = useRef<{ x: number; y: number } | null>(null)
   const hasDragged = useRef(false)
   const pdfTextCache = useRef<Map<number, PdfTextHit[]>>(new Map())
+  const textSelStart = useRef<{ x: number; y: number } | null>(null)
+  const isTextSelDragging = useRef(false)
+  const lastPdfClickRef = useRef<{ time: number } | null>(null)
+  const overlayRef = useRef<HTMLDivElement>(null)
+  const pdfWordCache = useRef<Map<number, PdfTextHit[]>>(new Map())
+  const eraseRadius = 0.025 // normalised — ~2.5 % of page width
+  const erasedIds = useRef<Set<string>>(new Set())
 
   // ── History ──────────────────────────────────────────────────────────────────
   const pushHistory = useCallback((next: Annot[]) => {
@@ -166,16 +204,25 @@ export default function PdfEditorTool() {
 
   // ── Load PDF ─────────────────────────────────────────────────────────────────
   const loadPdf = useCallback(async (file: File) => {
-    if (!file.name.toLowerCase().endsWith('.pdf')) return
-    const bytes = new Uint8Array(await file.arrayBuffer())
-    setPdfBytes(bytes); setFileName(file.name)
-    setAnnots([]); setHistory([[]]); setHistoryIdx(0)
-    setSelectedId(null); setCurrentPage(1)
-    pdfTextCache.current.clear()
-    const pdfjs = await getPdfjs()
-    const doc = await pdfjs.getDocument({ data: bytes }).promise
-    pdfDocRef.current = doc
-    setNumPages(doc.numPages)
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      setExportError('Please upload a valid PDF file.')
+      return
+    }
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer())
+      setFileName(file.name)
+      setAnnots([]); setHistory([[]]); setHistoryIdx(0)
+      setSelectedId(null); setCurrentPage(1); setZoom(1)
+      setExportError(''); setExtractMsg(null); setShowOcrPrompt(false)
+      pdfTextCache.current.clear(); pdfWordCache.current.clear()
+      const pdfjs = await getPdfjs()
+      const doc = await pdfjs.getDocument({ data: bytes }).promise
+      pdfDocRef.current = doc
+      setNumPages(doc.numPages)
+      setPdfBytes(bytes)
+    } catch {
+      setExportError('Could not open this file. Make sure it is a valid, non-corrupted PDF.')
+    }
   }, [])
 
   // ── Render page ──────────────────────────────────────────────────────────────
@@ -213,10 +260,11 @@ export default function PdfEditorTool() {
         'r': () => setTool('rect'), 'e': () => setTool('ellipse'),
         'l': () => setTool('line'), 'a': () => setTool('arrow'),
         'w': () => setTool('whitebox'),
+        'x': () => setTool('erase'),
         'z': () => { if (e.metaKey || e.ctrlKey) { e.shiftKey ? redo() : undo() } },
         'Delete': () => { if (selectedId) { pushHistory(annots.filter(a => a.id !== selectedId)); setSelectedId(null) } },
         'Backspace': () => { if (selectedId) { pushHistory(annots.filter(a => a.id !== selectedId)); setSelectedId(null) } },
-        'Escape': () => { setSelectedId(null); setTool('select'); setTextBubble(null) },
+        'Escape': () => { setSelectedId(null); setTool('select'); setTextBubble(null); setPdfTextSel(null) },
       }
       const fn = map[e.key]
       if (fn) { e.preventDefault(); fn() }
@@ -225,7 +273,7 @@ export default function PdfEditorTool() {
     return () => window.removeEventListener('keydown', handler)
   }, [selectedId, annots, undo, redo, pushHistory, textBubble])
 
-  // ── Build per-page text hit-test cache ──────────────────────────────────────
+  // ── Build per-page text hit-test cache (line-level + word-level) ────────────
   const loadTextCache = useCallback(async (pageNum: number) => {
     if (pdfTextCache.current.has(pageNum)) return
     const doc = pdfDocRef.current as { getPage: (n: number) => Promise<unknown> } | null
@@ -280,8 +328,38 @@ export default function PdfEditorTool() {
         })
       }
       pdfTextCache.current.set(pageNum, hits)
+
+      // ── Word-level cache: one hit per word (estimated positions) ──────────
+      const wordHits: PdfTextHit[] = []
+      for (const item of items) {
+        const fsp = Math.abs(item.transform[3]) || 12
+        const lx = item.transform[4]
+        const by = item.transform[5]
+        const iw = Math.max(item.width || 0, fsp * 0.5)
+        const iy = Math.max(0, 1 - (by + fsp) / ph)
+        const ih = (fsp * 1.3) / ph
+        // split into words; estimate each word's x by char-count ratio
+        const parts = item.str.split(' ')
+        const avgCharW = iw / Math.max(1, item.str.length)
+        let xOff = 0
+        for (const part of parts) {
+          const partW = avgCharW * part.length
+          if (part.trim()) {
+            wordHits.push({
+              str: part,
+              x: Math.max(0, (lx + xOff) / pw),
+              y: iy, w: partW / pw, h: ih,
+              fontSizePdf: fsp,
+              fontSizeCss: Math.max(6, Math.round(fsp * zoom)),
+            })
+          }
+          xOff += partW + avgCharW  // word width + space width
+        }
+      }
+      pdfWordCache.current.set(pageNum, wordHits)
     } catch {
       pdfTextCache.current.set(pageNum, [])
+      pdfWordCache.current.set(pageNum, [])
     }
   }, [zoom])
 
@@ -290,10 +368,18 @@ export default function PdfEditorTool() {
     if (pdfBytes && numPages > 0) loadTextCache(currentPage)
   }, [currentPage, pdfBytes, numPages, loadTextCache])
 
+  // ── Clear text selection when tool changes ───────────────────────────────────
+  useEffect(() => { setPdfTextSel(null) }, [tool])
+
   // ── Close extract menu on outside click ─────────────────────────────────────
   useEffect(() => {
     if (!showExtractMenu) return
-    const handler = () => setShowExtractMenu(false)
+    const handler = (e: MouseEvent) => {
+      if (extractMenuRef.current && !extractMenuRef.current.contains(e.target as Node)) {
+        setShowExtractMenu(false)
+      }
+    }
+    // Use mousedown so the menu closes quickly, but only when clicking OUTSIDE
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [showExtractMenu])
@@ -371,6 +457,22 @@ export default function PdfEditorTool() {
     ctx.restore()
   }
 
+  const previewSelectRect = (x1: number, y1: number, x2: number, y2: number) => {
+    const dc = drawCanvasRef.current; if (!dc) return
+    const ctx = dc.getContext('2d')!
+    ctx.clearRect(0, 0, dc.width, dc.height)
+    ctx.save()
+    ctx.fillStyle = 'rgba(59,130,246,0.12)'
+    ctx.strokeStyle = 'rgba(59,130,246,0.7)'
+    ctx.lineWidth = 1.5
+    ctx.setLineDash([5, 3])
+    const rx = Math.min(x1, x2) * dc.width, ry = Math.min(y1, y2) * dc.height
+    const rw = Math.abs(x2 - x1) * dc.width, rh = Math.abs(y2 - y1) * dc.height
+    ctx.fillRect(rx, ry, rw, rh)
+    ctx.strokeRect(rx, ry, rw, rh)
+    ctx.restore()
+  }
+
   // ── Pointer events ───────────────────────────────────────────────────────────
   const onDown = (e: React.PointerEvent) => {
     if (!pdfBytes) return
@@ -383,13 +485,31 @@ export default function PdfEditorTool() {
       let hit: Annot | null = null
       for (let i = pg.length - 1; i >= 0; i--) {
         const a = pg[i]
-        const lx = Math.min(a.x, a.x + a.w) - 0.01, rx = Math.max(a.x, a.x + a.w) + 0.01
-        const ty = Math.min(a.y, a.y + a.h) - 0.01, by = Math.max(a.y, a.y + a.h) + 0.01
+        // Line / arrow: use point-to-segment distance (bounding box too imprecise for thin/diagonal lines)
+        if ((a.type === 'line' || a.type === 'arrow') && a.x1 != null && a.y1 != null && a.x2 != null && a.y2 != null) {
+          const hitR = Math.max(a.strokeWidth * 0.004, 0.014)
+          if (pointToSegmentDist(x, y, a.x1, a.y1, a.x2, a.y2) <= hitR) { hit = a; break }
+          continue
+        }
+        // Use wider tolerance for text annotations so small blocks are easy to click
+        const pad = a.type === 'text' ? 0.018 : 0.01
+        const lx = Math.min(a.x, a.x + a.w) - pad, rx = Math.max(a.x, a.x + a.w) + pad
+        const ty = Math.min(a.y, a.y + a.h) - pad, by = Math.max(a.y, a.y + a.h) + pad
         if (x >= lx && x <= rx && y >= ty && y <= by) { hit = a; break }
       }
       if (hit) {
         const now = Date.now()
-        // Double-click on text → re-open text bubble for editing
+        setPdfTextSel(null); textSelStart.current = null
+
+        // fromPdf text blocks: single-click opens editor immediately (no double-click needed)
+        if (hit.type === 'text' && hit.fromPdf) {
+          lastClick.current = null; isDown.current = false; moveState.current = null
+          const r = canvasRef.current!.getBoundingClientRect()
+          setTextBubble({ screenX: e.clientX, screenY: e.clientY, normX: hit.x, normY: hit.y, existingId: hit.id, initialText: hit.text ?? '', initialFont: hit.fontFamily ?? fontFamily, initialSize: hit.fontSize ?? fontSize, initialBold: hit.bold ?? bold, initialItalic: hit.italic ?? italic, initialUnderline: hit.underline ?? underline, initialColor: hit.color, initialAlign: hit.align ?? align })
+          return
+        }
+
+        // Double-click on user-added text → re-open text bubble for editing
         if (hit.type === 'text' && lastClick.current?.id === hit.id && now - lastClick.current.time < 450) {
           lastClick.current = null; isDown.current = false; moveState.current = null
           const r = canvasRef.current!.getBoundingClientRect()
@@ -405,6 +525,40 @@ export default function PdfEditorTool() {
       } else {
         lastClick.current = null; setSelectedId(null); moveState.current = null
         dragOrigin.current = null; hasDragged.current = false
+        setPdfTextSel(null)
+
+        // ── Double-click on native PDF text → open editor ────────────────
+        const cached = pdfTextCache.current.get(currentPage) ?? []
+        const pdfHit = cached.find(h =>
+          x >= h.x - 0.006 && x <= h.x + h.w + 0.006 &&
+          y >= h.y - 0.004 && y <= h.y + h.h + 0.01
+        )
+        const now = Date.now()
+        if (pdfHit && lastPdfClickRef.current && now - lastPdfClickRef.current.time < 450) {
+          // Double-click confirmed
+          isDown.current = false
+          lastPdfClickRef.current = null
+          textSelStart.current = null
+          const r = canvasRef.current!.getBoundingClientRect()
+          setTextBubble({
+            screenX: r.left + pdfHit.x * r.width,
+            screenY: r.top + pdfHit.y * r.height,
+            normX: pdfHit.x, normY: pdfHit.y,
+            existingId: null,
+            initialText: pdfHit.str,
+            initialFont: fontFamily,
+            initialSize: pdfHit.fontSizeCss,
+            initialBold: false, initialItalic: false, initialUnderline: false,
+            initialColor: '#1a1a1a', initialAlign: 'left',
+            fromPdfHit: pdfHit,
+          })
+          return
+        }
+        lastPdfClickRef.current = pdfHit ? { time: now } : null
+
+        // Start drag-to-select
+        textSelStart.current = { x, y }
+        isTextSelDragging.current = false
       }
       return
     }
@@ -450,13 +604,66 @@ export default function PdfEditorTool() {
       return
     }
 
+    if (tool === 'erase') {
+      erasedIds.current = new Set()
+      eraseAt(x, y)
+      return
+    }
     if (tool === 'draw' || tool === 'highlight') {
       brushPts.current = [[x, y]]; return
     }
     shapeStart.current = { x, y }
   }
 
+  const eraseAt = (x: number, y: number) => {
+    setAnnots(prev => {
+      const toRemove = new Set<string>()
+      for (const a of prev) {
+        if (a.page !== currentPage) continue
+        if (erasedIds.current.has(a.id)) continue
+        let hit = false
+        if ((a.type === 'line' || a.type === 'arrow') && a.x1 != null && a.y1 != null && a.x2 != null && a.y2 != null) {
+          hit = pointToSegmentDist(x, y, a.x1, a.y1, a.x2, a.y2) <= eraseRadius
+        } else if (a.type === 'draw' || a.type === 'highlight') {
+          hit = (a.points ?? []).some(([px, py]) => Math.hypot(x - px, y - py) <= eraseRadius)
+        } else {
+          const cx = a.x + a.w / 2, cy = a.y + a.h / 2
+          const hw = Math.max(a.w / 2, eraseRadius), hh = Math.max(a.h / 2, eraseRadius)
+          hit = Math.abs(x - cx) <= hw + eraseRadius && Math.abs(y - cy) <= hh + eraseRadius
+        }
+        if (hit) { toRemove.add(a.id); erasedIds.current.add(a.id) }
+      }
+      if (toRemove.size === 0) return prev
+      return prev.filter(a => !toRemove.has(a.id))
+    })
+  }
+
   const onMove = (e: React.PointerEvent) => {
+    // Hover cursor: pointer over annotations, text cursor over PDF text, default elsewhere
+    if (!isDown.current && pdfBytes && tool === 'select' && overlayRef.current) {
+      const { x, y } = toNorm(e.clientX, e.clientY)
+      const pg = annots.filter(a => a.page === currentPage)
+      const overAnnot = pg.some(a => {
+        if ((a.type === 'line' || a.type === 'arrow') && a.x1 != null && a.y1 != null && a.x2 != null && a.y2 != null) {
+          return pointToSegmentDist(x, y, a.x1, a.y1, a.x2, a.y2) <= Math.max(a.strokeWidth * 0.004, 0.014)
+        }
+        const pad = a.type === 'text' ? 0.018 : 0.01
+        const lx = Math.min(a.x, a.x + a.w) - pad, rx = Math.max(a.x, a.x + a.w) + pad
+        const ty = Math.min(a.y, a.y + a.h) - pad, by = Math.max(a.y, a.y + a.h) + pad
+        return x >= lx && x <= rx && y >= ty && y <= by
+      })
+      if (overAnnot) {
+        overlayRef.current.style.cursor = 'pointer'
+      } else {
+        const cached = pdfTextCache.current.get(currentPage) ?? []
+        const overText = cached.some(h =>
+          x >= h.x - 0.006 && x <= h.x + h.w + 0.006 &&
+          y >= h.y - 0.004 && y <= h.y + h.h + 0.01
+        )
+        overlayRef.current.style.cursor = overText ? 'text' : 'default'
+      }
+    }
+
     if (!isDown.current || !pdfBytes) return
     const { x, y } = toNorm(e.clientX, e.clientY)
 
@@ -471,8 +678,34 @@ export default function PdfEditorTool() {
       setAnnots(prev => prev.map(a => a.id === id ? { ...a, x: x - ox, y: y - oy } : a))
       return
     }
-    if (tool === 'draw') { brushPts.current = [...brushPts.current, [x, y]]; previewBrush(brushPts.current, false); return }
-    if (tool === 'highlight') { brushPts.current = [...brushPts.current, [x, y]]; previewBrush(brushPts.current, true); return }
+    if (tool === 'select' && textSelStart.current && !moveState.current) {
+      isTextSelDragging.current = true
+      previewSelectRect(textSelStart.current.x, textSelStart.current.y, x, y)
+      return
+    }
+    if (tool === 'erase') { eraseAt(x, y); return }
+    if (tool === 'draw' || tool === 'highlight') {
+      const isHL = tool === 'highlight'
+      const pts = brushPts.current
+      if (pts.length > 0) {
+        // Interpolate intermediate points to fill gaps when pointer moves fast
+        const [lx, ly] = pts[pts.length - 1]
+        const dx = x - lx, dy = y - ly
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist > 0.004) {
+          const steps = Math.ceil(dist / 0.003)
+          for (let i = 1; i <= steps; i++) {
+            pts.push([lx + dx * (i / steps), ly + dy * (i / steps)])
+          }
+        } else {
+          pts.push([x, y])
+        }
+      } else {
+        pts.push([x, y])
+      }
+      previewBrush(pts, isHL)
+      return
+    }
     if (shapeStart.current) previewShape(shapeStart.current.x, shapeStart.current.y, x, y)
   }
 
@@ -481,9 +714,42 @@ export default function PdfEditorTool() {
     isDown.current = false; clearDraw()
     const { x, y } = toNorm(e.clientX, e.clientY)
 
+    if (tool === 'erase') {
+      if (erasedIds.current.size > 0) pushHistory([...annots])
+      erasedIds.current = new Set()
+      return
+    }
     if (tool === 'select' && moveState.current) {
       if (hasDragged.current) pushHistory([...annots])
       moveState.current = null; dragOrigin.current = null; hasDragged.current = false; return
+    }
+    if (tool === 'select' && textSelStart.current) {
+      if (isTextSelDragging.current) {
+        const sx = textSelStart.current.x, sy = textSelStart.current.y
+        const minX = Math.min(sx, x), maxX = Math.max(sx, x)
+        const minY = Math.min(sy, y), maxY = Math.max(sy, y)
+        if (maxX - minX > 0.005 && maxY - minY > 0.005) {
+          // Prefer word-level hits for fine selection; fall back to line-level
+          const wordHits = (pdfWordCache.current.get(currentPage) ?? []).filter(h =>
+            h.x < maxX && h.x + h.w > minX && h.y < maxY && h.y + h.h > minY
+          )
+          const lineHits = (pdfTextCache.current.get(currentPage) ?? []).filter(h =>
+            h.x < maxX && h.x + h.w > minX && h.y < maxY && h.y + h.h > minY
+          )
+          const hits = wordHits.length > 0 ? wordHits : lineHits
+          if (hits.length > 0) {
+            // Tight bounding box around matched words only
+            const bx = Math.min(...hits.map(h => h.x))
+            const by2 = Math.min(...hits.map(h => h.y))
+            const bx2 = Math.max(...hits.map(h => h.x + h.w))
+            const by3 = Math.max(...hits.map(h => h.y + h.h))
+            setPdfTextSel({ hits, rect: { x: bx, y: by2, w: bx2 - bx, h: by3 - by2 } })
+          }
+        }
+      }
+      textSelStart.current = null
+      isTextSelDragging.current = false
+      return
     }
     if ((tool === 'draw' || tool === 'highlight') && brushPts.current.length >= 2) {
       const pts = brushPts.current as [number, number][]
@@ -502,7 +768,7 @@ export default function PdfEditorTool() {
       }])
       setSelectedId(id); brushPts.current = []; return
     }
-    if (shapeStart.current && tool !== 'select' && tool !== 'text' && tool !== 'draw' && tool !== 'highlight') {
+    if (shapeStart.current && tool !== 'select' && tool !== 'text' && tool !== 'draw' && tool !== 'highlight' && tool !== 'erase') {
       const sx = shapeStart.current.x, sy = shapeStart.current.y
       if (Math.abs(x - sx) < 0.005 && Math.abs(y - sy) < 0.005) { shapeStart.current = null; return }
       const id = uid()
@@ -556,9 +822,10 @@ export default function PdfEditorTool() {
   const extractPageText = useCallback(async (allPages: boolean) => {
     const doc = pdfDocRef.current as { getPage: (n: number) => Promise<unknown> } | null
     if (!doc) return
-    setExtracting(true); setExtractMsg(''); setShowExtractMenu(false)
+    setExtracting(true); setExtractMsg(null); setShowExtractMenu(false); setShowOcrPrompt(false)
 
-    type PdfItem = { str: string; transform: number[]; width: number }
+    // pdfjs v4: items include TextMarkedContent (no str/transform); filter defensively
+    type RawItem = { str?: string; transform?: number[]; width?: number }
 
     try {
       const pagesToProcess = allPages
@@ -570,14 +837,19 @@ export default function PdfEditorTool() {
       for (const pageNum of pagesToProcess) {
         const page = await doc.getPage(pageNum) as {
           getViewport: (o: { scale: number }) => { width: number; height: number }
-          getTextContent: () => Promise<{ items: PdfItem[] }>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          getTextContent: (opts?: any) => Promise<{ items: RawItem[] }>
         }
         const vp = page.getViewport({ scale: 1 })
         const pw = vp.width, ph = vp.height
-        const content = await page.getTextContent()
+        const content = await page.getTextContent({ includeMarkedContent: false })
 
-        // Filter out empty items
-        const items = content.items.filter(it => it.str && it.str.trim() !== '' && it.transform?.length >= 6)
+        type PdfItem = { str: string; transform: number[]; width: number }
+        const items: PdfItem[] = content.items.filter(
+          (it): it is PdfItem =>
+            typeof it.str === 'string' && it.str.trim() !== '' &&
+            Array.isArray(it.transform) && it.transform.length >= 6
+        )
 
         // Group items into lines by baseline-y proximity (within 3 PDF points)
         const LINE_TOL = 3
@@ -588,21 +860,16 @@ export default function PdfEditorTool() {
           if (existing) existing.push(item)
           else lines.push([item])
         }
-
-        // Sort items within each line left-to-right
         for (const line of lines) line.sort((a, b) => a.transform[4] - b.transform[4])
-
-        // Sort lines top-to-bottom (high PDF-y = top of page)
         lines.sort((a, b) => b[0].transform[5] - a[0].transform[5])
 
         for (const line of lines) {
-          // Build text, inserting spaces when items have a visible gap
           let text = ''
           for (let i = 0; i < line.length; i++) {
             if (i > 0) {
-              const prevEnd = line[i - 1].transform[4] + line[i - 1].width
+              const prevEnd = line[i - 1].transform[4] + (line[i - 1].width || 0)
               const gap = line[i].transform[4] - prevEnd
-              const charW = line[i - 1].width / Math.max(1, line[i - 1].str.length)
+              const charW = (line[i - 1].width || 0) / Math.max(1, line[i - 1].str.length)
               if (gap > charW * 0.4) text += ' '
             }
             text += line[i].str
@@ -610,21 +877,181 @@ export default function PdfEditorTool() {
           if (!text.trim()) continue
 
           const first = line[0], last = line[line.length - 1]
-          const fontSizePdf = Math.abs(first.transform[3]) || 12
+          const fontSizePdf = Math.abs(first.transform[3]) || Math.abs(first.transform[0]) || 12
           const x = first.transform[4]
-          const baseY = first.transform[5]  // baseline from PDF bottom
-          const rightEdge = last.transform[4] + last.width
-          const textWidth = Math.max(rightEdge - x, fontSizePdf)
+          const baseY = first.transform[5]
+          const rightEdge = last.transform[4] + (last.width || 0)
+          const textWidth = Math.max(rightEdge - x, fontSizePdf * 0.5)
 
-          // Convert to normalised (0-1) — flip Y: PDF origin is bottom-left
           const normX = Math.max(0, x / pw)
           const normY = Math.max(0, 1 - (baseY + fontSizePdf) / ph)
           const normW = Math.min(textWidth / pw, 1 - normX)
-          const normH = Math.min((fontSizePdf * 1.3) / ph, 1 - normY)
-
-          // Font size in CSS px: at zoom level, canvas CSS width ≈ pw * zoom
+          const normH = Math.min((fontSizePdf * 1.4) / ph, 1 - normY)
           const fontSizeCss = Math.max(6, Math.round(fontSizePdf * zoom))
 
+          newAnnots.push({
+            id: uid(), page: pageNum, type: 'text',
+            x: normX, y: normY, w: normW, h: normH,
+            color: '#1a1a1a', fillColor: 'transparent', strokeWidth: 1, opacity: 1,
+            text: text.trim(), fontSize: fontSizeCss, fontSizePdf,
+            fontFamily: FONTS[0].css, bold: false, italic: false, underline: false, align: 'left',
+            fromPdf: true,
+          })
+        }
+      }
+
+      if (newAnnots.length === 0) {
+        setExtractMsg({ text: 'No text layer found in this PDF — it may be scanned.', type: 'warn' })
+        setShowOcrPrompt(true)
+        setExtracting(false); return
+      }
+
+      const replaced = annots.filter(a => !(pagesToProcess.includes(a.page) && a.fromPdf))
+      pushHistory([...replaced, ...newAnnots])
+      setTool('select')
+      setExtractMsg({ text: `Extracted ${newAnnots.length} text block${newAnnots.length !== 1 ? 's' : ''} — click any block to edit.`, type: 'success' })
+    } catch (err) {
+      setExtractMsg({ text: 'Extraction failed: ' + (err instanceof Error ? err.message : String(err)), type: 'error' })
+    }
+    setExtracting(false)
+  }, [annots, currentPage, numPages, zoom, pushHistory])
+
+  // ── OCR pages via Tesseract.js ───────────────────────────────────────────────
+  const ocrPage = useCallback(async (allPages: boolean) => {
+    const doc = pdfDocRef.current as {
+      getPage: (n: number) => Promise<{
+        getViewport: (o: { scale: number }) => { width: number; height: number }
+        render: (o: { canvasContext: CanvasRenderingContext2D; viewport: unknown }) => { promise: Promise<void>; cancel: () => void }
+      }>
+    } | null
+    if (!doc) return
+    setOcring(true); setExtractMsg(null); setShowOcrPrompt(false); setShowExtractMenu(false)
+
+    // pdfjs can only have one active render per page — re-rendering while the
+    // display canvas is active silently produces a blank canvas. Instead, copy
+    // the already-rendered display canvas for the current page, and for other
+    // pages wait until any active render task finishes before starting a new one.
+    const OCR_SCALE = 200 / 72   // ~200 DPI, good balance of accuracy vs canvas size
+
+    const snapshotCanvas = (src: HTMLCanvasElement): HTMLCanvasElement => {
+      const dst = document.createElement('canvas')
+      dst.width = src.width; dst.height = src.height
+      const ctx = dst.getContext('2d')!
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, dst.width, dst.height)
+      ctx.drawImage(src, 0, 0)
+      return dst
+    }
+
+    const invertIfDark = (canvas: HTMLCanvasElement) => {
+      const ctx = canvas.getContext('2d')!
+      const id = ctx.getImageData(0, 0, canvas.width, canvas.height)
+      const d = id.data
+      // Sample ~200 evenly-spaced pixels for average luminance
+      const step = Math.max(4, Math.floor(d.length / 800)) & ~3
+      let lum = 0, n = 0
+      for (let i = 0; i < d.length; i += step) { lum += d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114; n++ }
+      if (lum / n < 128) {
+        for (let i = 0; i < d.length; i += 4) { d[i]=255-d[i]; d[i+1]=255-d[i+1]; d[i+2]=255-d[i+2] }
+        ctx.putImageData(id, 0, 0)
+      }
+    }
+
+    // Returns { canvas, scale } — scale is needed for accurate font-size calculation
+    const getOcrCanvas = async (pageNum: number): Promise<{ canvas: HTMLCanvasElement; scale: number }> => {
+      // Current page: copy the live display canvas (guaranteed non-blank)
+      if (pageNum === currentPage && canvasRef.current && canvasRef.current.width > 10) {
+        const dpr = window.devicePixelRatio || 1
+        const copy = snapshotCanvas(canvasRef.current)
+        invertIfDark(copy)
+        return { canvas: copy, scale: zoom * dpr }
+      }
+      // Other pages: cancel any in-flight render then render fresh at OCR_SCALE
+      if (renderTaskRef.current) { renderTaskRef.current.cancel(); renderTaskRef.current = null }
+      const page = await doc.getPage(pageNum)
+      const vp = page.getViewport({ scale: OCR_SCALE })
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.round(vp.width); canvas.height = Math.round(vp.height)
+      const ctx = canvas.getContext('2d')!
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      const task = page.render({ canvasContext: ctx, viewport: vp })
+      renderTaskRef.current = task
+      await task.promise
+      renderTaskRef.current = null
+      invertIfDark(canvas)
+      return { canvas, scale: OCR_SCALE }
+    }
+
+    const toNorm = (v: number, dim: number) => Math.max(0, Math.min(1, v / dim))
+
+    try {
+      const { createWorker } = await import('tesseract.js')
+      const worker = await createWorker('eng')
+
+      const pagesToProcess = allPages
+        ? Array.from({ length: numPages }, (_, i) => i + 1)
+        : [currentPage]
+
+      const newAnnots: Annot[] = []
+
+      for (const pageNum of pagesToProcess) {
+        const { canvas, scale: canvasScale } = await getOcrCanvas(pageNum)
+
+        // Convert to PNG data-URL — most reliable ImageLike across browser engines
+        const imgUrl = canvas.toDataURL('image/png')
+        const { data } = await worker.recognize(imgUrl)
+
+        type TWord = { text: string; confidence: number; bbox: { x0: number; y0: number; x1: number; y1: number } }
+        type TLine = { text: string; confidence: number; bbox: { x0: number; y0: number; x1: number; y1: number } }
+        type AnnotLine = { text: string; x0: number; y0: number; x1: number; y1: number }
+
+        // Tier 1: structured lines from blocks→paragraphs→lines (best bbox accuracy)
+        const structuredLines: TLine[] = (data.blocks ?? []).flatMap(
+          (b: { paragraphs: { lines: TLine[] }[] }) => b.paragraphs.flatMap(p => p.lines)
+        )
+
+        const getAnnotLines = (): AnnotLine[] => {
+          if (structuredLines.length > 0) {
+            return structuredLines
+              .map(l => ({ text: l.text.replace(/\n/g, ' ').trim(), ...l.bbox }))
+              .filter(l => l.text.length > 0)
+          }
+          // Tier 2: group words by vertical proximity
+          const words: TWord[] = (data.words ?? []).filter((w: TWord) => w.text.trim().length > 0)
+          if (words.length > 0) {
+            const lineH = words.length > 0
+              ? (words[0].bbox.y1 - words[0].bbox.y0) * 0.8
+              : 15
+            const groups: TWord[][] = []
+            for (const w of words) {
+              const mid = (w.bbox.y0 + w.bbox.y1) / 2
+              const g = groups.find(gr => Math.abs(mid - (gr[0].bbox.y0 + gr[0].bbox.y1) / 2) < lineH)
+              if (g) g.push(w); else groups.push([w])
+            }
+            groups.sort((a, b) => a[0].bbox.y0 - b[0].bbox.y0)
+            return groups.map(gr => {
+              gr.sort((a, b) => a.bbox.x0 - b.bbox.x0)
+              return {
+                text: gr.map(w => w.text).join(' ').trim(),
+                x0: Math.min(...gr.map(w => w.bbox.x0)),
+                y0: Math.min(...gr.map(w => w.bbox.y0)),
+                x1: Math.max(...gr.map(w => w.bbox.x1)),
+                y1: Math.max(...gr.map(w => w.bbox.y1)),
+              }
+            }).filter(l => l.text.length > 0)
+          }
+          return []
+        }
+
+        for (const { text, x0, y0, x1, y1 } of getAnnotLines()) {
+          const normX = toNorm(x0, canvas.width)
+          const normY = toNorm(y0, canvas.height)
+          const normW = toNorm(x1 - x0, canvas.width)
+          const normH = toNorm(y1 - y0, canvas.height)
+          if (normW < 0.005 || normH < 0.002) continue
+          const fontSizePdf = Math.max(7, Math.round((y1 - y0) * 0.72 / canvasScale))
+          const fontSizeCss = Math.max(6, Math.round(fontSizePdf * zoom))
           newAnnots.push({
             id: uid(), page: pageNum, type: 'text',
             x: normX, y: normY, w: normW, h: normH,
@@ -636,20 +1063,20 @@ export default function PdfEditorTool() {
         }
       }
 
-      if (newAnnots.length === 0) {
-        setExtractMsg('No extractable text found — this may be a scanned (image-only) PDF.')
-        setExtracting(false); return
-      }
+      await worker.terminate()
 
-      // Replace existing fromPdf annotations on the processed pages
+      if (newAnnots.length === 0) {
+        setExtractMsg({ text: 'OCR found no text. The PDF may be a vector/graphic with no readable text.', type: 'warn' })
+        setOcring(false); return
+      }
       const replaced = annots.filter(a => !(pagesToProcess.includes(a.page) && a.fromPdf))
       pushHistory([...replaced, ...newAnnots])
       setTool('select')
-      setExtractMsg(`Extracted ${newAnnots.length} text block${newAnnots.length !== 1 ? 's' : ''}. Click any block to edit it.`)
+      setExtractMsg({ text: `OCR extracted ${newAnnots.length} text block${newAnnots.length !== 1 ? 's' : ''} — click any block to edit.`, type: 'success' })
     } catch (err) {
-      setExtractMsg('Extraction failed: ' + (err instanceof Error ? err.message : String(err)))
+      setExtractMsg({ text: 'OCR failed: ' + (err instanceof Error ? err.message : String(err)), type: 'error' })
     }
-    setExtracting(false)
+    setOcring(false)
   }, [annots, currentPage, numPages, zoom, pushHistory])
 
   // ── Export ───────────────────────────────────────────────────────────────────
@@ -830,33 +1257,39 @@ export default function PdfEditorTool() {
         <div className="relative mr-1">
           <button
             onClick={() => setShowExtractMenu(v => !v)}
-            disabled={extracting}
+            disabled={extracting || ocring}
             className="flex items-center gap-1.5 h-9 px-3 text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl transition-colors disabled:opacity-50"
             title="Extract text from PDF to make it editable">
-            {extracting
+            {(extracting || ocring)
               ? <span className="w-3.5 h-3.5 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
               : <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h10M7 16h6m4-12H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"/><path strokeLinecap="round" strokeLinejoin="round" d="M15 3v4a1 1 0 001 1h4"/></svg>}
-            {extracting ? 'Extracting…' : 'Extract Text'}
+            {extracting ? 'Extracting…' : ocring ? 'OCR Running…' : 'Extract Text'}
             <svg className="w-3 h-3 ml-0.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="m19 9-7 7-7-7"/></svg>
           </button>
           {showExtractMenu && (
-            <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden min-w-[200px]">
+            <div ref={extractMenuRef} className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden min-w-[220px]">
+              <p className="px-4 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Extract Text Layer</p>
               <button onClick={() => extractPageText(false)}
-                className="w-full px-4 py-3 text-sm text-left hover:bg-amber-50 flex items-center gap-3 transition-colors">
+                className="w-full px-4 py-2.5 text-sm text-left hover:bg-amber-50 flex items-center gap-3 transition-colors">
                 <svg className="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                <div>
-                  <p className="font-semibold text-gray-800">Current Page</p>
-                  <p className="text-xs text-gray-500">Extract text from page {currentPage}</p>
-                </div>
+                <div><p className="font-semibold text-gray-800">Current Page</p><p className="text-xs text-gray-500">Page {currentPage}</p></div>
               </button>
-              <div className="h-px bg-gray-100" />
               <button onClick={() => extractPageText(true)}
-                className="w-full px-4 py-3 text-sm text-left hover:bg-amber-50 flex items-center gap-3 transition-colors">
+                className="w-full px-4 py-2.5 text-sm text-left hover:bg-amber-50 flex items-center gap-3 transition-colors">
                 <svg className="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                <div>
-                  <p className="font-semibold text-gray-800">All Pages</p>
-                  <p className="text-xs text-gray-500">Extract text from all {numPages} pages</p>
-                </div>
+                <div><p className="font-semibold text-gray-800">All Pages</p><p className="text-xs text-gray-500">All {numPages} pages</p></div>
+              </button>
+              <div className="h-px bg-gray-100 mx-3" />
+              <p className="px-4 pt-2 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">OCR (Scanned PDF)</p>
+              <button onClick={() => ocrPage(false)}
+                className="w-full px-4 py-2.5 text-sm text-left hover:bg-blue-50 flex items-center gap-3 transition-colors">
+                <svg className="w-4 h-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714a2.25 2.25 0 001.357 2.059l.85.425a2.25 2.25 0 002.928-.878l.64-1.28a2.25 2.25 0 00-.878-2.928l-.85-.425M4.751 14.5a24.25 24.25 0 003.19 3.19M9.75 21h4.5"/></svg>
+                <div><p className="font-semibold text-gray-800">OCR Current Page</p><p className="text-xs text-gray-500">Uses AI to read scanned text</p></div>
+              </button>
+              <button onClick={() => ocrPage(true)}
+                className="w-full px-4 py-2.5 text-sm text-left hover:bg-blue-50 flex items-center gap-3 transition-colors mb-1">
+                <svg className="w-4 h-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714a2.25 2.25 0 001.357 2.059l.85.425a2.25 2.25 0 002.928-.878l.64-1.28a2.25 2.25 0 00-.878-2.928l-.85-.425M4.751 14.5a24.25 24.25 0 003.19 3.19M9.75 21h4.5"/></svg>
+                <div><p className="font-semibold text-gray-800">OCR All Pages</p><p className="text-xs text-gray-500">May take a while for large PDFs</p></div>
               </button>
             </div>
           )}
@@ -874,10 +1307,40 @@ export default function PdfEditorTool() {
       </div>
 
       {exportError && <div className="bg-red-50 border-b border-red-200 text-red-600 text-xs px-4 py-1.5 shrink-0">{exportError}</div>}
+
+      {/* Extract / OCR status banner */}
       {extractMsg && (
-        <div className={`border-b text-xs px-4 py-1.5 shrink-0 flex items-center justify-between ${extractMsg.startsWith('No') || extractMsg.startsWith('Extraction') ? 'bg-red-50 border-red-200 text-red-600' : 'bg-amber-50 border-amber-200 text-amber-700'}`}>
-          <span>{extractMsg}</span>
-          <button onClick={() => setExtractMsg('')} className="ml-3 opacity-60 hover:opacity-100">✕</button>
+        <div className={`border-b text-xs px-4 py-2 shrink-0 flex items-center gap-2.5 ${
+          extractMsg.type === 'success' ? 'bg-green-50 border-green-200 text-green-700' :
+          extractMsg.type === 'warn'    ? 'bg-amber-50 border-amber-200 text-amber-700' :
+                                          'bg-red-50 border-red-200 text-red-600'
+        }`}>
+          {extractMsg.type === 'success' && (
+            <span className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center shrink-0">
+              <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+            </span>
+          )}
+          {extractMsg.type === 'warn' && (
+            <svg className="w-4 h-4 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+          )}
+          {extractMsg.type === 'error' && (
+            <svg className="w-4 h-4 shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          )}
+          <span className="flex-1 font-medium">{extractMsg.text}</span>
+          {/* Offer OCR if no text layer found */}
+          {showOcrPrompt && (
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button onClick={() => ocrPage(false)}
+                className="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg transition-colors">
+                OCR This Page
+              </button>
+              <button onClick={() => ocrPage(true)}
+                className="bg-blue-100 hover:bg-blue-200 text-blue-700 text-[11px] font-semibold px-2.5 py-1 rounded-lg transition-colors">
+                OCR All Pages
+              </button>
+            </div>
+          )}
+          <button onClick={() => { setExtractMsg(null); setShowOcrPrompt(false) }} className="ml-1 opacity-50 hover:opacity-100 shrink-0">✕</button>
         </div>
       )}
 
@@ -897,8 +1360,22 @@ export default function PdfEditorTool() {
             <canvas ref={canvasRef} className="block" />
             <canvas ref={drawCanvasRef} className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }} />
 
+            {/* Whitebox covers: hide original PDF text under fromPdf annotations */}
+            <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 8 }}>
+              {annots.filter(a => a.page === currentPage && a.type === 'text' && a.fromPdf).map(a => (
+                <div key={`wb-${a.id}`} style={{
+                  position: 'absolute',
+                  left: `${Math.max(0, a.x * 100 - 0.4)}%`,
+                  top: `${Math.max(0, a.y * 100 - 0.3)}%`,
+                  width: `${(a.w + 0.008) * 100}%`,
+                  height: `${(a.h + 0.008) * 100}%`,
+                  background: '#ffffff',
+                }} />
+              ))}
+            </div>
+
             {/* SVG annotation overlay */}
-            <svg className="absolute inset-0 overflow-visible" style={{ width: '100%', height: '100%', zIndex: 10, pointerEvents: 'none' }} viewBox="0 0 1 1" preserveAspectRatio="none">
+            <svg className="absolute inset-0 overflow-visible" style={{ width: '100%', height: '100%', zIndex: 10, pointerEvents: 'none' }} viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
               {annots.filter(a => a.page === currentPage && !['text', 'draw', 'highlight'].includes(a.type)).map(a => (
                 <AnnotShape key={a.id} annot={a} selected={a.id === selectedId} />
               ))}
@@ -917,9 +1394,25 @@ export default function PdfEditorTool() {
               ))}
             </div>
 
+            {/* PDF text selection highlights */}
+            {pdfTextSel && (
+              <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 13 }}>
+                {pdfTextSel.hits.map((h, i) => (
+                  <div key={i} style={{
+                    position: 'absolute',
+                    left: `${h.x * 100}%`, top: `${h.y * 100}%`,
+                    width: `${h.w * 100}%`, height: `${h.h * 100}%`,
+                    background: 'rgba(59,130,246,0.28)',
+                    border: '1px solid rgba(59,130,246,0.5)',
+                    borderRadius: 2,
+                  }} />
+                ))}
+              </div>
+            )}
+
             {/* Interaction overlay */}
-            <div className="absolute inset-0"
-              style={{ zIndex: 15, cursor: tool === 'select' ? 'default' : tool === 'text' ? 'text' : 'crosshair', pointerEvents: textBubble ? 'none' : 'auto' }}
+            <div ref={overlayRef} className="absolute inset-0"
+              style={{ zIndex: 15, cursor: tool === 'text' ? 'text' : tool === 'erase' ? 'cell' : tool !== 'select' ? 'crosshair' : 'default', pointerEvents: textBubble ? 'none' : 'auto' }}
               onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} />
 
             {selected && selected.type !== 'text' && <SelectionHandles annot={selected} />}
@@ -931,7 +1424,7 @@ export default function PdfEditorTool() {
           <div className="p-4 space-y-5">
 
             {/* Highlight tool: dedicated color palette */}
-            {tool === 'highlight' || selected?.type === 'highlight' ? (
+            {tool === 'erase' ? null : tool === 'highlight' || selected?.type === 'highlight' ? (
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Highlight Color</p>
                 <div className="grid grid-cols-4 gap-1.5 mb-2">
@@ -959,6 +1452,26 @@ export default function PdfEditorTool() {
               </div>
             ) : (
               <>
+                {/* Draw / pencil live preview */}
+                {(tool === 'draw' || selected?.type === 'draw') && (
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Stroke Preview</p>
+                    <div className="rounded-xl border border-gray-100 bg-gray-50 flex items-center justify-center p-3" style={{ height: 64 }}>
+                      <svg viewBox="0 0 120 40" style={{ width: '100%', height: '100%' }}>
+                        <path
+                          d="M8 32 C 22 10, 38 10, 52 24 C 66 38, 80 8, 96 18 C 104 23, 110 28, 114 20"
+                          fill="none"
+                          stroke={selected ? selected.color : color}
+                          strokeWidth={Math.max(1, Math.min(selected ? selected.strokeWidth : strokeWidth, 20))}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          opacity={selected ? selected.opacity : opacity}
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                )}
+
                 {/* Main color palette */}
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Color</p>
@@ -1025,10 +1538,30 @@ export default function PdfEditorTool() {
               </>
             )}
 
+            {/* Select tool hint */}
+            {tool === 'select' && !selectedId && (
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs text-blue-700 leading-relaxed space-y-1">
+                <p className="font-semibold">Select Tool</p>
+                <p>• Click annotation to select &amp; move</p>
+                <p>• <strong>Double-click</strong> any PDF text to edit it</p>
+                <p>• Drag over PDF text to select a region</p>
+              </div>
+            )}
+
             {/* Text hint */}
             {tool === 'text' && (
               <div className="bg-violet-50 border border-violet-100 rounded-xl p-3 text-xs text-violet-700 leading-relaxed">
                 Click anywhere on the PDF to add text. Click existing text to edit it.
+              </div>
+            )}
+
+            {/* Eraser hint */}
+            {tool === 'erase' && (
+              <div className="bg-red-50 border border-red-100 rounded-xl p-3 text-xs text-red-700 leading-relaxed space-y-1">
+                <p className="font-semibold">Eraser Tool</p>
+                <p>• Click or drag over any annotation to remove it</p>
+                <p>• Works on shapes, lines, arrows, text &amp; drawings</p>
+                <p>• Press <span className="font-mono bg-red-100 px-1 rounded">Z</span> to undo</p>
               </div>
             )}
 
@@ -1097,6 +1630,93 @@ export default function PdfEditorTool() {
         </div>
       </div>
 
+      {/* ── PDF Text Selection Action Bar ─────────────────────────────────── */}
+      {pdfTextSel && typeof document !== 'undefined' && (() => {
+        const r = canvasRef.current?.getBoundingClientRect()
+        if (!r) return null
+        const screenX = r.left + (pdfTextSel.rect.x + pdfTextSel.rect.w / 2) * r.width
+        const screenY = r.top + pdfTextSel.rect.y * r.height
+        return createPortal(
+          <div style={{
+            position: 'fixed',
+            left: screenX,
+            top: Math.max(60, screenY - 10),
+            transform: 'translate(-50%, -100%)',
+            zIndex: 9990,
+            background: '#1e293b',
+            color: '#fff',
+            borderRadius: 10,
+            padding: '7px 12px',
+            fontSize: 12,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            boxShadow: '0 8px 30px rgba(0,0,0,0.35)',
+            whiteSpace: 'nowrap',
+            userSelect: 'none',
+          }}>
+            <span style={{ color: '#94a3b8' }}>
+              {pdfTextSel.hits.length} text block{pdfTextSel.hits.length !== 1 ? 's' : ''} selected
+            </span>
+            <button
+              onMouseDown={e => {
+                e.stopPropagation()
+                // Sort hits reading-order (top→bottom, left→right) then join
+                const sorted = [...pdfTextSel.hits].sort((a, b) => {
+                  const rowDiff = a.y - b.y
+                  return Math.abs(rowDiff) > a.h * 0.5 ? rowDiff : a.x - b.x
+                })
+                // Group into rows and join words per row with spaces, rows with newlines
+                const rows: PdfTextHit[][] = []
+                for (const h of sorted) {
+                  const lastRow = rows[rows.length - 1]
+                  if (lastRow && Math.abs(h.y - lastRow[0].y) <= lastRow[0].h * 0.5) {
+                    lastRow.push(h)
+                  } else {
+                    rows.push([h])
+                  }
+                }
+                const combined = rows.map(r => r.map(h => h.str).join(' ')).join('\n')
+                const firstHit = sorted[0]
+                const cr = canvasRef.current?.getBoundingClientRect()
+                if (!cr) return
+                const syntheticHit: PdfTextHit = {
+                  str: combined,
+                  x: pdfTextSel.rect.x, y: pdfTextSel.rect.y,
+                  w: pdfTextSel.rect.w, h: pdfTextSel.rect.h,
+                  fontSizePdf: firstHit.fontSizePdf,
+                  fontSizeCss: firstHit.fontSizeCss,
+                }
+                setTextBubble({
+                  screenX: cr.left + pdfTextSel.rect.x * cr.width,
+                  screenY: cr.top + pdfTextSel.rect.y * cr.height,
+                  normX: pdfTextSel.rect.x, normY: pdfTextSel.rect.y,
+                  existingId: null,
+                  initialText: combined,
+                  initialFont: fontFamily, initialSize: firstHit.fontSizeCss,
+                  initialBold: false, initialItalic: false, initialUnderline: false,
+                  initialColor: '#1a1a1a', initialAlign: 'left',
+                  fromPdfHit: syntheticHit,
+                })
+                setPdfTextSel(null)
+              }}
+              style={{
+                background: '#8b5cf6', color: '#fff', border: 'none',
+                borderRadius: 7, padding: '5px 12px', cursor: 'pointer',
+                fontSize: 12, fontWeight: 600,
+              }}
+            >
+              Edit Text
+            </button>
+            <button
+              onMouseDown={e => { e.stopPropagation(); setPdfTextSel(null) }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: 18, padding: 0, lineHeight: 1 }}
+            >×</button>
+          </div>,
+          document.body
+        )
+      })()}
+
       {/* ── Text Input Portal ─────────────────────────────────────────────── */}
       {textBubble && (
         <TextInputPortal
@@ -1124,25 +1744,44 @@ function TextInputPortal({ bubble, onConfirm, onCancel }: {
   const [isUnderline, setIsUnderline] = useState(bubble.initialUnderline)
   const [textColor, setTextColor] = useState(bubble.initialColor)
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>(bubble.initialAlign)
-  const [pos, setPos] = useState({ left: bubble.screenX + 10, top: bubble.screenY + 10 })
+  const [pos, setPos] = useState({ left: 0, top: 0 })
   const taRef = useRef<HTMLTextAreaElement>(null)
 
-  // Position the popup within the viewport
+  // Load all Google Fonts once (single <link> injected into <head>)
+  useEffect(() => {
+    const id = 'pdfeditor-google-fonts'
+    if (document.getElementById(id)) return
+    const families = FONTS
+      .filter(f => f.google)
+      .map(f => `family=${f.google}`)
+      .join('&')
+    const link = document.createElement('link')
+    link.id = id; link.rel = 'stylesheet'
+    link.href = `https://fonts.googleapis.com/css2?${families}&display=swap`
+    document.head.appendChild(link)
+  }, [])
+
+  // Position popup on the OPPOSITE side of the text being edited so it stays visible
   useEffect(() => {
     if (typeof window === 'undefined') return
-    setPos({
-      left: Math.max(16, Math.min(bubble.screenX + 10, window.innerWidth - 360)),
-      top: Math.max(16, Math.min(bubble.screenY + 10, window.innerHeight - 380)),
-    })
+    const POP_W = 400, POP_H = 440, GAP = 24, MARGIN = 16
+
+    // Horizontal: text on right half → popup opens to the left, and vice-versa
+    const textOnRight = bubble.screenX > window.innerWidth / 2
+    const left = textOnRight
+      ? Math.max(MARGIN, bubble.screenX - POP_W - GAP)       // left of the text
+      : Math.min(bubble.screenX + GAP, window.innerWidth - POP_W - MARGIN) // right of it
+
+    // Vertical: align top with the text row, clamp so popup stays on screen
+    const top = Math.max(MARGIN, Math.min(bubble.screenY - 20, window.innerHeight - POP_H - MARGIN))
+
+    setPos({ left, top })
   }, [bubble.screenX, bubble.screenY])
 
-  // Focus + select-all after position settles — reliable in portals
+  // Focus + select-all after position settles
   useEffect(() => {
     const id = requestAnimationFrame(() => {
-      if (taRef.current) {
-        taRef.current.focus()
-        taRef.current.select()
-      }
+      if (taRef.current) { taRef.current.focus(); taRef.current.select() }
     })
     return () => cancelAnimationFrame(id)
   }, [pos])
@@ -1154,60 +1793,72 @@ function TextInputPortal({ bubble, onConfirm, onCancel }: {
 
   if (typeof document === 'undefined') return null
 
-  const btnBase: React.CSSProperties = { width: 28, height: 28, border: '1px solid #e5e7eb', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center' }
+  const btnBase: React.CSSProperties = { width: 28, height: 28, border: '1px solid #e5e7eb', borderRadius: 6, cursor: 'pointer', fontWeight: 700, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }
   const btnActive: React.CSSProperties = { ...btnBase, border: '1px solid #8b5cf6', background: '#ede9fe', color: '#7c3aed' }
   const btnInactive: React.CSSProperties = { ...btnBase, background: 'white', color: '#6b7280' }
 
   const isPdfEdit = !!bubble.fromPdfHit
+  const accentColor = isPdfEdit ? '#f59e0b' : '#8b5cf6'
+
+  // Cap preview size so the textarea stays usable; actual placed size is unchanged
+  const previewFontSize = Math.min(size, 36)
 
   return createPortal(
     <div style={{ position: 'fixed', inset: 0, zIndex: 9999 }}
       onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel() }}>
-      <div style={{ position: 'absolute', left: pos.left, top: pos.top, width: 360, background: '#fff', border: isPdfEdit ? '1.5px solid #f59e0b' : '1.5px solid #e5e7eb', borderRadius: 14, boxShadow: '0 20px 60px rgba(0,0,0,0.22)', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', left: pos.left, top: pos.top, width: 400, background: '#fff', border: `1.5px solid ${isPdfEdit ? '#f59e0b' : '#e5e7eb'}`, borderRadius: 14, boxShadow: '0 20px 60px rgba(0,0,0,0.22)', overflow: 'hidden' }}>
 
         {/* Header */}
         <div style={{ background: isPdfEdit ? '#fffbeb' : '#f8f9fa', borderBottom: `1px solid ${isPdfEdit ? '#fde68a' : '#e5e7eb'}`, padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            {isPdfEdit && (
-              <span style={{ background: '#f59e0b', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20 }}>PDF TEXT</span>
-            )}
+            {isPdfEdit && <span style={{ background: '#f59e0b', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20 }}>PDF TEXT</span>}
             <span style={{ fontWeight: 600, fontSize: 13, color: '#374151' }}>
               {bubble.existingId ? 'Edit Text' : isPdfEdit ? 'Edit PDF Text' : 'Add Text'}
             </span>
           </div>
-          <button onMouseDown={(e) => { e.stopPropagation(); onCancel() }}
+          <button onMouseDown={e => { e.stopPropagation(); onCancel() }}
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: 20, lineHeight: 1, padding: 0 }}>×</button>
         </div>
 
-        {/* Tip for PDF text edits */}
         {isPdfEdit && (
           <div style={{ background: '#fffbeb', borderBottom: '1px solid #fde68a', padding: '6px 14px', fontSize: 11, color: '#92400e', lineHeight: 1.4 }}>
-            ✏️ Original text is pre-filled. Edit it below then click <strong>Replace Text</strong>.
+            ✏️ Original text is pre-filled. Edit it then click <strong>Replace Text</strong>.
           </div>
         )}
 
         {/* Format toolbar */}
         <div style={{ padding: '8px 14px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
+          {/* Font family — styled with the selected font so you can preview it */}
           <select value={font} onChange={e => setFont(e.target.value)}
             onMouseDown={e => e.stopPropagation()}
-            style={{ fontSize: 12, border: '1px solid #e5e7eb', borderRadius: 6, padding: '3px 6px', color: '#374151', background: 'white' }}>
-            {FONTS.map(f => <option key={f.label} value={f.css}>{f.label}</option>)}
+            style={{ fontSize: 12, border: '1px solid #e5e7eb', borderRadius: 6, padding: '3px 6px', color: '#374151', background: 'white', fontFamily: font, width: 148, maxWidth: '100%' }}>
+            {FONTS.map(f => (
+              <option key={f.label} value={f.css} style={{ fontFamily: f.css }}>{f.label}</option>
+            ))}
           </select>
+
           <select value={size} onChange={e => setSize(Number(e.target.value))}
             onMouseDown={e => e.stopPropagation()}
             style={{ fontSize: 12, border: '1px solid #e5e7eb', borderRadius: 6, padding: '3px 6px', color: '#374151', background: 'white', width: 60 }}>
             {FONT_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
-          <button onMouseDown={e => { e.stopPropagation(); setIsBold(v => !v) }} style={isBold ? btnActive : btnInactive}>B</button>
-          <button onMouseDown={e => { e.stopPropagation(); setIsItalic(v => !v) }} style={{ ...(isItalic ? btnActive : btnInactive), fontStyle: 'italic' }}>I</button>
-          <button onMouseDown={e => { e.stopPropagation(); setIsUnderline(v => !v) }} style={{ ...(isUnderline ? btnActive : btnInactive), textDecoration: 'underline' }}>U</button>
-          <input type="color" value={textColor.startsWith('#') ? textColor : '#000000'}
-            onChange={e => setTextColor(e.target.value)}
-            onMouseDown={e => e.stopPropagation()}
-            style={{ width: 28, height: 28, border: '1px solid #e5e7eb', borderRadius: 6, padding: 2, cursor: 'pointer' }} />
+
+          <button onMouseDown={e => { e.stopPropagation(); setIsBold(v => !v) }} style={isBold ? btnActive : btnInactive} title="Bold">B</button>
+          <button onMouseDown={e => { e.stopPropagation(); setIsItalic(v => !v) }} style={{ ...(isItalic ? btnActive : btnInactive), fontStyle: 'italic' }} title="Italic">I</button>
+          <button onMouseDown={e => { e.stopPropagation(); setIsUnderline(v => !v) }} style={{ ...(isUnderline ? btnActive : btnInactive), textDecoration: 'underline' }} title="Underline">U</button>
+
+          {/* Color swatch + picker */}
+          <div style={{ position: 'relative', width: 28, height: 28, flexShrink: 0 }}>
+            <div style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid #e5e7eb', background: textColor, cursor: 'pointer', boxSizing: 'border-box' }} />
+            <input type="color" value={textColor.startsWith('#') ? textColor : '#000000'}
+              onChange={e => setTextColor(e.target.value)}
+              onMouseDown={e => e.stopPropagation()}
+              style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer', padding: 0, border: 'none' }} />
+          </div>
+
           {(['left', 'center', 'right'] as const).map(a => (
             <button key={a} onMouseDown={e => { e.stopPropagation(); setTextAlign(a) }}
-              style={{ ...(textAlign === a ? btnActive : btnInactive) }}>
+              style={{ ...(textAlign === a ? btnActive : btnInactive) }} title={a}>
               <svg width={12} height={12} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                 {a === 'left' && <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></>}
                 {a === 'center' && <><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></>}
@@ -1217,7 +1868,7 @@ function TextInputPortal({ bubble, onConfirm, onCancel }: {
           ))}
         </div>
 
-        {/* Textarea — always 14px so it reads like an editor, not a styled label */}
+        {/* Live-preview textarea — reflects all formatting choices in real time */}
         <div style={{ padding: '10px 14px' }}>
           <textarea
             ref={taRef}
@@ -1231,22 +1882,28 @@ function TextInputPortal({ bubble, onConfirm, onCancel }: {
             placeholder={isPdfEdit ? 'Edit the text above…' : 'Type your text… (Enter to place, Shift+Enter for new line)'}
             style={{
               width: '100%', minHeight: 90, resize: 'vertical',
-              border: `1.5px solid ${isPdfEdit ? '#f59e0b' : '#8b5cf6'}`, borderRadius: 8,
+              border: `1.5px solid ${accentColor}`, borderRadius: 8,
               padding: '8px 10px',
-              // Always 14px in the editing box — actual size set via the size selector
-              fontSize: 14, fontFamily: 'inherit',
-              color: '#111827',
+              // ── live preview: reflect every formatting choice ──────────────
+              fontFamily: font,
+              fontSize: previewFontSize,
+              fontWeight: isBold ? 'bold' : 'normal',
+              fontStyle: isItalic ? 'italic' : 'normal',
+              textDecoration: isUnderline ? 'underline' : 'none',
+              color: textColor,
+              textAlign,
+              // ─────────────────────────────────────────────────────────────
               outline: 'none', boxSizing: 'border-box',
-              background: '#fff', lineHeight: 1.6,
+              background: '#fff', lineHeight: 1.5,
               boxShadow: `0 0 0 3px ${isPdfEdit ? 'rgba(245,158,11,0.15)' : 'rgba(139,92,246,0.12)'}`,
               cursor: 'text',
+              transition: 'font-family 0.15s, font-size 0.1s, color 0.1s',
             }}
           />
-          {isPdfEdit && (
-            <p style={{ fontSize: 11, color: '#6b7280', marginTop: 4 }}>
-              Size: <strong>{size}px</strong> · All text above is selected — just start typing to replace it
-            </p>
-          )}
+          <p style={{ fontSize: 10, color: '#9ca3af', marginTop: 4, display: 'flex', justifyContent: 'space-between' }}>
+            <span>Preview reflects font, size &amp; color</span>
+            <span>Placed size: <strong style={{ color: '#6b7280' }}>{size}px</strong></span>
+          </p>
         </div>
 
         {/* Action buttons */}
@@ -1256,7 +1913,7 @@ function TextInputPortal({ bubble, onConfirm, onCancel }: {
             Cancel
           </button>
           <button onMouseDown={e => { e.stopPropagation(); confirm() }}
-            style={{ padding: '7px 18px', border: 'none', borderRadius: 8, background: isPdfEdit ? '#f59e0b' : '#8b5cf6', color: 'white', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
+            style={{ padding: '7px 18px', border: 'none', borderRadius: 8, background: accentColor, color: 'white', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
             {bubble.existingId ? 'Update' : isPdfEdit ? 'Replace Text' : 'Place Text'}
           </button>
         </div>
@@ -1323,10 +1980,16 @@ function BrushPath({ annot: a, selected, isHighlight }: { annot: Annot; selected
   const sw = a.strokeWidth * 0.003
   const d = smoothPath(a.points)
   return (
-    <path d={d} stroke={a.color} strokeWidth={sw} fill="none"
-      opacity={isHighlight ? 0.4 : a.opacity}
-      strokeLinejoin="round" strokeLinecap="round"
-      strokeDasharray={selected ? `${sw * 3} ${sw * 1.5}` : undefined} />
+    <g>
+      {/* Violet glow outline when selected — no dashes so the path stays smooth */}
+      {selected && (
+        <path d={d} stroke="#8b5cf6" strokeWidth={sw + 0.006} fill="none"
+          opacity={0.45} strokeLinejoin="round" strokeLinecap="round" />
+      )}
+      <path d={d} stroke={a.color} strokeWidth={sw} fill="none"
+        opacity={isHighlight ? 0.4 : a.opacity}
+        strokeLinejoin="round" strokeLinecap="round" />
+    </g>
   )
 }
 
@@ -1344,11 +2007,8 @@ function TextLabel({ annot: a, selected }: { annot: Annot; selected: boolean }) 
       opacity: a.opacity, padding: '1px 2px', borderRadius: 2,
       whiteSpace: 'pre-wrap', lineHeight: 1.35,
       pointerEvents: 'none',
-      // Extracted text: amber dotted outline so user knows it's editable
-      outline: selected ? '2px solid #8b5cf6' : a.fromPdf ? '1px dashed rgba(217,119,6,0.6)' : 'none',
-      // White cover so edited text visually replaces the original underneath
-      background: a.fromPdf ? 'rgba(255,255,255,0.96)' : 'transparent',
-      boxShadow: a.fromPdf ? '0 0 0 3px rgba(255,255,255,0.96)' : 'none',
+      outline: selected ? '2px solid #8b5cf6' : 'none',
+      background: 'transparent',
       zIndex: 12, userSelect: 'none',
     }}>
       {a.text}

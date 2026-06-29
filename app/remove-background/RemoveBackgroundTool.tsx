@@ -3,9 +3,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import AdSlot from '@/components/AdSlot'
 
-type Status = 'idle' | 'loading-model' | 'processing' | 'done' | 'error'
+type Status = 'idle' | 'processing' | 'done' | 'error'
 
-interface Result {
+interface ImgResult {
   name: string
   originalUrl: string
   resultUrl: string
@@ -14,336 +14,470 @@ interface Result {
   h: number
 }
 
-const fmt = (b: number) =>
-  b >= 1_048_576 ? (b / 1_048_576).toFixed(2) + ' MB' : (b / 1024).toFixed(1) + ' KB'
+const BG_COLORS = [
+  { value: 'transparent', label: 'None'    },
+  { value: '#ffffff',     label: 'White'   },
+  { value: '#000000',     label: 'Black'   },
+  { value: '#f3f4f6',     label: 'Gray'    },
+  { value: '#fef9c3',     label: 'Yellow'  },
+  { value: '#fde68a',     label: 'Amber'   },
+  { value: '#bbf7d0',     label: 'Mint'    },
+  { value: '#22c55e',     label: 'Green'   },
+  { value: '#bfdbfe',     label: 'Sky'     },
+  { value: '#3b82f6',     label: 'Blue'    },
+  { value: '#e9d5ff',     label: 'Lavender'},
+  { value: '#a855f7',     label: 'Purple'  },
+  { value: '#fce7f3',     label: 'Pink'    },
+  { value: '#ef4444',     label: 'Red'     },
+]
+
+const CHECKER = 'repeating-conic-gradient(#d1d5db 0% 25%,#ffffff 0% 50%) 0 0/20px 20px'
+const CHECKER_SM = 'repeating-conic-gradient(#d1d5db 0% 25%,#ffffff 0% 50%) 0 0/10px 10px'
+
+function fmt(b: number) { return b >= 1_048_576 ? (b / 1_048_576).toFixed(1) + ' MB' : (b / 1024).toFixed(0) + ' KB' }
 
 export default function RemoveBackgroundTool() {
-  const [status, setStatus] = useState<Status>('idle')
-  const [progress, setProgress] = useState(0)
-  const [results, setResults] = useState<Result[]>([])
-  const [dragging, setDragging] = useState(false)
-  const [error, setError] = useState('')
-  const [preview, setPreview] = useState<string | null>(null)
-  const [bgColor, setBgColor] = useState<string>('transparent')
-  const [activeResult, setActiveResult] = useState(0)
-  const urlsRef = useRef<string[]>([])
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [status,    setStatus]    = useState<Status>('idle')
+  const [progress,  setProgress]  = useState(0)
+  const [results,   setResults]   = useState<ImgResult[]>([])
+  const [dragging,  setDragging]  = useState(false)
+  const [error,     setError]     = useState('')
+  const [preview,   setPreview]   = useState<string | null>(null)
+  const [bgColor,   setBgColor]   = useState('transparent')
+  const [customBg,  setCustomBg]  = useState('#ffffff')
+  const [activeIdx, setActiveIdx] = useState(0)
+  const [slider,    setSlider]    = useState(0.5)
+  const [draggingSlider, setDraggingSlider] = useState(false)
+
+  const urlsRef    = useRef<string[]>([])
+  const inputRef   = useRef<HTMLInputElement>(null)
+  const compareRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => () => { urlsRef.current.forEach(URL.revokeObjectURL) }, [])
 
+  // ── Process files ──────────────────────────────────────────────────────────
   const processFiles = useCallback(async (files: File[]) => {
     const valid = files.filter(f => f.type.startsWith('image/') && !f.type.includes('gif'))
     if (!valid.length) { setError('Please upload JPG, PNG, or WebP images.'); return }
 
-    setStatus('loading-model')
-    setError('')
-    setResults([])
-    setProgress(0)
-    setActiveResult(0)
+    setStatus('processing'); setError(''); setResults([]); setProgress(0); setActiveIdx(0); setSlider(0.5)
 
-    // Show first image preview immediately
     const firstUrl = URL.createObjectURL(valid[0])
-    urlsRef.current.push(firstUrl)
-    setPreview(firstUrl)
+    urlsRef.current.push(firstUrl); setPreview(firstUrl)
 
     try {
-      const { removeBackground } = await import('@imgly/background-removal')
-      setStatus('processing')
+      const out: ImgResult[] = []
 
-      const out: Result[] = []
       for (let i = 0; i < valid.length; i++) {
         const file = valid[i]
-
-        // Get original dimensions
         const origUrl = URL.createObjectURL(file)
         urlsRef.current.push(origUrl)
-        const dims = await new Promise<{ w: number; h: number }>((res) => {
-          const img = new Image()
-          img.onload = () => res({ w: img.naturalWidth, h: img.naturalHeight })
-          img.src = origUrl
+
+        const dims = await new Promise<{ w: number; h: number }>(res => {
+          const img = new Image(); img.onload = () => res({ w: img.naturalWidth, h: img.naturalHeight }); img.src = origUrl
         })
 
-        const blob = await removeBackground(file, {
-          publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/',
-          progress: (key, current, total) => {
-            const fileBase = (i / valid.length) * 100
-            const fileChunk = (1 / valid.length) * 100
-            const modelProgress = total > 0 ? (current / total) * fileChunk : 0
-            setProgress(Math.round(fileBase + modelProgress))
-          },
-        })
+        const form = new FormData()
+        form.append('image', file)
 
+        const res = await fetch('/api/remove-bg', { method: 'POST', body: form })
+
+        if (!res.ok) {
+          const json = await res.json().catch(() => ({ error: res.statusText }))
+          throw new Error(json.error ?? `Server error ${res.status}`)
+        }
+
+        const blob = await res.blob()
         const resultUrl = URL.createObjectURL(blob)
         urlsRef.current.push(resultUrl)
         out.push({ name: file.name, originalUrl: origUrl, resultUrl, blob, ...dims })
         setProgress(Math.round(((i + 1) / valid.length) * 100))
       }
 
-      setResults(out)
-      setStatus('done')
+      setResults(out); setStatus('done')
     } catch (err) {
-      console.error(err)
-      setError('Background removal failed. Please try a different image.')
+      const msg = err instanceof Error ? err.message : String(err)
+      console.error('Background removal error:', msg, err)
+      setError(`Background removal failed: ${msg.slice(0, 200)}`)
       setStatus('error')
     }
   }, [])
 
   const onDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setDragging(false)
-    processFiles(Array.from(e.dataTransfer.files))
+    e.preventDefault(); setDragging(false); processFiles(Array.from(e.dataTransfer.files))
   }, [processFiles])
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.length) processFiles(Array.from(e.target.files))
-    e.target.value = ''
+    if (e.target.files?.length) processFiles(Array.from(e.target.files)); e.target.value = ''
   }
 
-  const download = async (result: Result) => {
-    if (bgColor === 'transparent') {
-      const a = document.createElement('a')
-      a.href = result.resultUrl
-      a.download = result.name.replace(/\.[^.]+$/, '') + '-no-bg.png'
-      a.click()
-      return
-    }
+  // ── Comparison slider ──────────────────────────────────────────────────────
+  const sliderPosFromEvent = (e: React.PointerEvent) => {
+    if (!compareRef.current) return 0.5
+    const r = compareRef.current.getBoundingClientRect()
+    return Math.max(0.01, Math.min(0.99, (e.clientX - r.left) / r.width))
+  }
 
-    // Composite result onto chosen background colour
-    const canvas = document.createElement('canvas')
-    canvas.width = result.w
-    canvas.height = result.h
+  const onSliderDown = (e: React.PointerEvent) => {
+    e.preventDefault(); setDraggingSlider(true); setSlider(sliderPosFromEvent(e))
+    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+  }
+  const onSliderMove  = (e: React.PointerEvent) => { if (draggingSlider) setSlider(sliderPosFromEvent(e)) }
+  const onSliderUp    = () => setDraggingSlider(false)
+
+  // ── Download ───────────────────────────────────────────────────────────────
+  const download = async (r: ImgResult) => {
+    const effectiveBg = bgColor === 'custom' ? customBg : bgColor
+    if (effectiveBg === 'transparent') {
+      const a = document.createElement('a'); a.href = r.resultUrl; a.download = r.name.replace(/\.[^.]+$/, '') + '-no-bg.png'; a.click(); return
+    }
+    const canvas = document.createElement('canvas'); canvas.width = r.w; canvas.height = r.h
     const ctx = canvas.getContext('2d')!
-    ctx.fillStyle = bgColor
-    ctx.fillRect(0, 0, result.w, result.h)
-    const img = new Image()
-    img.onload = () => {
+    ctx.fillStyle = effectiveBg; ctx.fillRect(0, 0, r.w, r.h)
+    const img = new Image(); img.onload = () => {
       ctx.drawImage(img, 0, 0)
-      canvas.toBlob((blob) => {
+      canvas.toBlob(blob => {
         if (!blob) return
         const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = result.name.replace(/\.[^.]+$/, '') + '-no-bg.png'
-        a.click()
-        setTimeout(() => URL.revokeObjectURL(url), 5000)
+        const a = document.createElement('a'); a.href = url; a.download = r.name.replace(/\.[^.]+$/, '') + '-no-bg.png'; a.click()
+        setTimeout(() => URL.revokeObjectURL(url), 5_000)
       }, 'image/png')
-    }
-    img.src = result.resultUrl
+    }; img.src = r.resultUrl
+  }
+
+  const downloadAll = async () => {
+    const JSZip = (await import('jszip')).default; const zip = new JSZip()
+    for (const r of results) { const res = await fetch(r.resultUrl); zip.file(r.name.replace(/\.[^.]+$/, '') + '-no-bg.png', await res.blob()) }
+    const blob = await zip.generateAsync({ type: 'blob' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a'); a.href = url; a.download = 'removed-backgrounds.zip'; a.click()
+    setTimeout(() => URL.revokeObjectURL(url), 5_000)
   }
 
   const reset = () => {
-    urlsRef.current.forEach(URL.revokeObjectURL)
-    urlsRef.current = []
-    setStatus('idle')
-    setResults([])
-    setPreview(null)
-    setError('')
-    setProgress(0)
-    setActiveResult(0)
+    urlsRef.current.forEach(URL.revokeObjectURL); urlsRef.current = []
+    setStatus('idle'); setResults([]); setPreview(null); setError(''); setProgress(0); setActiveIdx(0); setSlider(0.5)
   }
 
-  const active = results[activeResult]
+  const active     = results[activeIdx]
+  const effectiveBg = bgColor === 'custom' ? customBg : bgColor
 
-  // ── Idle / upload state ──────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // IDLE / ERROR — Upload screen
+  // ═══════════════════════════════════════════════════════════════════════════
   if (status === 'idle' || status === 'error') {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-10">
-        <div
-          onDrop={onDrop}
-          onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
-          onDragLeave={() => setDragging(false)}
-          onClick={() => inputRef.current?.click()}
-          className={`relative border-2 border-dashed rounded-2xl p-14 flex flex-col items-center justify-center gap-4 cursor-pointer transition-all select-none
-            ${dragging ? 'border-green-400 bg-green-50 scale-[1.01]' : 'border-line hover:border-green-400 hover:bg-green-50/40 bg-white'}`}
-        >
-          <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={onFileChange} />
-
-          <div className="w-16 h-16 rounded-2xl bg-green-50 border border-green-100 flex items-center justify-center">
-            <svg className="w-8 h-8 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <circle cx="8.5" cy="8.5" r="1.5"/>
-              <path d="m21 15-5-5L5 21"/>
-              <path d="M3 3l18 18" strokeWidth="1.5" strokeDasharray="2 2" className="opacity-0"/>
-            </svg>
+      <div className="min-h-[calc(100vh-57px)] bg-gray-50 flex flex-col items-center justify-center px-4 py-12">
+        <div className="w-full max-w-2xl">
+          {/* Hero text */}
+          <div className="text-center mb-8">
+            <h1 className="font-display font-bold text-3xl text-ink mb-2">Remove Image Background</h1>
+            <p className="text-mute text-base">100% automatic · AI-powered · Free · No upload · Results in seconds</p>
           </div>
 
-          <div className="text-center">
-            <p className="font-display font-bold text-ink text-lg">Drop images here</p>
-            <p className="text-mute text-sm mt-1">or click to browse · JPG, PNG, WebP · Batch supported</p>
-          </div>
+          {/* Drop zone */}
+          <div
+            onDrop={onDrop}
+            onDragOver={e => { e.preventDefault(); setDragging(true) }}
+            onDragLeave={() => setDragging(false)}
+            onClick={() => inputRef.current?.click()}
+            className={`relative border-2 border-dashed rounded-3xl p-16 flex flex-col items-center justify-center gap-5 cursor-pointer transition-all select-none
+              ${dragging ? 'border-green-400 bg-green-50 scale-[1.01]' : 'border-gray-200 hover:border-green-400 hover:bg-green-50/40 bg-white shadow-sm'}`}
+          >
+            <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={onFileChange} />
 
-          <div className="flex items-center gap-2 bg-green-50 border border-green-100 rounded-full px-4 py-2 text-xs text-green-700 font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block animate-pulse" />
-            100% private — AI runs in your browser, no uploads
-          </div>
-        </div>
+            {/* Icon */}
+            <div className={`w-20 h-20 rounded-2xl flex items-center justify-center transition-colors ${dragging ? 'bg-green-100' : 'bg-green-50'}`}>
+              <svg className="w-10 h-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+              </svg>
+            </div>
 
-        {error && (
-          <div className="mt-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-sm font-medium text-center">
-            {error}
-          </div>
-        )}
+            <div className="text-center">
+              <p className="font-display font-bold text-xl text-ink">
+                {dragging ? 'Drop to remove background' : 'Drop image here'}
+              </p>
+              <p className="text-mute text-sm mt-1.5">or click to browse · JPG, PNG, WebP · Batch supported</p>
+            </div>
 
-        <AdSlot position="footer" />
-      </div>
-    )
-  }
+            <button
+              onClick={e => { e.stopPropagation(); inputRef.current?.click() }}
+              className="mt-1 bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-3 rounded-xl text-base transition-colors shadow-sm"
+            >
+              Upload Image
+            </button>
 
-  // ── Loading / Processing state ───────────────────────────────────────────
-  if (status === 'loading-model' || status === 'processing') {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-16 flex flex-col items-center gap-6">
-        {preview && (
-          <div className="relative w-48 h-48 rounded-2xl overflow-hidden border border-line shadow-sm">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={preview} alt="preview" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center">
-              <div className="w-12 h-12 rounded-full border-4 border-green-200 border-t-green-500 animate-spin" />
+            <div className="flex items-center gap-2 text-xs text-green-700 bg-green-50 border border-green-100 rounded-full px-4 py-2 font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              AI-powered · Fast · Free · No sign-up required
             </div>
           </div>
-        )}
-        <div className="text-center">
-          <p className="font-display font-bold text-ink text-lg">
-            {status === 'loading-model' ? 'Loading AI model…' : 'Removing background…'}
-          </p>
-          <p className="text-mute text-sm mt-1">
-            {status === 'loading-model'
-              ? 'Downloading the AI model once — cached for future use'
-              : `${progress}% complete`}
-          </p>
-        </div>
 
-        {status === 'processing' && (
-          <div className="w-64 bg-gray-100 rounded-full h-2 overflow-hidden">
-            <div
-              className="h-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        )}
+          {error && (
+            <div className="mt-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-sm font-medium text-center">{error}</div>
+          )}
 
-        {status === 'loading-model' && (
-          <div className="flex gap-1.5">
-            {[0, 1, 2].map(i => (
-              <div key={i} className="w-2 h-2 rounded-full bg-green-400 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+          {/* Feature pills */}
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {['People & portraits', 'Products', 'Animals', 'Cars', 'Graphics & logos'].map(label => (
+              <span key={label} className="text-xs font-semibold bg-white border border-gray-200 text-gray-600 rounded-full px-4 py-2 shadow-sm">{label}</span>
             ))}
           </div>
-        )}
+        </div>
+
+        <div className="mt-10 w-full max-w-2xl"><AdSlot position="footer" /></div>
       </div>
     )
   }
 
-  // ── Done state ───────────────────────────────────────────────────────────
-  return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      {/* Thumbnail strip for batch */}
-      {results.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-6">
-          {results.map((r, i) => (
-            <button key={i} onClick={() => setActiveResult(i)}
-              className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${i === activeResult ? 'border-green-500 shadow-md' : 'border-line hover:border-green-300'}`}>
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LOADING / PROCESSING
+  // ═══════════════════════════════════════════════════════════════════════════
+  if (status === 'processing') {
+    return (
+      <div className="min-h-[calc(100vh-57px)] bg-gray-50 flex items-center justify-center px-4">
+        <div className="flex flex-col items-center gap-6 text-center">
+          {/* Image preview with spinner overlay */}
+          {preview && (
+            <div className="relative w-56 h-56 rounded-2xl overflow-hidden shadow-lg border border-gray-200">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={r.resultUrl} alt={r.name} className="w-full h-full object-cover" style={{ background: 'repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%) 0 0 / 12px 12px' }} />
+              <img src={preview} alt="preview" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 backdrop-blur-[2px] bg-white/50 flex flex-col items-center justify-center gap-3">
+                <div className="w-14 h-14 rounded-full border-4 border-green-100 border-t-green-500 animate-spin" />
+                {status === 'processing' && (
+                  <span className="font-bold text-green-700 text-sm bg-white/90 px-3 py-1 rounded-full">{progress}%</span>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <p className="font-display font-bold text-xl text-ink">Removing background…</p>
+            <p className="text-mute text-sm mt-1">AI is processing your image — hang tight!</p>
+          </div>
+
+          <div className="w-72 bg-gray-200 rounded-full h-2.5 overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-300"
+              style={{ width: `${progress > 0 ? progress : 30}%` }} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // DONE — Result view
+  // ═══════════════════════════════════════════════════════════════════════════
+  return (
+    <div className="min-h-[calc(100vh-57px)] bg-gray-50 flex flex-col">
+
+      {/* Batch thumbnail strip */}
+      {results.length > 1 && (
+        <div className="flex gap-2 px-6 pt-4 overflow-x-auto">
+          {results.map((r, i) => (
+            <button key={i} onClick={() => { setActiveIdx(i); setSlider(0.5) }}
+              className={`shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 transition-all ${i === activeIdx ? 'border-green-500 shadow' : 'border-gray-200 hover:border-green-300'}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={r.resultUrl} alt={r.name} className="w-full h-full object-cover"
+                style={{ background: CHECKER_SM }} />
             </button>
           ))}
         </div>
       )}
 
       {active && (
-        <>
-          {/* Before / After comparison */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div className="bg-white border border-line rounded-2xl overflow-hidden">
-              <p className="text-xs font-bold uppercase tracking-widest text-mute px-4 py-2.5 border-b border-line">Original</p>
-              <div className="p-4 flex items-center justify-center min-h-[280px]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={active.originalUrl} alt="original" className="max-w-full max-h-64 rounded-xl object-contain shadow-sm" />
-              </div>
-            </div>
+        <div className="flex flex-1 gap-0">
 
-            <div className="bg-white border border-green-200 rounded-2xl overflow-hidden">
-              <p className="text-xs font-bold uppercase tracking-widest text-green-600 px-4 py-2.5 border-b border-green-100">Background Removed</p>
+          {/* ── LEFT: Comparison viewer ── */}
+          <div className="flex-1 flex items-center justify-center p-6 min-h-0">
+            <div className="w-full max-w-3xl">
+
+              {/* Comparison drag area */}
               <div
-                className="p-4 flex items-center justify-center min-h-[280px] rounded-b-2xl"
-                style={{ background: bgColor === 'transparent' ? 'repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%) 0 0 / 16px 16px' : bgColor }}
+                ref={compareRef}
+                className="relative overflow-hidden rounded-2xl shadow-xl select-none cursor-col-resize"
+                style={{ background: CHECKER }}
+                onPointerDown={onSliderDown}
+                onPointerMove={onSliderMove}
+                onPointerUp={onSliderUp}
+                onPointerLeave={onSliderUp}
               >
+                {/* Result layer (right side) */}
+                <div
+                  className="absolute inset-0"
+                  style={{ background: effectiveBg === 'transparent' ? CHECKER : effectiveBg }}
+                />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={active.resultUrl} alt="result" className="max-w-full max-h-64 rounded-xl object-contain" />
+                <img
+                  src={active.resultUrl}
+                  alt="result"
+                  className="relative block w-full"
+                  style={{ maxHeight: 'calc(100vh - 200px)', objectFit: 'contain' }}
+                  draggable={false}
+                />
+
+                {/* Original image clipped to left of slider */}
+                <div
+                  className="absolute inset-0 overflow-hidden"
+                  style={{ clipPath: `inset(0 ${(1 - slider) * 100}% 0 0)` }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={active.originalUrl}
+                    alt="original"
+                    className="w-full h-full object-contain"
+                    draggable={false}
+                  />
+                </div>
+
+                {/* Slider line */}
+                <div
+                  className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_8px_rgba(0,0,0,0.4)]"
+                  style={{ left: `${slider * 100}%`, transform: 'translateX(-50%)' }}
+                >
+                  {/* Handle circle */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center border border-gray-200">
+                    <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Before / After labels */}
+                <div className="absolute top-3 left-3 pointer-events-none"
+                  style={{ opacity: slider > 0.12 ? 1 : 0, transition: 'opacity 0.2s' }}>
+                  <span className="text-xs font-bold text-white bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full">Before</span>
+                </div>
+                <div className="absolute top-3 right-3 pointer-events-none"
+                  style={{ opacity: slider < 0.88 ? 1 : 0, transition: 'opacity 0.2s' }}>
+                  <span className="text-xs font-bold text-white bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full">After</span>
+                </div>
+
+                {/* Hint text */}
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 pointer-events-none">
+                  <span className="text-[11px] font-semibold text-white bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full whitespace-nowrap">
+                    ← Drag to compare →
+                  </span>
+                </div>
               </div>
+
+              {/* Image info */}
+              <p className="text-xs text-mute text-center mt-3">
+                {active.w} × {active.h} px · {active.name}
+              </p>
             </div>
           </div>
 
-          {/* Background colour picker */}
-          <div className="bg-white border border-line rounded-2xl p-5 mb-5">
-            <p className="text-sm font-semibold text-ink mb-3">Background colour</p>
-            <div className="flex flex-wrap gap-2 items-center">
-              {[
-                { label: 'Transparent', value: 'transparent' },
-                { label: 'White', value: '#ffffff' },
-                { label: 'Black', value: '#000000' },
-                { label: 'Red', value: '#ef4444' },
-                { label: 'Blue', value: '#3b82f6' },
-                { label: 'Green', value: '#22c55e' },
-                { label: 'Yellow', value: '#facc15' },
-              ].map(c => (
-                <button key={c.value} onClick={() => setBgColor(c.value)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${bgColor === c.value ? 'border-green-500 bg-green-50 text-green-700' : 'border-line text-mute hover:border-gray-300'}`}
-                  style={c.value !== 'transparent' ? { background: c.value === bgColor ? undefined : c.value + '18' } : {}}>
-                  {c.value === 'transparent' && <span className="inline-block w-3 h-3 mr-1.5 rounded-sm" style={{ background: 'repeating-conic-gradient(#ccc 0% 25%, white 0% 50%) 0 0 / 8px 8px' }} />}
-                  {c.label}
+          {/* ── RIGHT: Controls panel ── */}
+          <div className="w-80 shrink-0 border-l border-gray-200 bg-white flex flex-col overflow-y-auto">
+            <div className="p-5 space-y-6 flex-1">
+
+              {/* Download */}
+              <div>
+                <button
+                  onClick={() => download(active)}
+                  className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 rounded-xl text-base transition-colors flex items-center justify-center gap-2.5 shadow-sm"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download PNG
                 </button>
-              ))}
-              <div className="flex items-center gap-2 ml-1">
-                <label className="text-xs text-mute font-medium">Custom:</label>
-                <input type="color" value={bgColor === 'transparent' ? '#ffffff' : bgColor}
-                  onChange={e => setBgColor(e.target.value)}
-                  className="w-8 h-8 rounded-lg border border-line cursor-pointer p-0.5" />
+                {effectiveBg !== 'transparent' && (
+                  <p className="text-[11px] text-mute text-center mt-1.5">PNG with {effectiveBg} background</p>
+                )}
+                {effectiveBg === 'transparent' && (
+                  <p className="text-[11px] text-mute text-center mt-1.5">PNG with transparent background</p>
+                )}
               </div>
+
+              {/* Background color */}
+              <div>
+                <p className="text-sm font-bold text-ink mb-3">Background</p>
+
+                {/* Color grid */}
+                <div className="grid grid-cols-7 gap-1.5 mb-3">
+                  {BG_COLORS.map(c => (
+                    <button
+                      key={c.value}
+                      title={c.label}
+                      onClick={() => setBgColor(c.value)}
+                      className={`w-full aspect-square rounded-lg border-2 transition-all ${bgColor === c.value ? 'border-green-500 scale-110 shadow' : 'border-transparent hover:border-gray-300'}`}
+                      style={c.value === 'transparent'
+                        ? { background: CHECKER_SM }
+                        : { background: c.value }
+                      }
+                    />
+                  ))}
+                  {/* Custom color swatch */}
+                  <div className="relative w-full aspect-square">
+                    <input
+                      type="color"
+                      value={customBg}
+                      onChange={e => { setCustomBg(e.target.value); setBgColor('custom') }}
+                      onClick={() => setBgColor('custom')}
+                      title="Custom color"
+                      className={`absolute inset-0 w-full h-full rounded-lg border-2 cursor-pointer opacity-100 ${bgColor === 'custom' ? 'border-green-500 scale-110 shadow' : 'border-transparent hover:border-gray-300'}`}
+                      style={{ padding: '2px' }}
+                    />
+                  </div>
+                </div>
+
+                {/* Selected background label */}
+                <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2">
+                  <div className="w-5 h-5 rounded flex-shrink-0 border border-gray-200"
+                    style={effectiveBg === 'transparent' ? { background: CHECKER_SM } : { background: effectiveBg }} />
+                  <span className="text-xs font-semibold text-ink">
+                    {bgColor === 'transparent' ? 'Transparent (PNG)' : bgColor === 'custom' ? `Custom (${customBg})` : BG_COLORS.find(c => c.value === bgColor)?.label ?? bgColor}
+                  </span>
+                </div>
+              </div>
+
+              {/* Image size info */}
+              <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+                <p className="text-xs font-bold text-mute uppercase tracking-wider">Image Info</p>
+                <div className="flex justify-between text-xs">
+                  <span className="text-mute">Dimensions</span>
+                  <span className="font-semibold text-ink">{active.w} × {active.h} px</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-mute">Format</span>
+                  <span className="font-semibold text-ink">PNG (lossless)</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-mute">File size</span>
+                  <span className="font-semibold text-ink">{fmt(active.blob.size)}</span>
+                </div>
+              </div>
+
+              {/* Download all (batch) */}
+              {results.length > 1 && (
+                <button
+                  onClick={downloadAll}
+                  className="w-full border border-green-200 bg-green-50 hover:bg-green-100 text-green-700 font-semibold py-3 rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download All ({results.length}) as ZIP
+                </button>
+              )}
+
+              {/* New image */}
+              <button
+                onClick={reset}
+                className="w-full border border-gray-200 text-gray-600 hover:text-ink hover:border-gray-300 font-semibold py-3 rounded-xl text-sm transition-colors"
+              >
+                Remove Another Background
+              </button>
+            </div>
+
+            <div className="p-4 border-t border-gray-100">
+              <AdSlot position="footer" />
             </div>
           </div>
-
-          {/* Actions */}
-          <div className="flex flex-wrap gap-3">
-            <button onClick={() => download(active)}
-              className="btn-royal flex items-center gap-2 px-6 py-3 rounded-xl font-semibold">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              Download PNG
-            </button>
-
-            {results.length > 1 && (
-              <button onClick={async () => {
-                const JSZip = (await import('jszip')).default
-                const zip = new JSZip()
-                for (const r of results) {
-                  const resp = await fetch(r.resultUrl)
-                  const blob = await resp.blob()
-                  zip.file(r.name.replace(/\.[^.]+$/, '') + '-no-bg.png', blob)
-                }
-                const blob = await zip.generateAsync({ type: 'blob' })
-                const url = URL.createObjectURL(blob)
-                const a = document.createElement('a'); a.href = url; a.download = 'removed-backgrounds.zip'; a.click()
-                setTimeout(() => URL.revokeObjectURL(url), 5000)
-              }}
-                className="btn-ghost flex items-center gap-2 px-6 py-3 rounded-xl font-semibold">
-                Download All (.zip)
-              </button>
-            )}
-
-            <button onClick={reset}
-              className="px-6 py-3 rounded-xl border border-line text-mute hover:text-ink hover:border-gray-300 font-semibold text-sm transition-colors">
-              Remove Another
-            </button>
-          </div>
-
-          <p className="text-xs text-mute mt-3">
-            {active.w} × {active.h}px · Output: PNG with{bgColor === 'transparent' ? ' transparent background' : ` ${bgColor} background`}
-          </p>
-        </>
+        </div>
       )}
-
-      <div className="mt-8"><AdSlot position="footer" /></div>
     </div>
   )
 }

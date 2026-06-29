@@ -228,8 +228,8 @@ export const TOOLS: Tool[] = [
     iconBg: '#EFF6FF',
   },
   {
-    slug: 'resize-image',
-    name: 'Resize Image',
+    slug: 'edit-resize-image',
+    name: 'Edit & Resize Image',
     description: 'Resize images by exact pixel dimensions or percentage. Lock aspect ratio or set custom width and height.',
     shortDesc: 'Resize images by pixels or %',
     category: 'image',

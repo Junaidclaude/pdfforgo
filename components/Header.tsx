@@ -5,9 +5,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useUser, SignInButton, UserButton } from '@clerk/nextjs'
 import { TOOLS, NAV_CATEGORIES } from '@/lib/tools'
+import GoogleTranslate from './GoogleTranslate'
 
 // Tools shown directly in the top nav bar (most popular)
-const TOP_NAV_TOOLS = ['pdf-editor', 'resize-image']
+const TOP_NAV_TOOLS = ['pdf-editor', 'edit-resize-image', 'remove-background']
 
 const PDF_CATEGORIES = NAV_CATEGORIES.filter((c) => c.key !== 'image')
 
@@ -60,10 +61,10 @@ export default function Header() {
 
           {/* ── PDF Tools hover dropdown ── */}
           <div className="relative group/pdf">
-            <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium text-mute hover:text-ink hover:bg-line/60 transition-colors group-hover/pdf:text-ink group-hover/pdf:bg-line/60">
+            <Link href="/pdf-tools" className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors group-hover/pdf:text-ink group-hover/pdf:bg-line/60 ${pathname === '/pdf-tools' ? 'text-ink bg-line' : 'text-mute hover:text-ink hover:bg-line/60'}`}>
               PDF Tools
               <ChevronIcon open={false} groupHover="group-hover/pdf:rotate-180" />
-            </button>
+            </Link>
             {/* pt-2 bridge keeps hover alive between button and panel */}
             <div className="absolute top-full left-0 pt-2 pointer-events-none group-hover/pdf:pointer-events-auto">
               <div className="w-[640px] bg-white rounded-2xl shadow-2xl border border-gray-100 p-5 grid grid-cols-2 gap-5
@@ -96,10 +97,10 @@ export default function Header() {
 
           {/* ── Image Tools hover dropdown ── */}
           <div className="relative group/img">
-            <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium text-mute hover:text-ink hover:bg-line/60 transition-colors group-hover/img:text-ink group-hover/img:bg-line/60">
+            <Link href="/image-tools" className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors group-hover/img:text-ink group-hover/img:bg-line/60 ${pathname === '/image-tools' ? 'text-ink bg-line' : 'text-mute hover:text-ink hover:bg-line/60'}`}>
               Image Tools
               <ChevronIcon open={false} groupHover="group-hover/img:rotate-180" />
-            </button>
+            </Link>
             <div className="absolute top-full left-0 pt-2 pointer-events-none group-hover/img:pointer-events-auto">
               <div className="w-52 bg-white rounded-2xl shadow-2xl border border-gray-100 p-3
                 opacity-0 translate-y-[-6px] group-hover/img:opacity-100 group-hover/img:translate-y-0
@@ -124,10 +125,10 @@ export default function Header() {
 
           {/* ── ALL TOOLS hover mega menu ── */}
           <div className="relative group/mega">
-            <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium text-mute hover:text-ink hover:bg-line/60 transition-colors group-hover/mega:text-ink group-hover/mega:bg-line/60">
+            <Link href="/all-tools" className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors group-hover/mega:bg-line/60 ${pathname === '/all-tools' ? 'bg-line' : 'hover:bg-line/60'}`}>
               <span className="text-royal font-bold">ALL TOOLS</span>
               <ChevronIcon open={false} groupHover="group-hover/mega:rotate-180" />
-            </button>
+            </Link>
             <div className="absolute top-full left-0 pt-2 pointer-events-none group-hover/mega:pointer-events-auto">
               <div className="w-[1100px] bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 grid grid-cols-4 gap-6
                 opacity-0 translate-y-[-6px] group-hover/mega:opacity-100 group-hover/mega:translate-y-0
@@ -173,6 +174,7 @@ export default function Header() {
           >
             Pricing
           </Link>
+          <GoogleTranslate />
           {isLoaded && (
             isSignedIn ? (
               <UserButton />
@@ -201,6 +203,21 @@ export default function Header() {
       {/* Mobile drawer */}
       {mobileOpen && (
         <div className="lg:hidden bg-white border-t border-line overflow-y-auto max-h-[80vh]">
+          {/* Quick links to hub pages */}
+          <div className="flex gap-2 px-4 py-3 border-b border-line">
+            <Link href="/pdf-tools" onClick={() => setMobileOpen(false)}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-red-50 text-red-600 text-xs font-semibold">
+              PDF Tools
+            </Link>
+            <Link href="/image-tools" onClick={() => setMobileOpen(false)}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-pink-50 text-pink-600 text-xs font-semibold">
+              Image Tools
+            </Link>
+            <Link href="/all-tools" onClick={() => setMobileOpen(false)}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-violet-50 text-violet-600 text-xs font-semibold">
+              All Tools
+            </Link>
+          </div>
           {NAV_CATEGORIES.map((cat) => {
             const catTools = TOOLS.filter((t) => t.category === cat.key)
             const isExpanded = mobileExpanded === cat.key
@@ -314,6 +331,7 @@ function ToolIcon({ slug, size = 14 }: { slug: string; size?: number }) {
     'pdf-to-png': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>,
     'compress-image': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>,
     'resize-image': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>,
+    'edit-resize-image': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>,
     'crop-image': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>,
     'convert-image': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>,
     'pdf-editor': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M10.42 12.61a2.1 2.1 0 1 1 2.97 2.97L7.95 21 4 22l.99-3.95 5.43-5.44Z"/></svg>,

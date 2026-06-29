@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title: 'Compress Image – Free Online | PDFForge', description: 'Reduce image file size with quality control. JPG, PNG, WebP. No signup.' },
 }
 
-const RELATED_SLUGS = ['resize-image', 'convert-image', 'compress-pdf']
+const RELATED_SLUGS = ['edit-resize-image', 'convert-image', 'compress-pdf']
 
 export default function CompressImagePage() {
   const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug))

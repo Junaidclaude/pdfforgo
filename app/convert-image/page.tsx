@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title: 'Convert Image – Free Online | PDFForge', description: 'Convert JPG/PNG/WebP. Rotate and flip. Batch process. No signup.' },
 }
 
-const RELATED_SLUGS = ['compress-image', 'resize-image', 'crop-image']
+const RELATED_SLUGS = ['compress-image', 'edit-resize-image', 'crop-image']
 
 export default function ConvertImagePage() {
   const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug))

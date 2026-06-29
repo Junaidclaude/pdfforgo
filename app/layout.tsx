@@ -106,6 +106,27 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className={`${spaceGrotesk.variable} ${plusJakarta.variable}`}>
         <head>
+          {/* Suppress Google Translate / extension fetch errors before any other script runs */}
+          <script dangerouslySetInnerHTML={{ __html: `
+(function(){
+  function isSuppressed(msg) {
+    var s = String(msg || '');
+    return s.indexOf('translate') !== -1 || s.indexOf('Failed to fetch') !== -1 || s.indexOf('chrome-extension') !== -1;
+  }
+  var _onerror = window.onerror;
+  window.onerror = function(msg, src, line, col, err) {
+    if (isSuppressed(msg) || isSuppressed(src)) return true;
+    return _onerror ? _onerror(msg, src, line, col, err) : false;
+  };
+  window.addEventListener('unhandledrejection', function(e) {
+    var msg = (e.reason && e.reason.message) || e.reason || '';
+    if (isSuppressed(msg)) { e.preventDefault(); e.stopImmediatePropagation(); }
+  }, true);
+  window.addEventListener('error', function(e) {
+    if (isSuppressed(e.message) || isSuppressed(e.filename)) { e.preventDefault(); e.stopImmediatePropagation(); }
+  }, true);
+})();
+          `}} />
           {adSensePubId && (
             <Script
               async

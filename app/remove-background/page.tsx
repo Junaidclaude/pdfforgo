@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
 }
 
-const RELATED_SLUGS = ['compress-image', 'resize-image', 'crop-image']
+const RELATED_SLUGS = ['compress-image', 'edit-resize-image', 'crop-image']
 
 export default function RemoveBackgroundPage() {
   const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug))
