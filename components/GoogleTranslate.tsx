@@ -24,7 +24,6 @@ const LANGUAGES = [
 declare global {
   interface Window {
     googleTranslateElementInit?: () => void
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     google?: any
   }
 }

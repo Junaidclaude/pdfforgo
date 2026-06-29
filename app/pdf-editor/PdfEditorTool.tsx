@@ -837,7 +837,6 @@ export default function PdfEditorTool() {
       for (const pageNum of pagesToProcess) {
         const page = await doc.getPage(pageNum) as {
           getViewport: (o: { scale: number }) => { width: number; height: number }
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           getTextContent: (opts?: any) => Promise<{ items: RawItem[] }>
         }
         const vp = page.getViewport({ scale: 1 })
