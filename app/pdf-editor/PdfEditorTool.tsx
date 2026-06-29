@@ -768,7 +768,7 @@ export default function PdfEditorTool() {
       }])
       setSelectedId(id); brushPts.current = []; return
     }
-    if (shapeStart.current && tool !== 'select' && tool !== 'text' && tool !== 'draw' && tool !== 'highlight' && tool !== 'erase') {
+    if (shapeStart.current && tool !== 'select' && tool !== 'text' && tool !== 'draw' && tool !== 'highlight') {
       const sx = shapeStart.current.x, sy = shapeStart.current.y
       if (Math.abs(x - sx) < 0.005 && Math.abs(y - sy) < 0.005) { shapeStart.current = null; return }
       const id = uid()
@@ -1017,7 +1017,7 @@ export default function PdfEditorTool() {
               .filter(l => l.text.length > 0)
           }
           // Tier 2: group words by vertical proximity
-          const words: TWord[] = (data.words ?? []).filter((w: TWord) => w.text.trim().length > 0)
+          const words: TWord[] = ((data as any).words ?? []).filter((w: TWord) => w.text.trim().length > 0)
           if (words.length > 0) {
             const lineH = words.length > 0
               ? (words[0].bbox.y1 - words[0].bbox.y0) * 0.8
