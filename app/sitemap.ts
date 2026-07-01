@@ -21,10 +21,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.5,
     },
     {
-      url: `${BASE_URL}/blog`,
+      url: `${BASE_URL}/contact`,
       lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.7,
+      changeFrequency: 'yearly',
+      priority: 0.3,
     },
     {
       url: `${BASE_URL}/privacy`,

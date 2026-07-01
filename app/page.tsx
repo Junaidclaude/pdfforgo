@@ -15,6 +15,16 @@ const FEATURED_SLUGS = ['merge-pdf', 'split-pdf', 'compress-pdf', 'pdf-to-word']
 
 const FEATURES = [
   {
+    gradient: 'from-ruby to-rubyd',
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    ),
+    title: 'Most tools never touch a server',
+    body: 'Merge, split, compress, rotate, protect, image editing, background removal — all run entirely in your browser via JavaScript/WebAssembly. Your file never leaves your device. A handful of conversions (Word, Excel, HTML→PDF) need real rendering engines and process server-side over HTTPS, auto-deleted the moment your job finishes.',
+  },
+  {
     gradient: 'from-royal to-royald',
     icon: (
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -23,16 +33,6 @@ const FEATURES = [
     ),
     title: 'Real browser rendering',
     body: 'HTML conversions run on a full headless Chromium — flexbox, grid, custom fonts and gradients render exactly as designed.',
-  },
-  {
-    gradient: 'from-ruby to-rubyd',
-    icon: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg>
-    ),
-    title: 'Files auto-deleted',
-    body: 'Every upload is transmitted over HTTPS and removed from conversion servers the moment your job finishes. We never store documents.',
   },
   {
     gradient: 'from-royal to-royald',
@@ -137,6 +137,16 @@ export default function HomePage() {
             Merge, split, compress, convert and protect documents.
             Free, fast, private. No signup. No watermarks. Ever.
           </p>
+
+          {/* Privacy badge */}
+          <div className="reveal mt-4 flex justify-center">
+            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-100 px-3.5 py-1.5 text-xs font-semibold text-emerald-700">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 4.556-3.04 8.44-7.437 9.664a1.125 1.125 0 0 1-.626 0C8.54 20.44 5.5 16.556 5.5 12V6.28a1.125 1.125 0 0 1 .694-1.04l5.5-2.2a1.125 1.125 0 0 1 .812 0l5.5 2.2a1.125 1.125 0 0 1 .694 1.04V12Z" />
+              </svg>
+              Most tools run 100% in your browser — nothing to upload
+            </span>
+          </div>
 
           {/* CTAs */}
           <div className="reveal mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
