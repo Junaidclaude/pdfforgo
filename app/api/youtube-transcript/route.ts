@@ -53,10 +53,19 @@ export async function POST(req: NextRequest) {
     }
 
     // The ANDROID client isn't gated behind a PO token for caption tracks,
-    // unlike the plain WEB client.
+    // unlike the plain WEB client. Send the same headers a real Android app
+    // would (User-Agent + X-YouTube-Client-*) — without them the request
+    // looks like a bare API call rather than app traffic, which is more
+    // likely to get bot-challenged from datacenter IPs.
+    const ANDROID_UA = 'com.google.android.youtube/20.10.38 (Linux; U; Android 14) gzip'
     const playerRes = await fetch(`https://www.youtube.com/youtubei/v1/player?key=${apiKeyMatch[1]}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': ANDROID_UA,
+        'X-YouTube-Client-Name': '3',
+        'X-YouTube-Client-Version': '20.10.38',
+      },
       body: JSON.stringify({
         context: { client: { clientName: 'ANDROID', clientVersion: '20.10.38' } },
         videoId,
@@ -68,10 +77,19 @@ export async function POST(req: NextRequest) {
     const data = await playerRes.json()
 
     const status = data?.playabilityStatus?.status
+    const reason: string | undefined = data?.playabilityStatus?.reason
     if (status && status !== 'OK') {
+      // YouTube occasionally bot-challenges requests from cloud/datacenter
+      // IPs (not tied to a specific video) — surface that plainly instead
+      // of YouTube's generic "Sign in to confirm you're not a bot" text.
+      const botChallenged = /sign in to confirm/i.test(reason || '')
       return NextResponse.json(
-        { error: data?.playabilityStatus?.reason || 'This video is unavailable.' },
-        { status: 422 }
+        {
+          error: botChallenged
+            ? 'YouTube is temporarily rate-limiting requests from this server. Please try again in a few minutes.'
+            : reason || 'This video is unavailable.',
+        },
+        { status: botChallenged ? 429 : 422 }
       )
     }
 
