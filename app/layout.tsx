@@ -5,6 +5,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { ClerkProvider } from '@clerk/nextjs'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Breadcrumbs from '@/components/Breadcrumbs'
 import './globals.css'
 
 const spaceGrotesk = Space_Grotesk({
@@ -139,6 +140,7 @@ export default function RootLayout({
         </head>
         <body className="min-h-screen flex flex-col font-sans">
           <Header />
+          <Breadcrumbs />
           <main className="flex-1">{children}</main>
           <Footer />
           <Analytics />

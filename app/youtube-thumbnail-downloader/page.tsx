@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
 }
 
-const RELATED_SLUGS = ['youtube-transcript', 'compress-image', 'convert-image']
+const RELATED_SLUGS = ['youtube-transcript', 'caption-character-counter', 'hashtag-generator']
 
 export default function YoutubeThumbnailPage() {
   const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug))

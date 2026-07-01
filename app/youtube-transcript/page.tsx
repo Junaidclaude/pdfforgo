@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
 }
 
-const RELATED_SLUGS = ['pdf-to-word', 'compress-image', 'meme-generator']
+const RELATED_SLUGS = ['youtube-thumbnail-downloader', 'caption-character-counter', 'hashtag-generator']
 
 export default function YoutubeTranscriptPage() {
   const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug))

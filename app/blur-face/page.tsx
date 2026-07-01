@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
 }
 
-const RELATED_SLUGS = ['remove-background', 'compress-image', 'convert-image']
+const RELATED_SLUGS = ['bg-remover', 'compress-image', 'convert-image']
 
 export default function BlurFacePage() {
   const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug))
