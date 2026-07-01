@@ -19,8 +19,15 @@ export async function POST(req: NextRequest) {
     const mimeType = file.type || 'image/jpeg'
     const blob = new Blob([arrayBuffer], { type: mimeType })
 
-    // publicPath defaults to the local node_modules dist dir automatically
-    const resultBlob = await removeBackground(blob, { model: 'medium' })
+    // publicPath defaults to the local node_modules dist dir, but Vercel's
+    // build-time file tracer doesn't bundle the model chunks (they're loaded
+    // by hash name computed at runtime, not a traceable require()/import) —
+    // fetch them from IMG.LY's CDN instead. Must match the installed
+    // @imgly/background-removal-node version (see package.json).
+    const resultBlob = await removeBackground(blob, {
+      model: 'medium',
+      publicPath: 'https://staticimgly.com/@imgly/background-removal-data/1.4.5/dist/',
+    })
 
     const resultBuffer = Buffer.from(await resultBlob.arrayBuffer())
 

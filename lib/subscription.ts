@@ -5,6 +5,10 @@ import { useState, useEffect, useCallback } from 'react'
 
 export const FREE_DAILY_LIMIT = 10
 
+// Auth is optional: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is inlined at build time,
+// so this never changes across renders for a given deployment.
+const clerkEnabled = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
 interface ToolUsage {
   count: number
   date: string
@@ -35,7 +39,8 @@ function getToolCount(slug: string): number {
 }
 
 export function useSubscription(toolSlug: string) {
-  const { user, isLoaded } = useUser()
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { user, isLoaded } = clerkEnabled ? useUser() : { user: undefined, isLoaded: true }
   const isPro = isLoaded && user?.publicMetadata?.plan === 'pro'
   const [usagesLeft, setUsagesLeft] = useState(FREE_DAILY_LIMIT)
 

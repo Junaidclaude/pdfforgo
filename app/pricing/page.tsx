@@ -4,8 +4,15 @@ import { useUser, SignInButton } from '@clerk/nextjs'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, Suspense } from 'react'
 
+// Auth is optional: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is inlined at build time,
+// so this never changes across renders for a given deployment.
+const clerkEnabled = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
 function PricingContent() {
-  const { user, isLoaded, isSignedIn } = useUser()
+  const { user, isLoaded, isSignedIn } = clerkEnabled
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    ? useUser()
+    : { user: undefined, isLoaded: true, isSignedIn: false }
   const router = useRouter()
   const params = useSearchParams()
   const success = params.get('success')
@@ -162,12 +169,16 @@ function PricingContent() {
                   {loading === 'annual' ? 'Redirecting…' : 'Subscribe annually — $79'}
                 </button>
               </div>
-            ) : (
+            ) : clerkEnabled ? (
               <SignInButton mode="modal">
                 <button className="w-full bg-white text-red-600 font-semibold rounded-xl py-3 hover:bg-red-50 transition-colors">
                   Sign in to upgrade
                 </button>
               </SignInButton>
+            ) : (
+              <button disabled className="w-full bg-white/40 text-white/70 font-semibold rounded-xl py-3 cursor-not-allowed">
+                Pro plan coming soon
+              </button>
             )}
           </div>
         </div>

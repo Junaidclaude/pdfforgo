@@ -95,6 +95,8 @@ export const metadata: Metadata = {
   },
 }
 
+const clerkEnabled = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
 export default function RootLayout({
   children,
 }: {
@@ -102,8 +104,7 @@ export default function RootLayout({
 }) {
   const adSensePubId = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID
 
-  return (
-    <ClerkProvider>
+  const body = (
       <html lang="en" className={`${spaceGrotesk.variable} ${plusJakarta.variable}`}>
         <head>
           {/* Suppress Google Translate / extension fetch errors before any other script runs */}
@@ -143,6 +144,7 @@ export default function RootLayout({
           <Analytics />
         </body>
       </html>
-    </ClerkProvider>
   )
+
+  return clerkEnabled ? <ClerkProvider>{body}</ClerkProvider> : body
 }
