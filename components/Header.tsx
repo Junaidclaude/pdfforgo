@@ -8,7 +8,7 @@ import { TOOLS, NAV_CATEGORIES } from '@/lib/tools'
 import GoogleTranslate from './GoogleTranslate'
 
 // Tools shown directly in the top nav bar (most popular)
-const TOP_NAV_TOOLS = ['pdf-editor', 'edit-resize-image', 'remove-background']
+const TOP_NAV_TOOLS = ['pdf-editor', 'edit-resize-image', 'bg-remover']
 
 // Explicit include-list (not an exclude-list) so adding a new non-PDF
 // category — like 'social' — can't silently leak into the PDF dropdown by
@@ -350,7 +350,7 @@ function ToolIcon({ slug, size = 14 }: { slug: string; size?: number }) {
     'crop-image': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>,
     'convert-image': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>,
     'pdf-editor': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M10.42 12.61a2.1 2.1 0 1 1 2.97 2.97L7.95 21 4 22l.99-3.95 5.43-5.44Z"/></svg>,
-    'remove-background': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/><line x1="2" y1="2" x2="22" y2="22" strokeDasharray="3 3"/></svg>,
+    'bg-remover': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/><line x1="2" y1="2" x2="22" y2="22" strokeDasharray="3 3"/></svg>,
     'blur-face': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M6 16c0-2 2.7-3.5 6-3.5s6 1.5 6 3.5"/><rect x="8" y="5" width="8" height="6" rx="2" fill="currentColor" opacity="0.2"/></svg>,
     'meme-generator': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/><path d="M8 21h8M12 17v4" strokeWidth="1.5"/></svg>,
     'add-text-to-image': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 7h6M12 7v10M8 17h8"/></svg>,

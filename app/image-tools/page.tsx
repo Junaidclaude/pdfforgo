@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 const IMAGE_CATEGORIES = [
   { label: 'Edit & Transform', keys: ['edit-resize-image', 'crop-image', 'convert-image', 'compress-image'] },
-  { label: 'AI & Creative', keys: ['remove-background', 'blur-face', 'meme-generator', 'add-text-to-image'] },
+  { label: 'AI & Creative', keys: ['bg-remover', 'blur-face', 'meme-generator', 'add-text-to-image'] },
 ]
 
 export default function ImageToolsPage() {

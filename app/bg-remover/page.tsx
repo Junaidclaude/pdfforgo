@@ -14,25 +14,25 @@ const RemoveBackgroundTool = dynamic(() => import('./RemoveBackgroundTool'), {
 })
 
 export const metadata: Metadata = {
-  title: 'Remove Background – Free AI Background Remover Online | PDFForge',
+  title: 'BG Remover – Free AI Background Remover Online | PDFForge',
   description:
     'Remove image backgrounds instantly with AI. 100% free, no signup, runs entirely in your browser — your images never leave your device. Supports JPG, PNG, WebP.',
-  alternates: { canonical: '/remove-background' },
+  alternates: { canonical: '/bg-remover' },
   openGraph: {
-    title: 'Remove Image Background Free – AI-Powered | PDFForge',
+    title: 'BG Remover – Free AI-Powered Background Remover | PDFForge',
     description: 'Instantly remove backgrounds from photos. AI runs in your browser, completely private. Free, no signup.',
-    url: '/remove-background',
+    url: '/bg-remover',
     type: 'website',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Remove Background Free Online | PDFForge',
+    title: 'BG Remover Free Online | PDFForge',
     description: 'AI background remover. Runs in your browser — no uploads, no signup.',
   },
 }
 
-const RELATED_SLUGS = ['compress-image', 'edit-resize-image', 'crop-image']
+const RELATED_SLUGS = ['blur-face', 'edit-resize-image', 'compress-image']
 
 export default function RemoveBackgroundPage() {
   const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug))
@@ -47,7 +47,7 @@ export default function RemoveBackgroundPage() {
             AI runs in your browser · Zero uploads · 100% private
           </div>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-4 leading-tight text-ink">
-            Remove Image Background <span className="text-green-600">Free</span>
+            BG Remover <span className="text-green-600">Free</span>
           </h1>
           <p className="text-mute text-lg max-w-xl mx-auto">
             Instantly remove backgrounds from photos, products, portraits, and logos using on-device AI. No account, no uploads, no watermarks.
@@ -87,6 +87,43 @@ export default function RemoveBackgroundPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">How This Actually Works, and When It Struggles</h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              Background removal here runs a segmentation model directly in your browser — the same
+              category of AI that powers portrait mode on phone cameras, just running on-device instead of
+              in a data center. It looks at every pixel and estimates how likely it is to belong to the
+              main subject versus the background, then builds a soft alpha mask from those estimates rather
+              than a hard cutout line. That soft edge is what makes hair and fur look natural instead of
+              looking pasted on.
+            </p>
+            <p>
+              It does best on the case it was built for: one clear subject — a person, product, or animal —
+              against a background that contrasts with it. It struggles more with low-contrast edges (a
+              white shirt against a white wall), very fine or wispy detail at small image resolutions, and
+              busy backgrounds where it&apos;s genuinely ambiguous what counts as &quot;the subject.&quot; If
+              an edge comes out rough, the <strong>Effects</strong> tab&apos;s blur slider can soften it
+              enough to blend, and re-running on a higher-resolution source image usually helps more than
+              any setting.
+            </p>
+            <p>
+              Once the background is off, you&apos;re not limited to a transparent PNG — the{' '}
+              <strong>Background</strong> tab lets you drop in a solid color or your own image, and{' '}
+              <strong>Design</strong> gives you zoom and position controls to fit it properly behind the
+              subject. That&apos;s useful for product photos that need a consistent brand background, or
+              portraits that need a plain backdrop without actually re-shooting them.
+            </p>
+            <p>
+              Everything happens locally — the model downloads once to your browser and every image after
+              that is processed without a network round-trip, which is also why the second and third image
+              in a batch process noticeably faster than the first.
+            </p>
           </div>
         </div>
       </section>
@@ -151,9 +188,9 @@ const FAQS = [
 const SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'Background Remover — PDFForge',
+  name: 'BG Remover — PDFForge',
   applicationCategory: 'MultimediaApplication',
   operatingSystem: 'Web Browser',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-  url: 'https://pdfforge.io/remove-background',
+  url: 'https://pdfforge.io/bg-remover',
 }

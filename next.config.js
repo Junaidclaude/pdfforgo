@@ -1,5 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      // /remove-background was renamed to /bg-remover — 301 so existing
+      // bookmarks/backlinks/search rankings carry over instead of 404ing.
+      {
+        source: '/remove-background',
+        destination: '/bg-remover',
+        permanent: true,
+      },
+    ]
+  },
+
   experimental: {
     // Don't bundle native server-side packages — they contain .node binaries
     serverComponentsExternalPackages: [

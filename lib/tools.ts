@@ -210,8 +210,8 @@ export const TOOLS: Tool[] = [
     iconBg: '#EFF6FF',
   },
   {
-    slug: 'remove-background',
-    name: 'Remove Background',
+    slug: 'bg-remover',
+    name: 'BG Remover',
     description: 'Remove image backgrounds instantly with AI. Runs 100% in your browser — no uploads, no signup, no watermarks. Supports batch processing.',
     shortDesc: 'AI background remover, runs in browser',
     category: 'image',

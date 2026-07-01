@@ -39,7 +39,7 @@ const COLS = [
     links: [
       { href: '/compress-image', label: 'Compress Image' },
       { href: '/edit-resize-image', label: 'Edit & Resize Image' },
-      { href: '/remove-background', label: 'Remove Background' },
+      { href: '/bg-remover', label: 'BG Remover' },
       { href: '/crop-image', label: 'Crop Image' },
       { href: '/blur-face', label: 'Blur Face' },
       { href: '/convert-image', label: 'Convert Image' },
