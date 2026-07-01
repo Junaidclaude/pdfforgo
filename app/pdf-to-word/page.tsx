@@ -59,6 +59,36 @@ export default function PdfToWordPage() {
           </div>
         </div>
       </section>
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-syne text-2xl md:text-3xl font-extrabold text-dark mb-6">What &quot;Editable&quot; Actually Means Here</h2>
+          <div className="space-y-4 text-gray-600 text-sm md:text-base leading-relaxed">
+            <p>
+              PDF was designed to look the same everywhere, not to be edited — it stores text as
+              positioned glyphs on a page rather than as flowing paragraphs. Converting to Word means
+              reconstructing that structure: figuring out which glyphs form a paragraph, where a table
+              starts and ends, and which image is a logo versus a photo. That reconstruction is never
+              perfect for every document, which is why results vary by source file.
+            </p>
+            <p>
+              The conversion works best on PDFs that were originally created from a word processor —
+              contracts, reports, resumes exported from Word or Google Docs. Complex multi-column layouts,
+              PDFs built from design software (magazines, brochures), and scanned documents are the harder
+              cases: scans in particular contain no real text at all, just a picture of text, so they need
+              OCR (optical character recognition) rather than a straight structural conversion.
+            </p>
+            <p>
+              If your result looks close but not perfect, it&apos;s usually faster to fix spacing/formatting
+              directly in Word than to keep re-converting — small inconsistencies in font substitution or
+              table borders are normal and quick to clean up by hand. For the reverse direction, or if you
+              just need to add annotations rather than fully re-edit the text,{' '}
+              <Link href="/pdf-editor" className="text-primary hover:underline">PDF Editor</Link> lets you
+              mark up the original PDF directly without converting it at all.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-syne text-2xl md:text-3xl font-extrabold text-dark text-center mb-10">Frequently Asked Questions</h2>

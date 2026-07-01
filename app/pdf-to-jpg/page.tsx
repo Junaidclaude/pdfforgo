@@ -94,6 +94,58 @@ export default function PdfToJpgPage() {
         </div>
       </section>
 
+      {/* ── Guide ─────────────────────────────────────────── */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-syne text-2xl md:text-3xl font-extrabold text-dark mb-6">
+            Why Convert a PDF to JPG (and What You Lose)
+          </h2>
+          <div className="space-y-4 text-gray-600 text-sm md:text-base leading-relaxed">
+            <p>
+              PDF and JPG solve different problems, and converting between them means giving something up.
+              A PDF page is a set of drawing instructions — text, vector shapes, embedded fonts — rendered
+              fresh every time you open it. A JPG is a flat grid of pixels. Converting a page to JPG bakes
+              that page into a picture: perfect for dropping into a slide deck, a website, a social post, or
+              anywhere that expects an image rather than a document, but no longer selectable or searchable
+              text, and no longer infinitely scalable — it&apos;s locked to whatever resolution it was
+              rendered at.
+            </p>
+            <p>
+              That tradeoff is exactly right for some jobs and wrong for others. If you need to drop a
+              single page into a presentation, embed a diagram in a blog post, or share a page as a
+              thumbnail preview, JPG is the correct format — nobody needs to edit the text of a screenshot.
+              If you need the recipient to actually edit or copy text from the document, converting to JPG
+              is the wrong move entirely; you want{' '}
+              <Link href="/pdf-to-word" className="text-primary hover:underline">PDF to Word</Link> instead,
+              which preserves the document as editable text rather than flattening it into pixels.
+            </p>
+            <p>
+              A multi-page PDF converts to one JPG per page, not a single combined image — that&apos;s
+              inherent to the format, since JPG has no concept of &quot;pages.&quot; If you actually need a
+              single image containing multiple pages stacked or arranged together, you&apos;ll need a photo
+              or design tool to compose them after conversion; there&apos;s no PDF-to-JPG setting that can do
+              that for you, because a single flat image with multiple pages laid out is really a design
+              decision, not a file conversion.
+            </p>
+            <p>
+              Resolution is the other thing worth understanding. Text that looks perfectly crisp in the
+              original PDF (because it&apos;s vector-based, not pixels) can look soft as a JPG if it&apos;s
+              rendered at too low a resolution and then viewed large — the classic &quot;blurry when I zoom
+              in&quot; complaint. If the images are going somewhere they&apos;ll be viewed at full size or
+              printed, render at a higher resolution than you think you need; file size difference for text
+              documents is usually small, so there&apos;s little downside to erring high.
+            </p>
+            <p>
+              If you&apos;re going the other direction — you have photos or scanned pages as JPGs and need
+              them as one document —{' '}
+              <Link href="/jpg-to-pdf" className="text-primary hover:underline">JPG to PDF</Link> does that
+              conversion, and lets you combine several images into a single multi-page PDF, which is the
+              reverse of what this tool does.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">

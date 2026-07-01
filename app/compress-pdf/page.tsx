@@ -95,6 +95,47 @@ export default function CompressPdfPage() {
         </div>
       </section>
 
+      {/* ── Guide ─────────────────────────────────────────── */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-syne text-2xl md:text-3xl font-extrabold text-dark mb-6">
+            Why PDFs Get Huge (and What Actually Shrinks Them)
+          </h2>
+          <div className="space-y-4 text-gray-600 text-sm md:text-base leading-relaxed">
+            <p>
+              A 3-page PDF that&apos;s 40 MB is almost never a text problem — it&apos;s an image problem.
+              Scanned documents, screenshots pasted into a Word export, or high-resolution photos dropped
+              into a report are the usual culprits. Text and vector graphics take up almost no space by
+              comparison, so compression tools work primarily by re-encoding the embedded images at a
+              lower resolution and quality, not by touching the text itself.
+            </p>
+            <p>
+              That&apos;s why the &quot;quality&quot; setting matters more than most people expect. A scanned
+              contract that only needs to be read on screen can usually drop to a much lower quality than a
+              photography portfolio meant for print — the same compression level that looks fine for one
+              can look noticeably soft on the other. It&apos;s worth trying a middle setting first and
+              comparing file size against visual quality before going aggressive.
+            </p>
+            <p>
+              If you&apos;re specifically trying to hit an email attachment limit (commonly 25 MB on Gmail,
+              often lower on corporate mail servers), compressing is usually enough on its own. For PDFs
+              that are large mainly because they contain <em>many</em> pages rather than heavy images,
+              consider whether the recipient actually needs every page —{' '}
+              <Link href="/extract-pages" className="text-primary hover:underline">Extract Pages</Link> or{' '}
+              <Link href="/remove-pages" className="text-primary hover:underline">Remove Pages</Link> can
+              cut file size more than compression alone when the bulk of the document isn&apos;t relevant.
+            </p>
+            <p>
+              One thing compression won&apos;t fix: a PDF that&apos;s bloated because of duplicate embedded
+              fonts or leftover editing history from the software that created it. Those cases benefit more
+              from{' '}
+              <Link href="/repair-pdf" className="text-primary hover:underline">Repair PDF</Link>, which
+              rebuilds the file&apos;s internal structure rather than re-compressing images.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">

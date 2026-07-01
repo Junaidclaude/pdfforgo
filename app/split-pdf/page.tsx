@@ -94,6 +94,62 @@ export default function SplitPdfPage() {
         </div>
       </section>
 
+      {/* ── Guide ─────────────────────────────────────────── */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-syne text-2xl md:text-3xl font-extrabold text-dark mb-6">
+            A Complete Guide to Splitting PDFs
+          </h2>
+          <div className="space-y-4 text-gray-600 text-sm md:text-base leading-relaxed">
+            <p>
+              &quot;Split a PDF&quot; actually covers two different jobs people search for interchangeably,
+              and it helps to know which one you actually need. The first is <strong>extraction</strong>:
+              pulling a specific handful of pages — say, pages 4 through 9 — out of a larger document to send
+              on their own. The second is <strong>batch splitting</strong>: breaking one large file into
+              several smaller files, usually along even boundaries, like turning a 100-page scanned book
+              into ten 10-page chapters. This tool handles both, and the workflow you pick changes depending
+              on which one you&apos;re actually trying to do.
+            </p>
+            <p>
+              The most common reason people land here is a file that&apos;s too big for its purpose. A
+              200-page merged scan needs to become individual invoices again. A signed contract bundle needs
+              just the signature page pulled out for a records system. A textbook PDF needs to become
+              per-chapter files so students can download only what they need for that week. In every case,
+              the underlying problem is the same: someone combined things into one file for convenience, and
+              now that convenience is working against you.
+            </p>
+            <p>
+              <strong>If you&apos;re extracting a specific range</strong>, the fastest approach is to select
+              exactly the pages you need and export them as one file — don&apos;t split into individual
+              single-page files and then try to reassemble them, that&apos;s extra steps for no benefit. If
+              you&apos;re not sure of the exact page numbers, preview thumbnails first rather than guessing
+              from the page count alone; scanned documents in particular often have blank separator pages or
+              cover sheets that throw off simple math like &quot;chapter 2 starts at page 21.&quot;
+            </p>
+            <p>
+              <strong>If you&apos;re batch-splitting into equal chunks</strong>, think about how the pieces
+              will actually be used before picking a split size. Splitting a 100-page report into 10-page
+              chunks makes sense for review purposes, but if the real goal is &quot;one file per chapter,&quot;
+              chapters are rarely exactly the same length — you&apos;ll get a cleaner result extracting each
+              chapter&apos;s actual page range individually rather than forcing an even split and manually
+              fixing the boundaries afterward.
+            </p>
+            <p>
+              One thing worth knowing: splitting a PDF doesn&apos;t reduce total file size — the sum of the
+              parts is roughly the same as (or very slightly larger than) the original whole. If your actual
+              goal is a smaller file rather than separate files, split first and then run the specific pages
+              you need through{' '}
+              <Link href="/compress-pdf" className="text-primary hover:underline">Compress PDF</Link>, or
+              compress before splitting if you want every resulting piece to already be small. And if what
+              you actually want is to remove a few pages while keeping everything else as one document —
+              rather than producing multiple output files —{' '}
+              <Link href="/remove-pages" className="text-primary hover:underline">Remove Pages</Link> is the
+              more direct tool for that job.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">

@@ -94,6 +94,48 @@ export default function MergePdfPage() {
         </div>
       </section>
 
+      {/* ── Guide ─────────────────────────────────────────── */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-syne text-2xl md:text-3xl font-extrabold text-dark mb-6">
+            When You Actually Need to Merge PDFs
+          </h2>
+          <div className="space-y-4 text-gray-600 text-sm md:text-base leading-relaxed">
+            <p>
+              The most common reason people end up here is paperwork that arrived in the wrong shape: a
+              signed contract that came back as three separate scans, an invoice and its supporting
+              receipts sitting in different files, or a set of chapter PDFs that need to become one
+              submission. Merging turns that scattered set into a single document you can actually send,
+              print, or archive without explaining to the recipient which order to read things in.
+            </p>
+            <p>
+              A few things are worth knowing before you merge. First, <strong>page order matters more than
+              it seems</strong> — once merged, most people don&apos;t reorder again, so it&apos;s worth
+              double-checking the drag order against the physical document if you&apos;re combining scans.
+              Second, <strong>mixed page sizes are fine</strong>: a merged PDF can contain both A4 and Letter
+              pages, or portrait and landscape pages, without any conversion — each page keeps its own
+              dimensions.
+            </p>
+            <p>
+              If you&apos;re merging scanned documents specifically, consider running each scan through{' '}
+              <Link href="/compress-pdf" className="text-primary hover:underline">Compress PDF</Link> first
+              — scanned pages are usually the biggest contributor to an oversized final file, and merging
+              won&apos;t reduce their size for you. And if any of the source files are locked with an owner
+              password (print/edit restrictions rather than an open password), merging usually still works;
+              if a file requires a password just to open, run it through{' '}
+              <Link href="/unlock-pdf" className="text-primary hover:underline">Unlock PDF</Link> first.
+            </p>
+            <p>
+              Because merging happens entirely in your browser, there&apos;s no practical limit tied to
+              upload speed or server queues — the only real constraint is your device&apos;s own memory when
+              handling very large combined files (say, merging dozens of high-resolution scans). For typical
+              use — combining a handful of contracts, reports, or scanned pages — it&apos;s essentially
+              instant regardless of your connection.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">

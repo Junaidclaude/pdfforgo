@@ -95,6 +95,53 @@ export default function JpgToPdfPage() {
         </div>
       </section>
 
+      {/* ── Guide ─────────────────────────────────────────── */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-syne text-2xl md:text-3xl font-extrabold text-dark mb-6">
+            Turning a Pile of Photos Into One Document
+          </h2>
+          <div className="space-y-4 text-gray-600 text-sm md:text-base leading-relaxed">
+            <p>
+              The single most common reason people land here is a phone camera: a stack of photos of a
+              multi-page form, receipt, or handwritten document, taken one page at a time, that now needs to
+              become a single file to email, upload to a portal, or print. Email attachments and most upload
+              forms expect one file, not eight separate JPGs — converting to a single PDF is what actually
+              solves the problem, not just changing the format.
+            </p>
+            <p>
+              <strong>Order matters more than people expect.</strong> Once combined, the page order in the
+              PDF is exactly the order you arranged the images in — there&apos;s no automatic detection of
+              which photo is &quot;page 1.&quot; If you photographed pages out of sequence (which happens
+              constantly with multi-page forms), fix the order before converting rather than after; it&apos;s
+              much easier to drag-reorder thumbnails than to fix page order inside a PDF afterward.
+            </p>
+            <p>
+              <strong>Photo quality carries straight through.</strong> A blurry, poorly-lit, or crooked photo
+              becomes a blurry, poorly-lit, crooked PDF page — conversion doesn&apos;t fix or enhance the
+              source image. If a page needs to be legible for someone else (a signed contract, a form for an
+              official process), it&apos;s worth a few seconds to retake a photo that&apos;s genuinely
+              readable rather than converting a marginal one and hoping it&apos;s good enough. Even, direct
+              overhead lighting without a shadow across the page is the single biggest factor in a phone
+              photo actually looking like a scan.
+            </p>
+            <p>
+              Mixed image sizes and orientations are completely fine to combine — a portrait phone photo and
+              a landscape screenshot can sit in the same PDF as different-sized pages, the same way a{' '}
+              <Link href="/merge-pdf" className="text-primary hover:underline">merged PDF</Link> can mix
+              page sizes. You don&apos;t need to crop or resize images to match before combining them.
+            </p>
+            <p>
+              If the resulting PDF ends up larger than expected — a batch of full-resolution phone photos
+              adds up fast — run it through{' '}
+              <Link href="/compress-pdf" className="text-primary hover:underline">Compress PDF</Link>{' '}
+              afterward rather than downscaling each photo individually first; it&apos;s faster and gives you
+              a size/quality tradeoff to tune in one place instead of guessing per image.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
