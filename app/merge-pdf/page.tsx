@@ -50,15 +50,16 @@ export default function MergePdfPage() {
       />
 
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="bg-dark text-white py-10 px-4">
+      <section className="hero-bg py-12 px-4 border-b border-line">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-3 py-1.5 mb-4 text-xs text-primary-light">
+          <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 rounded-full px-3 py-1.5 mb-4 text-xs text-ruby font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-ruby inline-block animate-pulse" />
             Client-side · Files stay on your device
           </div>
-          <h1 className="font-syne text-3xl md:text-5xl font-extrabold mb-4 leading-tight">
+          <h1 className="font-display text-3xl md:text-5xl font-bold mb-4 leading-tight text-ink">
             Merge PDF Files Online
           </h1>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
+          <p className="text-mute text-lg max-w-xl mx-auto">
             Combine multiple PDFs into one. Drag to reorder. Download
             instantly. No signup, no watermarks — 100% free.
           </p>
@@ -69,23 +70,23 @@ export default function MergePdfPage() {
       <MergeTool />
 
       {/* ── How It Works ──────────────────────────────────── */}
-      <section className="py-16 px-4 bg-bg-dark">
+      <section className="py-16 px-4 bg-paper">
         <div className="max-w-4xl mx-auto">
-          <h2 className="font-syne text-2xl md:text-3xl font-extrabold text-dark text-center mb-10">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">
             How to Merge PDF Files
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {HOW_TO_STEPS.map((step, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 shadow-card">
-                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
-                  <span className="font-syne font-extrabold text-primary text-lg">
+              <div key={i} className="bg-white rounded-2xl p-6 border border-line">
+                <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center mb-4">
+                  <span className="font-display font-bold text-ruby text-lg">
                     {i + 1}
                   </span>
                 </div>
-                <h3 className="font-syne font-bold text-dark mb-2">
+                <h3 className="font-display font-bold text-ink mb-2">
                   {step.title}
                 </h3>
-                <p className="text-gray-500 text-sm leading-relaxed">
+                <p className="text-mute text-sm leading-relaxed">
                   {step.body}
                 </p>
               </div>
@@ -97,7 +98,7 @@ export default function MergePdfPage() {
       {/* ── Guide ─────────────────────────────────────────── */}
       <section className="py-16 px-4 bg-white">
         <div className="max-w-3xl mx-auto">
-          <h2 className="font-syne text-2xl md:text-3xl font-extrabold text-dark mb-6">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
             When You Actually Need to Merge PDFs
           </h2>
           <div className="space-y-4 text-gray-600 text-sm md:text-base leading-relaxed">
@@ -118,12 +119,12 @@ export default function MergePdfPage() {
             </p>
             <p>
               If you&apos;re merging scanned documents specifically, consider running each scan through{' '}
-              <Link href="/compress-pdf" className="text-primary hover:underline">Compress PDF</Link> first
+              <Link href="/compress-pdf" className="text-ruby hover:underline">Compress PDF</Link> first
               — scanned pages are usually the biggest contributor to an oversized final file, and merging
               won&apos;t reduce their size for you. And if any of the source files are locked with an owner
               password (print/edit restrictions rather than an open password), merging usually still works;
               if a file requires a password just to open, run it through{' '}
-              <Link href="/unlock-pdf" className="text-primary hover:underline">Unlock PDF</Link> first.
+              <Link href="/unlock-pdf" className="text-ruby hover:underline">Unlock PDF</Link> first.
             </p>
             <p>
               Because merging happens entirely in your browser, there&apos;s no practical limit tied to
@@ -139,16 +140,16 @@ export default function MergePdfPage() {
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
-          <h2 className="font-syne text-2xl md:text-3xl font-extrabold text-dark text-center mb-10">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">
             Frequently Asked Questions
           </h2>
           <div className="space-y-4">
             {FAQS.map((faq, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 shadow-card">
-                <h3 className="font-syne font-bold text-dark mb-2 text-base">
+              <div key={i} className="bg-white rounded-2xl p-6 border border-line">
+                <h3 className="font-display font-bold text-ink mb-2 text-base">
                   {faq.q}
                 </h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{faq.a}</p>
+                <p className="text-mute text-sm leading-relaxed">{faq.a}</p>
               </div>
             ))}
           </div>
@@ -156,9 +157,9 @@ export default function MergePdfPage() {
       </section>
 
       {/* ── Related tools ─────────────────────────────────── */}
-      <section className="py-12 px-4 bg-bg-dark">
+      <section className="py-12 px-4 bg-paper">
         <div className="max-w-4xl mx-auto">
-          <h2 className="font-syne text-xl font-extrabold text-dark mb-6 text-center">
+          <h2 className="font-display text-xl font-bold text-ink mb-6 text-center">
             You Might Also Need
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -166,12 +167,12 @@ export default function MergePdfPage() {
               <Link
                 key={tool.slug}
                 href={`/${tool.slug}`}
-                className="group bg-white rounded-2xl p-5 shadow-card hover:shadow-card-hover transition-all hover:-translate-y-1 block"
+                className="group bg-white rounded-2xl p-5 border border-line hover:border-red-300 transition-all hover:-translate-y-1 block"
               >
-                <p className="font-syne font-bold text-dark group-hover:text-primary transition-colors">
+                <p className="font-display font-bold text-ink group-hover:text-ruby transition-colors">
                   {tool.name}
                 </p>
-                <p className="text-gray-500 text-sm mt-1">{tool.shortDesc}</p>
+                <p className="text-mute text-sm mt-1">{tool.shortDesc}</p>
               </Link>
             ))}
           </div>
