@@ -10,13 +10,26 @@ import GoogleTranslate from './GoogleTranslate'
 // Tools shown directly in the top nav bar (most popular)
 const TOP_NAV_TOOLS = ['pdf-editor', 'edit-resize-image', 'remove-background']
 
-const PDF_CATEGORIES = NAV_CATEGORIES.filter((c) => c.key !== 'image')
+// Explicit include-list (not an exclude-list) so adding a new non-PDF
+// category — like 'social' — can't silently leak into the PDF dropdown by
+// being forgotten from an exclusion filter.
+const PDF_CATEGORY_KEYS = ['organize', 'optimize', 'convert-to', 'convert-from', 'edit', 'security'] as const
+const PDF_CATEGORIES = NAV_CATEGORIES.filter((c) => (PDF_CATEGORY_KEYS as readonly string[]).includes(c.key))
+// The TOOLS nav dropdown only previews newer, non-PDF/non-image tool types
+// (transcript, thumbnails, social tools, and whatever ships after them) —
+// PDF/Image tools already have their own dedicated dropdowns above.
+const OTHER_CATEGORIES = NAV_CATEGORIES.filter((c) => c.key !== 'image' && !PDF_CATEGORY_KEYS.includes(c.key as (typeof PDF_CATEGORY_KEYS)[number]))
+
+// Auth is optional: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is inlined at build time,
+// so this never changes across renders for a given deployment.
+const clerkEnabled = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null)
   const pathname = usePathname()
-  const { isSignedIn, isLoaded } = useUser()
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { isSignedIn, isLoaded } = clerkEnabled ? useUser() : { isSignedIn: false, isLoaded: true }
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -123,35 +136,33 @@ export default function Header() {
             </div>
           </div>
 
-          {/* ── ALL TOOLS hover mega menu ── */}
+          {/* ── TOOLS hover dropdown — newer tool types (transcript, etc.) ── */}
           <div className="relative group/mega">
             <Link href="/all-tools" className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors group-hover/mega:bg-line/60 ${pathname === '/all-tools' ? 'bg-line' : 'hover:bg-line/60'}`}>
-              <span className="text-royal font-bold">ALL TOOLS</span>
+              <span className="text-royal font-bold">TOOLS</span>
               <ChevronIcon open={false} groupHover="group-hover/mega:rotate-180" />
             </Link>
             <div className="absolute top-full left-0 pt-2 pointer-events-none group-hover/mega:pointer-events-auto">
-              <div className="w-[1100px] bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 grid grid-cols-4 gap-6
+              <div className="w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 p-3
                 opacity-0 translate-y-[-6px] group-hover/mega:opacity-100 group-hover/mega:translate-y-0
                 transition-all duration-200 ease-out">
-                {NAV_CATEGORIES.map((cat) => {
+                {OTHER_CATEGORIES.map((cat) => {
                   const catTools = TOOLS.filter((t) => t.category === cat.key)
+                  if (catTools.length === 0) return null
                   return (
-                    <div key={cat.key}>
-                      <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: cat.color }}>
+                    <div key={cat.key} className="mb-1 last:mb-0">
+                      <p className="text-[10px] font-bold uppercase tracking-widest mb-2 px-2" style={{ color: cat.color }}>
                         {cat.label}
                       </p>
                       <ul className="space-y-0.5">
                         {catTools.map((tool) => (
                           <li key={tool.slug}>
                             <Link href={`/${tool.slug}`}
-                              className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-gray-50 transition-colors group">
-                              <span className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-sm"
-                                style={{ background: tool.iconBg, color: tool.iconColor }}>
-                                <ToolIcon slug={tool.slug} />
+                              className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors group">
+                              <span className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: tool.iconBg, color: tool.iconColor }}>
+                                <ToolIcon slug={tool.slug} size={12} />
                               </span>
-                              <span className="text-sm font-medium text-gray-700 group-hover:text-dark transition-colors">
-                                {tool.name}
-                              </span>
+                              <span className="text-sm font-medium text-gray-700 group-hover:text-dark">{tool.name}</span>
                             </Link>
                           </li>
                         ))}
@@ -159,6 +170,10 @@ export default function Header() {
                     </div>
                   )
                 })}
+                <Link href="/all-tools"
+                  className="mt-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-xs font-semibold text-royal hover:bg-gray-50 transition-colors border-t border-gray-100 pt-2.5">
+                  Browse all PDF & image tools
+                </Link>
               </div>
             </div>
           </div>
@@ -175,7 +190,7 @@ export default function Header() {
             Pricing
           </Link>
           <GoogleTranslate />
-          {isLoaded && (
+          {clerkEnabled && isLoaded && (
             isSignedIn ? (
               <UserButton />
             ) : (
@@ -215,7 +230,7 @@ export default function Header() {
             </Link>
             <Link href="/all-tools" onClick={() => setMobileOpen(false)}
               className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-violet-50 text-violet-600 text-xs font-semibold">
-              All Tools
+              Tools
             </Link>
           </div>
           {NAV_CATEGORIES.map((cat) => {
@@ -339,6 +354,10 @@ function ToolIcon({ slug, size = 14 }: { slug: string; size?: number }) {
     'blur-face': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M6 16c0-2 2.7-3.5 6-3.5s6 1.5 6 3.5"/><rect x="8" y="5" width="8" height="6" rx="2" fill="currentColor" opacity="0.2"/></svg>,
     'meme-generator': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/><path d="M8 21h8M12 17v4" strokeWidth="1.5"/></svg>,
     'add-text-to-image': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 7h6M12 7v10M8 17h8"/></svg>,
+    'youtube-transcript': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="5" width="14" height="14" rx="2"/><path d="m10 9 4 3-4 3z" fill="currentColor" stroke="none"/><path d="M18 8h4M18 12h4M18 16h2"/></svg>,
+    'youtube-thumbnail-downloader': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="m21 15-5-4-4 3-3-2-6 5"/></svg>,
+    'caption-character-counter': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/></svg>,
+    'hashtag-generator': <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 9h14M5 15h14M10 3 8 21M16 3l-2 18"/></svg>,
   }
   return <>{icons[slug] ?? <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/></svg>}</>
 }

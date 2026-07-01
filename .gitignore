@@ -34,3 +34,8 @@ yarn-debug.log*
 yarn-error.log*
 
 .vercel
+
+# clerk configuration (can include secrets)
+/.clerk/
+
+.env*

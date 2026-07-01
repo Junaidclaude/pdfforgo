@@ -3,7 +3,7 @@ export interface Tool {
   name: string
   description: string
   shortDesc: string
-  category: 'organize' | 'optimize' | 'convert-to' | 'convert-from' | 'edit' | 'security' | 'image'
+  category: 'organize' | 'optimize' | 'convert-to' | 'convert-from' | 'edit' | 'security' | 'image' | 'video' | 'social'
   iconColor: string
   iconBg: string
 }
@@ -265,6 +265,46 @@ export const TOOLS: Tool[] = [
     iconBg: '#EDE9FE',
   },
 
+  // ── VIDEO TOOLS ──────────────────────────────────────────
+  {
+    slug: 'youtube-transcript',
+    name: 'YouTube Transcript',
+    description: 'Get the full transcript of any YouTube video with existing captions. Paste a link, view timestamped text, copy or download as TXT/SRT.',
+    shortDesc: 'Extract YouTube video transcripts',
+    category: 'video',
+    iconColor: '#DC2626',
+    iconBg: '#FEF2F2',
+  },
+  {
+    slug: 'youtube-thumbnail-downloader',
+    name: 'YouTube Thumbnail Downloader',
+    description: 'Download any YouTube video\'s thumbnail in every available resolution, up to full HD (1280×720). Paste a link, pick a size, download instantly.',
+    shortDesc: 'Download YouTube thumbnails in HD',
+    category: 'video',
+    iconColor: '#DC2626',
+    iconBg: '#FEF2F2',
+  },
+
+  // ── SOCIAL TOOLS ─────────────────────────────────────────
+  {
+    slug: 'caption-character-counter',
+    name: 'Caption Character Counter',
+    description: 'Live character counter for X/Twitter, Instagram, TikTok, YouTube, Facebook, and LinkedIn. See exactly how much room you have left as you type.',
+    shortDesc: 'Character limits for every platform',
+    category: 'social',
+    iconColor: '#0891B2',
+    iconBg: '#ECFEFF',
+  },
+  {
+    slug: 'hashtag-generator',
+    name: 'Hashtag Generator',
+    description: 'Generate relevant hashtags for Instagram, TikTok, and X from a topic or keyword. Curated hashtag sets across dozens of popular niches.',
+    shortDesc: 'Generate hashtags for any topic',
+    category: 'social',
+    iconColor: '#9333EA',
+    iconBg: '#FAF5FF',
+  },
+
   // ── PDF SECURITY ─────────────────────────────────────────
   {
     slug: 'protect-pdf',
@@ -298,6 +338,8 @@ export const NAV_CATEGORIES: {
   { label: 'Edit PDF', key: 'edit', color: '#EAB308' },
   { label: 'PDF Security', key: 'security', color: '#22C55E' },
   { label: 'Image Tools', key: 'image', color: '#EC4899' },
+  { label: 'Video Tools', key: 'video', color: '#DC2626' },
+  { label: 'Social Tools', key: 'social', color: '#9333EA' },
 ]
 
 export const SITE_URL =

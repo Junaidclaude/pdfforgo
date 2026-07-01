@@ -194,6 +194,35 @@ function ToolIcon({ slug, color }: { slug: string; color: string }) {
           <path d="M16 7h3" />
         </svg>
       )
+    case 'youtube-transcript':
+      return (
+        <svg {...shared}>
+          <rect x="2" y="5" width="14" height="14" rx="2" />
+          <path d="m10 9 4 3-4 3z" fill={color} stroke="none" />
+          <path d="M18 8h4M18 12h4M18 16h2" />
+        </svg>
+      )
+    case 'youtube-thumbnail-downloader':
+      return (
+        <svg {...shared}>
+          <rect x="3" y="5" width="18" height="14" rx="2" />
+          <circle cx="8.5" cy="10" r="1.5" />
+          <path d="m21 15-5-4-4 3-3-2-6 5" />
+        </svg>
+      )
+    case 'caption-character-counter':
+      return (
+        <svg {...shared}>
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <path d="M7 9h10M7 13h6" />
+        </svg>
+      )
+    case 'hashtag-generator':
+      return (
+        <svg {...shared}>
+          <path d="M5 9h14M5 15h14M10 3 8 21M16 3l-2 18" />
+        </svg>
+      )
     default:
       return (
         <svg {...shared}>
