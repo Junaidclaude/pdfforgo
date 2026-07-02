@@ -61,6 +61,54 @@ export default function RemovePagesPage() {
           </div>
         </div>
       </section>
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            What People Actually Delete, and What They Miss
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              Most page removal falls into a small set of recurring situations. Duplex scanners produce a
+              blank verso page after every odd-length document, and those blank pages need to go before
+              you file or send the scan. Cover sheets, fax headers, and internal routing slips get scanned
+              in along with the document they&apos;re attached to and rarely belong in the version you actually
+              share. And a signed contract or NDA template often needs a stray draft-watermark page or an
+              old, superseded signature page pulled out before it goes back out for a fresh signature. The{' '}
+              <strong>Odd/Even</strong> shortcuts in the toolbar are built specifically for the blank-verso
+              case — a scan where every other page is blank has a very regular pattern that&apos;s tedious to
+              click through page-by-page but instant with a bulk toggle.
+            </p>
+            <p>
+              One thing worth knowing before you remove pages: this tool deletes the page objects
+              themselves, but it has no idea what&apos;s printed on the pages you keep. If your document has
+              &quot;Page 5 of 20&quot; typed into a footer, removing three pages won&apos;t renumber anything — the
+              printed footer text on the remaining pages will still say what it said before, just
+              mismatched against the new, shorter document. That&apos;s a manual fix in the source file (or a
+              job for a full page editor) rather than something a page-removal tool can reasonably know how
+              to do.
+            </p>
+            <p>
+              File size is another place expectations can be off. If the pages you remove are mostly text,
+              don&apos;t expect a dramatic size drop — text and vector content is small to begin with. But if
+              you&apos;re removing high-resolution scanned pages or large embedded images, the savings can be
+              substantial, since those pages&apos; image data made up most of the file&apos;s weight in the first
+              place. Either way, the pages you keep are copied over untouched — no recompression, no
+              quality loss — so the parts of your document that matter are pixel-for-pixel identical to the
+              original.
+            </p>
+            <p>
+              If you find yourself wanting to remove pages <em>and</em> shuffle the ones that remain into a
+              new order, <Link href="/organize-pdf" className="text-red-600 hover:underline">Organize PDF</Link> does
+              both in a single pass instead of making you run two tools back to back. And if the goal is
+              really the opposite — keeping only a handful of specific, non-adjacent pages rather than
+              deleting a few —{' '}
+              <Link href="/extract-pages" className="text-red-600 hover:underline">Extract Pages</Link> flips
+              the selection logic to match that.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

@@ -51,6 +51,52 @@ export default function AddTextToImagePage() {
 
       <AddTextTool />
 
+      <section className="py-16 px-4">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            Making Text Actually Readable on a Photo
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              Most people land here for one of three reasons: turning a photo into a quote graphic for
+              Instagram, labeling a product photo with a price or feature callout, or stamping a family
+              photo with a date, name, or credit before sharing it. All three need the same thing — text
+              that reads clearly at a glance, not text that technically exists on the image. The editor
+              supports as many independent layers as you need, so a typical product shot might carry a
+              bold headline, a smaller price tag in the corner, and a small watermark, each positioned and
+              styled on its own.
+            </p>
+            <p>
+              Legibility comes down to contrast, not font choice. A white headline on a bright sky photo
+              will disappear no matter how bold the font is — that&apos;s what the{' '}
+              <strong>shadow and background box toggles</strong> are for. Turning on the shadow adds a soft
+              dark edge that keeps light text readable over busy backgrounds without needing a solid box;
+              turning on the background box guarantees legibility on any photo but covers more of the
+              image. For quote-style graphics, Georgia or Times New Roman read as more editorial; for
+              labels and callouts, Impact or Oswald hold up better at small sizes because their letterforms
+              stay open even when condensed.
+            </p>
+            <p>
+              Layer order matters here too — text you add later renders on top of earlier layers, so if
+              you&apos;re stacking a background box under a headline, add the box layer first. Rotation is
+              useful for anything meant to look like a sticker or stamp (a &quot;SOLD&quot; banner across a
+              listing photo, for example) rather than for straightening crooked text — if your photo itself
+              is tilted, the text won&apos;t fix that. If you&apos;re going for meme-style layouts
+              specifically — bold caps top and bottom with heavy outlines — the{' '}
+              <Link href="/meme-generator" className="text-purple-600 hover:underline">Meme Generator</Link>{' '}
+              is built around that exact convention and will get you there faster.
+            </p>
+            <p>
+              Everything here happens on an HTML canvas in your browser — the image is decoded locally,
+              drawn with your text layers, and exported straight to a JPG via the canvas itself, so nothing
+              is uploaded anywhere. The one real constraint worth knowing: export is JPG only, so if you
+              need a transparent background preserved (a logo overlay, for instance), this isn&apos;t the
+              right tool for that step.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-12 px-4 bg-white">
         <div className="max-w-4xl mx-auto">
           <h2 className="font-display text-xl font-bold text-ink mb-6 text-center">You Might Also Need</h2>

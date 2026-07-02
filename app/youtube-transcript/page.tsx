@@ -74,6 +74,55 @@ export default function YoutubeTranscriptPage() {
         </div>
       </section>
 
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            What Actually Happens When You Paste a Link
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              This is one of the few tools on this site that isn&apos;t purely client-side, and it&apos;s
+              worth being clear about why: YouTube&apos;s caption data isn&apos;t something a browser can
+              fetch directly from another site due to how the platform is set up, so when you submit a
+              link, your browser sends the video URL to our server, which requests the video&apos;s own
+              caption track from YouTube and hands the parsed, timestamped result back to you. It&apos;s not
+              scraping a third-party transcript database and it doesn&apos;t touch YouTube&apos;s official
+              (quota-limited, API-key-gated) Data API — it reads the same public caption track your own
+              browser would pull if you turned on subtitles — but the fetch itself happens server-side, not
+              inside your browser.
+            </p>
+            <p>
+              The practical uses for this tend to fall into a few buckets: pulling notes from a recorded
+              lecture or webinar without rewatching the whole thing, grabbing an accurate quote for an
+              article or research note instead of transcribing it by ear, and repurposing a video into a
+              blog post or newsletter draft without retyping it from scratch. It&apos;s also just a faster
+              way to search inside a long video — paste the link, then use your browser&apos;s own
+              find-in-page (Ctrl/Cmd+F) against the transcript text to jump straight to the section that
+              covers what you actually need, instead of scrubbing the timeline.
+            </p>
+            <p>
+              One thing this tool genuinely can&apos;t do anything about: if a video&apos;s uploader never
+              enabled captions — neither YouTube&apos;s auto-generated ones nor a manually uploaded track —
+              there&apos;s no caption data to read, and you&apos;ll see &quot;No captions are available for
+              this video&quot; rather than a transcript. It doesn&apos;t fall back to transcribing the audio
+              itself. In practice this covers the large majority of videos, since YouTube auto-generates
+              captions for most uploads by default, but very old videos, some livestream replays, and
+              videos where the uploader explicitly disabled captions will come back empty. Occasionally
+              YouTube will also rate-limit or bot-challenge requests coming from server infrastructure
+              rather than a real browser — if you see a message about being temporarily rate-limited,
+              that&apos;s YouTube&apos;s own defense kicking in, unrelated to the specific video, and
+              it&apos;s usually worth trying again in a few minutes.
+            </p>
+            <p>
+              For output, plain text without timestamps is what you want for pasting into a document or
+              article; text with timestamps is better for note-taking where you might want to jump back to
+              the source; and the .srt download is built specifically to drop into a video editor as a
+              subtitle track if you&apos;re repurposing the footage itself, not just the words.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

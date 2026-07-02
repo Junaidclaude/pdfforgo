@@ -85,6 +85,53 @@ export default function PdfEditorPage() {
         </div>
       </section>
 
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">PDF Editor vs. a Purpose-Built Tool: When to Use Which</h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              PDF Editor is the right choice when what you need is a one-off, freeform mark-up: drawing an
+              arrow at a specific spot to flag an error, jotting a margin note explaining a change, circling
+              a figure before a meeting, or covering a stray line of sensitive text with a whiteout box
+              before forwarding a preview. It works directly on the rendered page, so you&apos;re not limited to
+              a fixed template — anything you can draw or type, you can place anywhere. That flexibility is
+              also its limit: every annotation is placed by hand, page by page, which is fine for a handful
+              of marks but tedious for anything that needs to repeat consistently across a whole document.
+            </p>
+            <p>
+              That&apos;s the point where a dedicated tool usually wins. If you need the same watermark text
+              stamped on every page at a consistent position and opacity,{' '}
+              <Link href="/watermark-pdf" className="text-violet-600 hover:underline">Watermark PDF</Link>{' '}
+              does that in one pass with controls built specifically for it, instead of you manually
+              placing and re-placing text on each page here. The same logic applies to sequential page
+              numbers — the Page Numbers tool auto-increments across the whole document, where doing it
+              manually in the editor means typing a different number onto every single page yourself.
+            </p>
+            <p>
+              It&apos;s also worth being clear about what this editor doesn&apos;t do. The Whiteout tool covers
+              content visually with a white box, but — as with any annotation-based editor — the original
+              text underneath is untouched and still present in the file; someone with the right tools
+              could still recover it. If you&apos;re preparing a document for legal disclosure or compliance
+              review and need the sensitive content genuinely gone, not just visually hidden, you need
+              software built specifically for redaction that strips the underlying content stream, not an
+              annotation layer on top of it. Similarly, if the PDF has real form fields — the kind you&apos;d
+              normally click into and type — the editor doesn&apos;t know they exist; it just draws text on top
+              of whatever&apos;s rendered. For that,{' '}
+              <Link href="/fill-pdf-form" className="text-violet-600 hover:underline">Fill PDF Form</Link>{' '}
+              reads the actual form structure and lets you fill it the way the form was designed to be
+              filled, rather than approximating field positions by eye.
+            </p>
+            <p>
+              A reasonable rule of thumb: reach for PDF Editor when you&apos;re marking up a document that will
+              only ever need this one round of annotations, and reach for a dedicated tool when the task is
+              something you&apos;d describe as a single repeatable operation applied consistently across the
+              whole file. Both approaches produce a real, permanently embedded PDF — the difference is just
+              how much manual placement you want to do yourself.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4 bg-paper">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

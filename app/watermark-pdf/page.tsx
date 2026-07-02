@@ -65,6 +65,47 @@ export default function WatermarkPdfPage() {
           </div>
         </div>
       </section>
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">A Watermark Marks Intent — It Doesn&apos;t Enforce It</h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              Text watermarks are drawn directly onto each page&apos;s content, the same way any other text
+              on the page is rendered. That means once you download the watermarked file, the label is a
+              genuine part of the document, not a floating overlay that a viewer can toggle off. It&apos;s the
+              right tool for the job it&apos;s actually meant for: marking a document as a draft so nobody
+              treats it as final, stamping CONFIDENTIAL on internal material before it&apos;s emailed around, or
+              putting a company name across a preview PDF you&apos;re sending to a client before the paid
+              version. What it isn&apos;t is a security feature — anyone with a capable PDF editor can select
+              that text and delete it, or paint over it, the same way you added it in the first place. If
+              you actually need to control who can open, print, or copy from a file, that&apos;s a job for{' '}
+              <Link href="/protect-pdf" className="text-cyan-600 hover:underline">Protect PDF</Link>,
+              which applies real password-based restrictions rather than a visible label.
+            </p>
+            <p>
+              Opacity and position aren&apos;t just cosmetic choices — they trade off visibility against how
+              easy the watermark is to work around. A large, centered watermark at 30–40% opacity and a
+              diagonal rotation (the default -45° here mimics the classic &quot;CONFIDENTIAL&quot; stamp look) sits
+              across the actual content of the page, so cropping or selectively copying around it is
+              genuinely inconvenient. A small watermark tucked in a corner at low opacity is subtler and
+              looks more like professional branding, but it&apos;s also trivial to crop out of a single page or
+              screenshot. If the goal is deterring casual redistribution, favor the centered, higher-opacity
+              option; if the goal is just attribution or a light branding touch, a corner mark is enough.
+            </p>
+            <p>
+              The &quot;Apply To&quot; custom range is worth using deliberately rather than defaulting to every
+              page. A DRAFT stamp usually belongs on every page of a working document, but a confidentiality
+              notice sometimes only needs to appear on the pages that actually contain sensitive figures,
+              leaving a clean cover page or signature page untouched. Since scanned pages tend to be the
+              largest contributor to file size in a mixed document, if you&apos;re watermarking a scan-heavy PDF
+              and the output feels larger than expected, run it through{' '}
+              <Link href="/compress-pdf" className="text-cyan-600 hover:underline">Compress PDF</Link>{' '}
+              afterward — the watermark text itself adds only a negligible amount of data.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

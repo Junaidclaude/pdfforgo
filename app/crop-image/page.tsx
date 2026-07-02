@@ -55,6 +55,48 @@ export default function CropImagePage() {
           </div>
         </div>
       </section>
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            Picking the Right Crop Ratio for Where the Image Is Going
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              Most cropping needs come down to matching whatever container the image is about to sit in.
+              A profile photo almost always wants 1:1 so it doesn&apos;t get stretched or off-center inside a
+              circular avatar frame. A story or reel wants 9:16, a normal feed post is closer to 4:5 or
+              1:1, and a banner or cover photo wants something wide like 16:9 or 3:2. Using the matching
+              preset instead of eyeballing a freeform crop means the platform won&apos;t re-crop your image
+              again on its own terms after you upload it.
+            </p>
+            <p>
+              Freeform cropping is the better choice when the goal isn&apos;t a standard shape but a specific
+              framing decision — isolating a product from a busy background, tightening a group photo
+              around the people who matter, or cutting a screenshot down to just the relevant panel. The
+              rule-of-thirds grid overlaid on the selection is there for exactly this case: placing your
+              subject near one of the four intersection points rather than dead center tends to produce a
+              more balanced composition, a habit borrowed straight from photography.
+            </p>
+            <p>
+              One thing worth knowing about output quality: the crop itself is lossless — it reads pixel
+              data directly from the source at full resolution with no scaling or re-sampling involved. Any
+              quality loss you might see comes only from the output format you choose afterward: PNG stays
+              fully lossless, while JPG re-encodes the cropped result at a high (but not perfect) quality
+              setting. If you&apos;re archiving the crop or plan to edit it further, PNG avoids that extra
+              generation of compression.
+            </p>
+            <p>
+              If you need the cropped result at an exact pixel size afterward — say, a square crop that
+              also needs to be precisely 800×800 — follow up with{' '}
+              <Link href="/edit-resize-image" className="text-orange-600 hover:underline">Resize Image</Link>.
+              And if the platform you&apos;re uploading to needs a specific file type rather than just a shape,{' '}
+              <Link href="/convert-image" className="text-orange-600 hover:underline">Convert Image</Link>{' '}
+              handles that in a separate pass.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

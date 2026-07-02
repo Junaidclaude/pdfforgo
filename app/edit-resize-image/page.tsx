@@ -59,6 +59,51 @@ export default function ResizeImagePage() {
           </div>
         </div>
       </section>
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            Resize, Crop, or Remove the Background — and What Actually Leaves Your Device
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              This tool bundles a lot into one workspace — pixel or percentage resizing with presets for
+              things like HD, 4K, and Instagram sizes, plus a full lightweight editor with crop, filters,
+              rotation and flip, blur, and background removal. It&apos;s worth knowing which of those you
+              actually need: resizing scales the whole image down or up while keeping all of it, while
+              cropping (either here in the Edit panel or with the dedicated{' '}
+              <Link href="/crop-image" className="text-violet-600 hover:underline">Crop Image</Link> tool)
+              removes part of the frame to change the composition. If you just need a smaller file for the
+              same photo, resize; if you need a different shape or want to cut something out of view, crop.
+            </p>
+            <p>
+              On enlarging: the resize engine uses the browser&apos;s Canvas API with high-quality
+              interpolation, which is a smoothing technique, not an AI reconstruction. It can stretch a
+              small image up to a larger canvas and the result will be usable, but it can&apos;t invent detail
+              that wasn&apos;t in the original — enlarge a photo by 20–30% and it usually still looks sharp;
+              push a 300px thumbnail up to poster size and it will look visibly soft. That&apos;s the fundamental
+              limit of any canvas-based resize, as opposed to a dedicated AI upscaler that generates
+              plausible new detail.
+            </p>
+            <p>
+              The one part of this tool that works differently from everything else here is Remove
+              Background. Resizing, cropping, filters, rotation, and blur all run locally in your browser
+              using the Canvas API — nothing about those operations ever leaves your device. Remove
+              Background is the exception: it bakes in whatever edits you&apos;ve already applied, sends that
+              image to our server to run the background-removal model, and returns a transparent PNG a few
+              seconds later. It&apos;s the only step on this page that touches a network request, which is why
+              the badge at the top of this page calls it out specifically rather than claiming the whole
+              tool is private by default.
+            </p>
+            <p>
+              Once you&apos;ve resized or edited a batch of images, if some of them still need a smaller file
+              size for upload, run them through{' '}
+              <Link href="/compress-image" className="text-violet-600 hover:underline">Compress Image</Link>{' '}
+              — resizing and compressing solve different problems and often get used back to back.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

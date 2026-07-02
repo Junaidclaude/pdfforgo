@@ -91,6 +91,53 @@ export default function BlurFacePage() {
         </div>
       </section>
 
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            Why Blurring Bystanders Actually Matters Before You Post
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              The two most common reasons to blur a face are surprisingly different in feel but land in the
+              same tool: publishing a photo that happens to include strangers in the background — a street
+              shot, a photo taken at a public event, a screenshot of a group chat — and protecting people
+              who didn&apos;t consent to be identified, like other people&apos;s kids in a shared photo album
+              or a colleague caught in the frame of a work photo. Auto mode handles the first case well
+              because it finds every face without you hunting for them; Manual mode is what you reach for
+              when the sensitive thing in the photo isn&apos;t a face at all — a license plate, an ID card, a
+              whiteboard with someone&apos;s phone number on it, a screen showing private information.
+            </p>
+            <p>
+              The &quot;runs in your browser&quot; claim is worth taking literally here, not as marketing
+              language. Auto mode loads BlazeFace, a small face-detection model, via TensorFlow.js, and runs
+              it directly against the image element in your browser — the actual inference happens on your
+              device&apos;s CPU/GPU, and your photo is never sent anywhere. The only network request involved
+              is downloading the model&apos;s weights the first time you use Auto mode (a small file, cached
+              by your browser afterward); after that, detection works without any request tied to your
+              specific image. That&apos;s a meaningfully different privacy story than tools that upload your
+              photo to a server to run detection remotely.
+            </p>
+            <p>
+              Worth knowing honestly: BlazeFace, like most lightweight face detectors, is tuned for speed and
+              does best on faces that are reasonably front-facing, well-lit, and not tiny relative to the
+              frame. It can miss faces in profile, faces partly covered by sunglasses, masks, or hair, and
+              small faces far in the background of a wide group shot. The practical fix is built in — run
+              Auto first to catch the easy cases, then switch to Manual and draw over anything it missed
+              before you download. For a photo where getting every face matters, it&apos;s worth a quick
+              visual check rather than trusting Auto blindly.
+            </p>
+            <p>
+              One more distinction that matters for genuinely sensitive content: soft and medium blur
+              presets are quick to apply but, like any Gaussian-style blur, are not a strong guarantee
+              against someone trying to reverse them, especially on low-detail regions like a license plate.
+              If you&apos;re blurring something you really don&apos;t want reconstructed, the{' '}
+              <strong>pixelate mode</strong> (the heaviest preset) destroys the underlying detail more
+              thoroughly and is the safer choice for redacting text, plates, or ID numbers.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4 bg-paper">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

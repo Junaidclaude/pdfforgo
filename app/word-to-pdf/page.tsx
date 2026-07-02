@@ -60,6 +60,47 @@ export default function WordToPdfPage() {
           </div>
         </div>
       </section>
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            What Word to PDF Keeps — and What It Simplifies
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              This gets used most for exactly the documents you&apos;d expect: resumes and cover letters going
+              into an application portal, signed contracts, reports handed off to someone without Word,
+              anything where you want the layout locked so it can&apos;t shift when opened on a different
+              machine. For that kind of text-driven document, the conversion is essentially seamless.
+            </p>
+            <p>
+              Under the hood, the conversion parses your .docx file&apos;s XML and rebuilds it as clean,
+              semantic HTML — headings, paragraphs, bold and italic runs, lists, tables, and inline images
+              all map over directly, which is why those elements come through reliably. What doesn&apos;t map
+              over as cleanly are the layout features that are specific to Word&apos;s own page-composition
+              engine: multi-column newsletter-style sections, headers and footers, footnotes, and exact
+              pixel-perfect positioning get flattened into a single linear flow rather than reproduced
+              precisely. A one-column document — a letter, a resume, a report — converts essentially
+              perfectly; a heavily designed multi-column brochure will read fine but won&apos;t look identical
+              to the original.
+            </p>
+            <p>
+              One detail worth knowing: rather than trying to replicate whatever font your Word document
+              used, the output is rendered in a clean, consistent serif typeface sized for readability on
+              the page. That&apos;s a deliberate simplification, not a bug — it means the PDF looks polished
+              even if the source document used unusual or web-unsafe fonts, at the cost of not being a
+              pixel-for-pixel visual match to the original.
+            </p>
+            <p>
+              If your document started life as a spreadsheet rather than a Word file, use{' '}
+              <Link href="/excel-to-pdf" className="text-blue-600 hover:underline">Excel to PDF</Link>{' '}
+              instead — it has its own table-aware rendering path. And if you&apos;re assembling a submission
+              from several converted documents, <Link href="/merge-pdf" className="text-blue-600 hover:underline">Merge PDF</Link>{' '}
+              will stitch them into one file after each has been converted.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

@@ -61,6 +61,49 @@ export default function OrganizePdfPage() {
           </div>
         </div>
       </section>
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            The Double-Sided Scan Problem (and Other Reasons to Reorder)
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              The single most common reason people land on this tool is a scanning quirk that has nothing
+              to do with the PDF itself: scanning a double-sided document on a single-sided scanner. You
+              run the fronts through first — pages 1, 3, 5, 7 — flip the stack, and run the backs, which
+              come out as 8, 6, 4, 2. The resulting PDF has all the right content but in a sequence no one
+              can read. Dragging thumbnails back into 1, 2, 3, 4… order fixes it in under a minute, and
+              it&apos;s the kind of fix that&apos;s genuinely painful to do any other way.
+            </p>
+            <p>
+              A second common case is assembling a packet from pieces that were correct individually but
+              wrong together — moving a cover page to the front after merging, pulling a table of contents
+              back to page one, or shifting a signature page to the end so it&apos;s the last thing a reviewer
+              sees. Because reordering and deletion share the same view here, you can also clean out a
+              stray blank page or a duplicate scan in the same pass, instead of reordering first and then
+              running a separate removal step.
+            </p>
+            <p>
+              A couple of practical notes on how the tool behaves: dragging is genuinely just a visual
+              reorder — nothing is re-rendered or re-compressed, so a 40-page reordered PDF saves just as
+              fast as a 4-page one. Marking a page for deletion with the × doesn&apos;t remove it immediately;
+              it&apos;s held in a &quot;marked&quot; state (shown dimmed) until you click Save, and clicking the same ×
+              again restores it, so you can safely experiment before committing. The one hard rule: you
+              can&apos;t delete every page — a PDF needs at least one page to exist, and the tool won&apos;t let you
+              mark the last remaining page.
+            </p>
+            <p>
+              If all you need is to trim a document down without touching page order,{' '}
+              <Link href="/remove-pages" className="text-violet-600 hover:underline">Remove Pages</Link> is
+              a more focused tool for that. And if your actual goal is combining several separate PDFs into
+              one before you reorder anything, start with{' '}
+              <Link href="/merge-pdf" className="text-violet-600 hover:underline">Merge PDF</Link> and
+              bring the combined file back here to arrange it.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

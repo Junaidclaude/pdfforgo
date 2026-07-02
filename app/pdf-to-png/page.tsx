@@ -92,6 +92,54 @@ export default function PdfToPngPage() {
         </div>
       </section>
 
+      {/* ── Guide ─────────────────────────────────────────── */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            Higher DPI Doesn&apos;t Always Mean a Sharper Image
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              It&apos;s worth understanding what &quot;DPI&quot; actually changes here, because it behaves differently
+              depending on what&apos;s on the page. If a page is built from real vector content — text set in
+              an actual font, drawn lines, shapes — then rendering it at 300 DPI genuinely produces more
+              detail than 72 DPI, because the renderer is regenerating crisp edges from the underlying
+              instructions at a higher pixel density. But if the page is a scanned document — which is
+              itself already just an embedded raster image sitting inside the PDF — requesting a higher
+              DPI doesn&apos;t recover detail that was never captured. You&apos;re asking the renderer to upscale a
+              fixed-resolution image, and the result is a bigger file with essentially the same amount of
+              real detail, not a sharper one. For scanned PDFs, it&apos;s worth trying Standard (150 DPI) first
+              and only stepping up to Print Quality if the source scan itself was captured at high
+              resolution.
+            </p>
+            <p>
+              The bigger practical constraint on long documents is memory, not disk space. Every page gets
+              rendered onto a canvas element inside your browser tab, converted to a PNG blob, and held in
+              memory until you download it — and because PNG is lossless, a single 300 DPI page can run
+              past 10–15 MB uncompressed in the canvas before it&apos;s even encoded. Multiply that across a
+              hundred-page report and older laptops or phones can genuinely slow down or run low on
+              available memory, especially since the ZIP step at the end has to hold every image again
+              while it packages them. If you only actually need a handful of pages out of a long document —
+              a few figures from a report, say — it&apos;s much lighter to run{' '}
+              <Link href="/extract-pages" className="text-teal-600 hover:underline">Extract Pages</Link>{' '}
+              first and convert just that smaller file, rather than rendering every page of the original at
+              high resolution.
+            </p>
+            <p>
+              PNG&apos;s actual advantage over JPG isn&apos;t about being generically &quot;higher quality&quot; — it&apos;s about
+              having zero compression artifacts around hard edges. JPG&apos;s compression is tuned for
+              photographic gradients and tends to introduce faint ringing or blur around sharp boundaries,
+              which is barely noticeable in a photo but very noticeable around small text or thin diagram
+              lines. That&apos;s the entire reason this tool defaults people toward PNG for document pages:
+              screenshots, invoices, technical drawings, and anything with text benefit from PNG&apos;s
+              pixel-exact edges, while photographic scans usually don&apos;t need it and would convert more
+              efficiently with{' '}
+              <Link href="/pdf-to-jpg" className="text-teal-600 hover:underline">PDF to JPG</Link> instead.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">

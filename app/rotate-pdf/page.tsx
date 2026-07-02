@@ -95,6 +95,52 @@ export default function RotatePdfPage() {
         </div>
       </section>
 
+      {/* ── Guide ─────────────────────────────────────────── */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            Why Every Other Scanned Page Comes Out Upside Down
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              The most common reason people land on this tool isn&apos;t a single sideways page — it&apos;s a
+              duplex scan gone wrong. When a document is fed through a scanner or copier that scans both
+              sides in one pass, the sheet physically flips between the front and back capture. Depending
+              on how the stack was loaded, that flip can leave every back-side page — the even-numbered
+              ones, or the odd-numbered ones — rotated 180° while the rest of the document looks fine.
+              Phone-based scanning apps cause a similar problem when you rotate the phone partway through
+              photographing a stack of pages.
+            </p>
+            <p>
+              This is exactly why the tool separates &quot;Odd pages&quot; and &quot;Even pages&quot; from a manual custom
+              list. Instead of hunting through a 40-page scan to find which specific pages are flipped,
+              you can usually just glance at the pattern — if pages 2, 4, 6… are upside down, select &quot;Even
+              pages&quot; and rotate 180° in one pass. If only a handful of pages are actually wrong and there&apos;s
+              no clean pattern, the custom range (e.g. &quot;3, 7, 12-14&quot;) handles that instead.
+            </p>
+            <p>
+              It&apos;s worth knowing that rotation here doesn&apos;t touch the page content at all — it only
+              updates the page&apos;s <code>/Rotate</code> value, the same flag every PDF viewer already reads
+              to decide how to display a page. That&apos;s why it&apos;s instant and why the file size barely
+              changes, even on large scanned documents: there&apos;s no re-encoding, no quality loss, nothing to
+              &quot;flatten.&quot; The trade-off is that this only fixes orientation, not other scan issues — if a
+              page also needs cropping or the whole document needs reordering, you&apos;ll want{' '}
+              <Link href="/split-pdf" className="text-yellow-600 hover:underline">Split PDF</Link> or a
+              dedicated organizer for that.
+            </p>
+            <p>
+              A practical workflow: if you&apos;re stitching together scans from multiple sessions — say, the
+              front pages from one scan and a re-scanned page from another — fix each batch&apos;s orientation
+              first, then use{' '}
+              <Link href="/merge-pdf" className="text-yellow-600 hover:underline">Merge PDF</Link> to
+              combine them into one correctly oriented document. Doing the rotation before the merge means
+              you&apos;re only ever fixing one batch&apos;s consistent flip pattern at a time, rather than trying to
+              untangle mixed orientations across a combined file.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">

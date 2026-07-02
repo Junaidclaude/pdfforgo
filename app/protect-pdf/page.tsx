@@ -96,6 +96,56 @@ export default function ProtectPdfPage() {
         </div>
       </section>
 
+      {/* ── Guide ─────────────────────────────────────────── */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            What a PDF Password Actually Protects — and What It Doesn&apos;t
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              It&apos;s worth being precise about what you&apos;re getting, because the two passwords this tool sets
+              do very different jobs. An <strong>open password</strong> encrypts the document itself — the
+              file is genuinely unreadable without it, using 128-bit AES, the same standard Adobe Acrobat
+              uses. That&apos;s real cryptographic protection, appropriate for anything you&apos;d be uncomfortable
+              having read by whoever it lands in front of: signed contracts, tax documents, medical or HR
+              records sent over email. An <strong>owner password</strong>, on the other hand, doesn&apos;t
+              encrypt the file for viewing — it sets permission flags that ask compliant PDF readers to
+              disable printing, copying, or editing. Most mainstream readers respect those flags, but they
+              are a request, not a lock; someone with the right tools can strip permission-only
+              restrictions without ever knowing the owner password. If the content itself needs to stay
+              private, use an open password — permissions alone are for discouraging casual copying, not
+              stopping a determined recipient.
+            </p>
+            <p>
+              A detail that surprises people: you don&apos;t need to set both passwords for permissions to take
+              effect. If you only enter an open password and leave the owner password blank, this tool
+              generates one for you behind the scenes so your printing/copying/editing choices still get
+              applied to the encrypted file — you just won&apos;t know that generated password, which is fine
+              since its only role is enforcing permissions on a file that already requires your open
+              password to view in the first place.
+            </p>
+            <p>
+              Realistically, most people reach for this tool for one of three reasons: sending a document
+              that contains something sensitive over a channel they don&apos;t fully trust (email, a shared
+              drive), meeting a client or vendor&apos;s requirement that deliverables be password-protected
+              before submission, or simply discouraging a document from being casually forwarded or edited
+              once it leaves your hands. For the first two, set an open password. For the third, an owner
+              password with printing/editing disabled is usually enough — and it has the advantage of
+              letting the recipient still open and read the file without typing anything.
+            </p>
+            <p>
+              One consequence of using real encryption: there&apos;s no recovery path if you forget an open
+              password. Not from PDFForge, not from anyone — that&apos;s what makes it real protection rather
+              than a soft restriction. Write it down somewhere before you send the file. And if you&apos;re on
+              the receiving end of a PDF that&apos;s locked in a way you shouldn&apos;t be dealing with,{' '}
+              <Link href="/unlock-pdf" className="text-green-600 hover:underline">Unlock PDF</Link> handles
+              the reverse of everything described here.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">

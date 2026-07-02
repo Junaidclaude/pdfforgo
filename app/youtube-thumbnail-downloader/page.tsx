@@ -57,6 +57,52 @@ export default function YoutubeThumbnailPage() {
 
       <YoutubeThumbnailTool />
 
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            Where These Images Actually Come From (and What You Can Do With Them)
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              Unlike some of the other tools here, this one never touches our own servers at all — when you
+              click download, your browser fetches the image bytes directly from{' '}
+              <code>i.ytimg.com</code>, YouTube&apos;s own public image CDN, the exact same CDN your browser
+              already loads thumbnails from every time you browse YouTube. Pasting a link just extracts the
+              video ID and builds the predictable URL YouTube itself uses for each resolution; there&apos;s
+              no processing or intermediary step involved.
+            </p>
+            <p>
+              The resolution list isn&apos;t guaranteed to be complete for every video, and there&apos;s a
+              specific reason why. Only videos uploaded in HD actually have a 1280×720{' '}
+              <code>maxresdefault</code> thumbnail stored — older uploads, or ones YouTube processed at
+              lower quality, simply don&apos;t have that file. Oddly, YouTube doesn&apos;t return a normal
+              404 for a missing size; it silently serves a small grey 120×90 placeholder image instead,
+              which would otherwise trick a naive tool into offering a &quot;HD&quot; download that&apos;s
+              actually a blank grey square. This tool checks the actual pixel dimensions of what loaded and
+              quietly drops any resolution that turns out to be that placeholder, so what you see listed is
+              only what genuinely exists for that video.
+            </p>
+            <p>
+              Beyond the obvious (grabbing a thumbnail to reference or reuse), this gets used for a couple
+              of specific things: competitive research — pulling thumbnails from videos that are doing well
+              in a niche to study what colors, expressions, and text treatments are working — and
+              production reference, matching the crop, contrast, or layout of your own channel&apos;s
+              thumbnails against others at a glance. It&apos;s also just a fast way to grab a still image
+              tied to a video without scrubbing to a frame and screenshotting it yourself.
+            </p>
+            <p>
+              One thing worth keeping in mind: a video&apos;s thumbnail is normally the uploader&apos;s own
+              creative work (or a frame plus overlay they created), and it&apos;s protected the same way any
+              other image is. Downloading it for personal reference, research, or analysis is generally
+              fine, but reusing someone else&apos;s thumbnail in something you publish — a competing video,
+              an article, a social post — without permission carries the same copyright risk as lifting any
+              other image you didn&apos;t make. When in doubt, treat it as a reference to learn from rather
+              than an asset to republish.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4 bg-paper">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

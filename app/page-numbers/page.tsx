@@ -61,6 +61,48 @@ export default function PageNumbersPage() {
           </div>
         </div>
       </section>
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">Numbering a Document That Has an Unnumbered Cover Page</h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              This tool numbers every page of the PDF you upload, in order, starting from whatever number
+              you set in &quot;Start at.&quot; That&apos;s exactly what most documents need — but it means there&apos;s no
+              built-in way to leave a single cover or title page blank while numbering everything after it
+              as &quot;1.&quot; A lot of reports, theses, and legal filings want precisely that: an unnumbered cover,
+              then page 1 starting on the content that follows it.
+            </p>
+            <p>
+              The workaround is a two-tool combination rather than a setting. Use{' '}
+              <Link href="/split-pdf" className="text-sky-600 hover:underline">Split PDF</Link> to pull
+              the cover page off as its own file, run this tool on the remaining pages with &quot;Start at&quot; set
+              to 1, then use{' '}
+              <Link href="/merge-pdf" className="text-sky-600 hover:underline">Merge PDF</Link> to stitch
+              the untouched cover back onto the front of the newly numbered set. It&apos;s three quick steps
+              instead of one, but each step runs in seconds and you end up with exactly the numbering
+              convention that formal documents actually expect.
+            </p>
+            <p>
+              The &quot;Start at&quot; field has one more consequence worth knowing if you use the &quot;Page n of N&quot;
+              or &quot;n / N&quot; formats. The &quot;N&quot; isn&apos;t a count of the physical pages in the file you uploaded —
+              it&apos;s the highest number the sequence reaches. If you start at 5 on a 10-page PDF, the last
+              page is labeled &quot;Page 14 of 14,&quot; not &quot;Page 14 of 10.&quot; That&apos;s the correct behavior when this
+              PDF is one segment of a larger combined document and you want the numbering to reflect the
+              full document&apos;s true length, but it will look wrong if you just wanted to offset the count
+              without changing what &quot;total pages&quot; means — in that case, leave &quot;Start at&quot; on 1 and adjust
+              expectations instead.
+            </p>
+            <p>
+              Format choice is mostly about the reader&apos;s context: a bare number works for internal drafts,
+              &quot;Page n&quot; reads naturally in printed handouts, and &quot;Page n of N&quot; or &quot;n / N&quot; are the formats
+              reviewers expect in contracts and academic submissions, since they make it obvious if a page
+              is missing from a printed set. Whichever you pick, the numbers are drawn into the page margin,
+              so as long as your original content has reasonable margins already, nothing gets covered.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

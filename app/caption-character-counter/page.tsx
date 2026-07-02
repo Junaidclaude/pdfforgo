@@ -57,6 +57,52 @@ export default function CaptionCounterPage() {
 
       <CaptionCounterTool />
 
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            Why the Same Caption Behaves Differently on Every Platform
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              The reason this tool shows eight numbers instead of one is that &quot;character limit&quot;
+              means two different things depending on the platform. X enforces its 280-character cap as a
+              hard limit — go over and the post simply won&apos;t publish. Instagram, TikTok, Facebook, and
+              LinkedIn work differently: their <em>real</em> limits are enormous (2,200, 2,200, 63,206, and
+              3,000 characters respectively), but the feed itself only shows a fraction of that before
+              collapsing the rest behind &quot;more&quot; — 125 characters on Instagram, 150 on TikTok, 477
+              on Facebook, 210 on LinkedIn. Most people who scroll past your post in their feed never tap
+              &quot;more,&quot; so the caption&apos;s real audience is often just that first truncated chunk,
+              not the full text you wrote.
+            </p>
+            <p>
+              That changes how you should write. Put the actual hook, offer, or point in the first sentence
+              or two — before the truncation cutoff for that platform — rather than opening with a
+              scene-setting intro that only pays off three sentences in. Hashtags, credits, and
+              calls-to-action are safer placed after the visible cutoff, since anyone who cares enough to
+              expand the caption will see them, but they&apos;re doing nothing for the people who
+              don&apos;t. The counter updates live as you type specifically so you can see, per platform,
+              exactly where that cutoff lands in your actual text.
+            </p>
+            <p>
+              One honest caveat: this counts Unicode characters, which is a very close match to how these
+              platforms count but not a perfect one in every edge case. X&apos;s own composer, for example,
+              always counts a link as a fixed 23 characters regardless of how long the actual URL is, and
+              has its own weighting rules for certain scripts and emoji. For the overwhelming majority of
+              captions — plain text, standard emoji, normal punctuation — the count here will match what you
+              see in each platform&apos;s own editor almost exactly; just don&apos;t treat it as a
+              byte-perfect guarantee if your caption is right at the edge of a limit and full of raw links.
+            </p>
+            <p>
+              If you&apos;re finishing a caption with hashtags, the{' '}
+              <Link href="/hashtag-generator" className="text-cyan-600 hover:underline">Hashtag Generator</Link>{' '}
+              is worth checking first — it&apos;s easy to eat 60-80 characters on hashtags alone, which
+              matters more on platforms like Instagram Bio (150-character limit total) than on a
+              2,200-character caption.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4 bg-paper">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

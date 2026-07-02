@@ -55,6 +55,50 @@ export default function CompressImagePage() {
           </div>
         </div>
       </section>
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            Getting the Right Quality Setting Without Guessing
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              Compression usually gets used to solve a size problem, not a quality problem: a photo needs
+              to fit under a website&apos;s upload limit, an email attachment is bouncing, or a page is loading
+              slowly because of an oversized hero image. In most of those cases you&apos;re looking for the
+              biggest size reduction you can get before the difference becomes visible — not the biggest
+              reduction possible.
+            </p>
+            <p>
+              For JPG, quality around 75–85% is usually the sweet spot: file size drops sharply from 100%
+              with almost no visible change, while pushing much below 60% starts introducing blocky
+              artifacts, especially around sharp edges and text. WebP tends to look better than JPG at the
+              same quality number and same file size, because its encoder is simply newer and more
+              efficient — if compatibility isn&apos;t a concern, it&apos;s usually the better default. PNG is a
+              different case entirely: it&apos;s a lossless format, so the quality slider genuinely does nothing
+              to it. If you upload a PNG and leave the output format on &quot;Keep Original,&quot; you&apos;ll get the
+              same file size back — to actually shrink a PNG, you need to convert it to JPG or WebP, which
+              trades a lossless format for a lossy one.
+            </p>
+            <p>
+              Compression also has diminishing (or negative) returns in a couple of predictable situations.
+              Recompressing a JPG that&apos;s already been compressed once doesn&apos;t reclaim much — most of the
+              easy savings were already taken, and each additional lossy pass adds a small amount of new
+              artifacting rather than removing old data. And images that are mostly flat color or text —
+              screenshots, scanned documents, simple graphics — tend to compress unevenly as JPG, producing
+              visible &quot;ringing&quot; around hard edges; those often look cleaner and just as small as WebP, or
+              are better left as PNG if they need to stay crisp.
+            </p>
+            <p>
+              If you need to change pixel dimensions as well as file size, pair this with{' '}
+              <Link href="/edit-resize-image" className="text-blue-600 hover:underline">Resize Image</Link>{' '}
+              — a smaller image at the same quality setting will always produce a smaller file. And if you
+              specifically need a different file type rather than just a smaller one, use{' '}
+              <Link href="/convert-image" className="text-blue-600 hover:underline">Convert Image</Link>.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

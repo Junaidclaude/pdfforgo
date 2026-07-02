@@ -89,6 +89,47 @@ export default function ExcelToPdfPage() {
         </div>
       </section>
 
+      {/* ── Guide ─────────────────────────────────────────── */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            What Actually Survives the Trip from Excel to PDF
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              Most people reach for this tool at a specific moment: a report needs to go to someone who
+              doesn&apos;t have Excel installed, an invoice needs to be attached to an email as something that
+              can&apos;t be accidentally edited, or a portal only accepts PDF uploads. Converting freezes the
+              spreadsheet exactly as it looks right now — no formulas to break, no accidental cell edits,
+              just a flat document anyone can open.
+            </p>
+            <p>
+              Because the conversion renders each sheet as an actual HTML table before capturing it, the
+              things tied to that table&apos;s own styling come through faithfully: font weights, cell colors,
+              borders, and merged cells all look the way they do in Excel. What doesn&apos;t come through is
+              anything Excel draws <em>on top of</em> the grid rather than inside a cell — native charts
+              aren&apos;t rendered, and cells show their calculated values rather than the underlying formula
+              text, since the PDF captures what&apos;s on screen, not what&apos;s driving it.
+            </p>
+            <p>
+              One thing worth planning around: output is always a fixed landscape A4 page, and tall data
+              paginates automatically as it flows down, but very wide spreadsheets don&apos;t get the same
+              treatment — columns are fit to that fixed page width, so a table with a lot of columns can
+              end up cramped or clipped rather than spilling cleanly onto a second page. If you&apos;ve got a
+              wide report, it&apos;s worth hiding a few less-important columns in Excel before uploading, or
+              splitting it into two narrower exports.
+            </p>
+            <p>
+              If you&apos;re assembling a packet from several converted files — say, a spreadsheet report plus a{' '}
+              <Link href="/word-to-pdf" className="text-green-600 hover:underline">Word document</Link>{' '}
+              cover letter — convert each piece separately and then use{' '}
+              <Link href="/compress-pdf" className="text-green-600 hover:underline">Compress PDF</Link>{' '}
+              if the combined file ends up larger than you&apos;d like before sending it on.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ──────────────────────────────────────────── */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">

@@ -95,6 +95,54 @@ export default function UnlockPdfPage() {
         </div>
       </section>
 
+      {/* ── Guide ─────────────────────────────────────────── */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            Legitimate Reasons to Unlock a PDF (and the One Thing This Tool Won&apos;t Do)
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              People end up here for reasons that have nothing to do with bypassing someone else&apos;s
+              security. A common one: your own company or a client locked a PDF with printing and copying
+              disabled, and now you&apos;re the one who needs to pull a paragraph into a report or print a
+              signed copy for a physical file. Another: you inherited a batch of old scanned records or
+              statements that were protected years ago, the person who set the password is long gone, but
+              you have every right to the content and just need the restriction lifted so the files are
+              usable again. A third: you&apos;re archiving documents and want a clean, unencrypted copy that
+              won&apos;t prompt future software or long-term storage systems for a password nobody remembers.
+            </p>
+            <p>
+              What actually happens under the hood depends on which kind of protection you&apos;re dealing with.
+              Plenty of PDFs are locked with an <strong>owner password only</strong> — no password required
+              to open them, just permission flags disabling printing or editing. Those, this tool clears
+              automatically with no password needed at all, because the content was never actually hidden
+              from you in the first place; only the permission flags were set. A PDF with a genuine{' '}
+              <strong>open password</strong> is different — the file&apos;s contents are encrypted, and you have
+              to supply the correct password before anything can be decrypted and re-saved without it.
+            </p>
+            <p>
+              This is also the honest limitation to know going in: if you don&apos;t have the password to a PDF
+              that requires one to open, this tool cannot get you in. It tries the password you type exactly
+              once, and if it&apos;s wrong you&apos;ll see an &quot;incorrect password&quot; message — there&apos;s no brute-forcing,
+              no dictionary attack, no backdoor. That&apos;s a deliberate line, not a missing feature; a tool that
+              cracked open-password PDFs without the password would be far more useful to someone trying to
+              get into a document that isn&apos;t theirs than to someone who&apos;s genuinely locked out of their own
+              file.
+            </p>
+            <p>
+              Once a file is unlocked, it&apos;s a completely ordinary, unencrypted PDF — worth remembering if
+              you&apos;re planning to send it back out. If you need to re-apply a password (a new one you&apos;ll
+              actually remember, or updated permissions), run it through{' '}
+              <Link href="/protect-pdf" className="text-orange-600 hover:underline">Protect PDF</Link> before
+              it goes anywhere. And if the unlocked file also happens to be oversized once you can finally
+              work with it, <Link href="/compress-pdf" className="text-orange-600 hover:underline">Compress PDF</Link> is
+              a natural next stop.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">

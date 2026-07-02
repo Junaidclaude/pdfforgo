@@ -88,6 +88,56 @@ export default function GrayscalePdfPage() {
         </div>
       </section>
 
+      {/* ── Guide ─────────────────────────────────────────── */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            What Grayscale Conversion Actually Costs You
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              This tool doesn&apos;t just desaturate the colors in your PDF — it renders every page to an
+              image and rebuilds the document from those images. That&apos;s the only reliable way to strip
+              color from arbitrary PDF content (vector graphics, embedded photos, gradients, form fields)
+              in the browser, but it means the output is fundamentally different from the input: a
+              text-based PDF goes in, and an image-based PDF comes out. Any text that was previously
+              selectable, searchable, or copyable stops being any of those things, because as far as the
+              new file is concerned, the page is a picture of text rather than actual text.
+            </p>
+            <p>
+              That trade-off matters for file size in a way that surprises people. The &quot;30–60% smaller&quot;
+              figure genuinely holds for PDFs dominated by color photos or scanned color pages, since
+              stripping color from a large embedded image and re-compressing it saves real bytes. But a
+              PDF that&apos;s mostly plain text and vector graphics starts out very small — often just a few
+              hundred kilobytes for dozens of pages — precisely because text is cheap to store as text.
+              Rendering that same document to a full-page image at 144 DPI and re-encoding it as JPEG can
+              easily produce a <em>larger</em> file than the original, not a smaller one. If your goal is
+              purely a smaller file and the PDF is already mostly black text, skip this tool and reach for{' '}
+              <Link href="/compress-pdf" className="text-gray-700 hover:underline">Compress PDF</Link>{' '}
+              instead — it works losslessly on the structure you already have rather than rasterizing it.
+            </p>
+            <p>
+              It also follows that this tool isn&apos;t the right move if your only goal is cheaper black-and-white
+              printing of a text document. Most printer drivers and office software already have a
+              &quot;print in grayscale&quot; or &quot;black ink only&quot; setting that handles that without altering the file
+              at all. Grayscale conversion earns its keep when you need the color actually gone from the
+              file itself — for archiving a document in a black-and-white-only records system, submitting
+              to a portal that rejects color PDFs outright, or permanently stripping color from scanned
+              pages you&apos;re redistributing.
+            </p>
+            <p>
+              If you convert a document you actually need to search or copy text from later, you can
+              partially recover that by running the grayscale output through{' '}
+              <Link href="/ocr-pdf" className="text-gray-700 hover:underline">OCR PDF</Link>, which reads
+              the text back out of the flattened images and adds an invisible searchable text layer on top.
+              It won&apos;t be pixel-identical to the original text (font kerning and exact positioning are
+              approximated by the OCR engine), but it restores the ability to search and select, which is
+              usually what people actually miss once a document has been flattened.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ──────────────────────────────────────────── */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">

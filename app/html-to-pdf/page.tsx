@@ -74,6 +74,49 @@ export default function HtmlToPdfPage() {
         </div>
       </section>
 
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            Why Page Breaks Land Where They Do
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              This tool is a good fit for turning a self-contained HTML file — an invoice template, a
+              saved article, an email design you&apos;re proofing, a flyer or one-pager you built with plain
+              CSS — into something you can archive, print, or send without asking the recipient to open
+              it in a browser. It&apos;s less of a fit for anything that depends on a live server or that was
+              designed with multi-page print layout in mind.
+            </p>
+            <p>
+              The reason comes down to how the conversion actually works. Rather than a dedicated print
+              engine that understands page boundaries, this renders your HTML in a hidden container and
+              takes a single tall screenshot of the whole thing, then slices that image into A4-height
+              strips to build the pages. The slicing happens purely by pixel position — it has no idea
+              where a paragraph, table row, or image ends — so a line of text or a table row can land right
+              on a page boundary and get visually split between two pages. For a short, single-page
+              document this is rarely noticeable; for a long flowed document with many rows, it&apos;s worth
+              expecting the occasional awkward break.
+            </p>
+            <p>
+              It&apos;s also worth knowing that the HTML is inserted as static markup, not loaded as a live
+              page — so any content that a `&lt;script&gt;` tag would normally generate at runtime (data
+              fetched by JavaScript, content rendered by a front-end framework) won&apos;t appear, since script
+              tags injected this way don&apos;t execute. If your HTML is a fully rendered export — the kind you&apos;d
+              get from &quot;View Source&quot; after the page has already loaded — you&apos;re in good shape.
+            </p>
+            <p>
+              For documents where you need Word-style headers, footers, or guaranteed clean page breaks,
+              building the document in{' '}
+              <Link href="/word-to-pdf" className="text-orange-600 hover:underline">Word</Link>{' '}
+              and converting it is usually more predictable than fighting HTML pagination. And if what
+              you&apos;re really trying to do is turn a batch of photos or scanned pages into a PDF rather than
+              markup, <Link href="/jpg-to-pdf" className="text-orange-600 hover:underline">JPG to PDF</Link>{' '}
+              is the more direct route.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

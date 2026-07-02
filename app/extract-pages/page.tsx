@@ -91,6 +91,52 @@ export default function ExtractPagesPage() {
         </div>
       </section>
 
+      {/* ── Guide ─────────────────────────────────────────── */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            Real Workflows for Picking Out Exactly the Pages You Need
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              Extraction earns its keep in situations a straight split can&apos;t handle. Think of pulling
+              exhibit pages 4, 19, and 27 out of a 90-page discovery bundle for a filing, grabbing the
+              three slides you actually need from a 40-page deck a colleague emailed you, or lifting just
+              the signature and notary pages out of a lease so you can send a shorter document for
+              e-signature. Anytime the pages you want aren&apos;t a contiguous block, extraction is the right
+              tool — you click exactly what you need, wherever it lives in the document.
+            </p>
+            <p>
+              The order you click pages in becomes the order they appear in the output, which is genuinely
+              useful (you can reassemble a document in a new sequence without a separate reorder step) but
+              also a common source of mistakes if you&apos;re not paying attention to the numbered badges. If
+              you want the output to simply mirror the original page order, don&apos;t click pages one at a
+              time — use the <strong>All</strong> button and then click to deselect the ones you don&apos;t
+              want, or use the <strong>Odd/Even</strong> shortcuts. Those always leave you with pages in
+              ascending order; manual clicking is really for when you deliberately want to resequence.
+            </p>
+            <p>
+              Worth knowing before you extract: internal hyperlinks that jump from one page to another
+              inside the same PDF only keep working if both the link and its destination page end up in
+              your extracted selection — if you leave the destination page behind, that link becomes dead
+              in the new file. Document-level bookmarks aren&apos;t carried over at all, since they&apos;re built to
+              reference the full original page tree. Form fields on the pages you keep are preserved, but
+              if a field&apos;s calculation depends on a value from a page you excluded, that calculation will
+              no longer resolve correctly.
+            </p>
+            <p>
+              If what you actually want is to keep the whole document but drop a couple of pages or move
+              them around, <Link href="/organize-pdf" className="text-emerald-600 hover:underline">Organize PDF</Link> is
+              usually the better fit — it&apos;s built around reordering and deleting in place rather than
+              picking a subset. And if you&apos;re thinking about extraction in reverse — &quot;keep everything
+              except these three pages&quot; — <Link href="/remove-pages" className="text-emerald-600 hover:underline">Remove Pages</Link> applies
+              that inverse selection logic directly instead of making you click every page you want to
+              keep.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">

@@ -55,6 +55,49 @@ export default function ConvertImagePage() {
           </div>
         </div>
       </section>
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            Choosing the Right Format (and What Happens to Transparency)
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              The three formats here solve different problems. JPG is the right call for photos — it&apos;s
+              small and every platform accepts it, but it has no concept of transparency and re-compresses
+              the image every time you save it. PNG is lossless and supports a transparent background,
+              which makes it the standard for logos, icons, and screenshots with sharp text or flat color.
+              WebP is the newer option that combines both strengths — strong compression and transparency
+              support — and is now supported by every modern browser, though a small number of older tools
+              and platforms still don&apos;t accept it.
+            </p>
+            <p>
+              Transparency specifically is worth understanding before you convert, because it&apos;s a one-way
+              trip in one direction. If your source image is a PNG or WebP with a transparent background
+              and you convert it to JPG, the transparent areas get filled with solid white before the image
+              is flattened — JPG simply has no channel to store transparency in, so there&apos;s no way around
+              this. Converting the other direction is safe: turning a JPG into PNG or WebP doesn&apos;t add
+              transparency (there was none to begin with), it just gives you a lossless copy of whatever
+              was already there.
+            </p>
+            <p>
+              A couple of related details: rotating an image by 90° or 270° swaps its width and height, so
+              a 1920×1080 photo becomes 1080×1920 after a quarter turn — worth checking if you&apos;re
+              targeting an exact output size. And any filter you apply (grayscale, sepia, vivid, and so on)
+              is baked permanently into the pixels of the downloaded file — there&apos;s no way to remove it
+              afterward, so it&apos;s worth keeping the original file until you&apos;re sure about the result.
+            </p>
+            <p>
+              If you&apos;re converting a batch of product photos or icons and also need to trim them to a
+              specific shape, do the crop first with{' '}
+              <Link href="/crop-image" className="text-pink-600 hover:underline">Crop Image</Link>{' '}
+              and convert afterward. For hitting an exact pixel size rather than just a format,{' '}
+              <Link href="/edit-resize-image" className="text-pink-600 hover:underline">Resize Image</Link>{' '}
+              is the more direct tool.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>

@@ -89,6 +89,56 @@ export default function RepairPdfPage() {
         </div>
       </section>
 
+      {/* ── Guide ────────────────────────────────────────── */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            What &quot;Corrupted PDF&quot; Actually Means — and Where Repair Hits Its Limits
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              A PDF isn&apos;t a flat image — it&apos;s a small database of objects (pages, fonts, images, an outline
+              tree) stitched together by a cross-reference table that tells a reader where every object
+              lives inside the file. &quot;Corruption&quot; almost always means that index, or one of the objects it
+              points to, got damaged: a download that stopped halfway through, an app that crashed or lost
+              power mid-save, an email gateway that mangled an attachment, or a PDF generator that wrote an
+              incomplete file. The document&apos;s actual content — the text, the images — is often still sitting
+              intact inside the file; what&apos;s broken is the map to find it.
+            </p>
+            <p>
+              This is exactly why the tool works in tiers rather than trying one fix. It first attempts a
+              normal, strict parse — if that succeeds, the file wasn&apos;t really broken, just re-saved cleanly.
+              If that fails, it re-parses while tolerating invalid objects instead of aborting on the first
+              one it can&apos;t make sense of, which recovers files where the xref table or a handful of objects
+              are damaged but the rest of the structure is sound. If that still fails, it additionally
+              strips an encryption wrapper, which fixes PDFs that combine structural damage with an
+              owner-level lock. Each tier that succeeds re-saves the document with a fresh, valid
+              cross-reference table — which is also why repaired files sometimes come out noticeably
+              smaller: bloated or duplicated xref data and orphaned objects don&apos;t get carried into the
+              rewrite.
+            </p>
+            <p>
+              What this can&apos;t do is reconstruct data that&apos;s actually gone. If the bytes making up a page&apos;s
+              content stream were themselves overwritten, truncated mid-write, or replaced with garbage —
+              not just misindexed, but genuinely destroyed — there&apos;s nothing for any repair tool to recover;
+              the content simply isn&apos;t in the file anymore. Similarly, if the file isn&apos;t a PDF at all (a
+              renamed file, or a download that grabbed an error page instead of the actual document), no
+              amount of lenient parsing will produce a PDF out of it. In practice, the failure message
+              &quot;too severely damaged to recover&quot; means the parser couldn&apos;t find enough valid structure
+              anywhere in the file to rebuild from — not that the tool gave up early.
+            </p>
+            <p>
+              If your file opens with a warning but still opens, it&apos;s worth running through repair anyway —
+              stricter viewers, print workflows, or automated ingestion systems (court filing portals,
+              document management systems) are often far less forgiving than the software you happened to
+              open it with. And if a repaired file also needs a password removed first,{' '}
+              <Link href="/unlock-pdf" className="text-amber-600 hover:underline">Unlock PDF</Link> handles
+              open-password PDFs that repair alone can&apos;t get past.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ──────────────────────────────────────────── */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto">

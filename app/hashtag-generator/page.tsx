@@ -57,6 +57,53 @@ export default function HashtagGeneratorPage() {
 
       <HashtagGeneratorTool />
 
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">
+            Curated Tags vs. &quot;Trending Now&quot;: What This Tool Actually Gives You
+          </h2>
+          <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
+            <p>
+              It&apos;s worth being upfront about where these hashtags actually come from, because it
+              changes how you should use them: this isn&apos;t a service that scrapes Instagram or TikTok
+              for what&apos;s trending this hour. It&apos;s a hand-built dataset of roughly twenty niches —
+              travel, food, fitness, fashion, tech, gaming, and so on — each carrying about twenty hashtags
+              that have been broadly popular and relevant in that space for a long time. When you type a
+              topic, the tool first checks for an exact niche match, then checks if any word in your query
+              matches a niche&apos;s keywords, then falls back to a looser substring match. If nothing
+              matches at all, it still generates something useful — a handful of tags derived from your
+              actual keyword (yourword, yourwordgram, yourwordlife, and so on) plus a small set of generic,
+              works-everywhere tags like #instagood and #photooftheday.
+            </p>
+            <p>
+              That tradeoff is deliberate. A curated, static list can&apos;t break when a platform changes
+              its trending API or rate-limits a scraper, and it won&apos;t chase a fad that&apos;s dead in
+              three days — the tags here are the kind that stay relevant month over month. What it
+              genuinely can&apos;t do is tell you what&apos;s spiking <em>right now</em> — a breaking meme
+              format, a moment tied to a live event, a regionally-specific trend. If real-time
+              trend-chasing is the goal for a specific campaign, this is the wrong tool for that particular
+              job; for steady, evergreen discoverability on a normal post, it&apos;s exactly the right one.
+            </p>
+            <p>
+              On strategy: resist the urge to use all 30 generated tags on every post. The broadest tags
+              (#travel, #fitness) have enormous volume, which also means your post is buried instantly
+              among millions of others using the same tag — mixing in a few more specific tags related to
+              your actual content (a city name, a specific workout style, a sub-niche) tends to surface
+              better to people who&apos;d actually care. That&apos;s why every tag here is individually
+              clickable — deselect the ones that don&apos;t fit this particular post rather than pasting the
+              full block every time.
+            </p>
+            <p>
+              If you&apos;re pairing hashtags with a caption, run the combined text through the{' '}
+              <Link href="/caption-character-counter" className="text-purple-600 hover:underline">Caption Character Counter</Link>{' '}
+              before posting — hashtags eat into the same character budget as your caption, and it&apos;s
+              easy to blow past Instagram&apos;s 150-character bio limit or crowd out your actual message on
+              a shorter-form platform.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 px-4 bg-paper">
         <div className="max-w-3xl mx-auto">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink text-center mb-10">Frequently Asked Questions</h2>
