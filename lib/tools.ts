@@ -198,6 +198,15 @@ export const TOOLS: Tool[] = [
     iconColor: '#0EA5E9',
     iconBg: '#F0F9FF',
   },
+  {
+    slug: 'fill-pdf-form',
+    name: 'Fill PDF Form',
+    description: 'Fill out PDF forms online — text fields, checkboxes, dropdowns, and radio buttons.',
+    shortDesc: 'Fill out PDF forms online',
+    category: 'edit',
+    iconColor: '#EA580C',
+    iconBg: '#FFF7ED',
+  },
 
   // ── IMAGE TOOLS ──────────────────────────────────────────
   {
