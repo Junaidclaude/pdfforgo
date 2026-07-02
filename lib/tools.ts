@@ -89,7 +89,7 @@ export const TOOLS: Tool[] = [
   {
     slug: 'html-to-pdf',
     name: 'HTML to PDF',
-    description: 'Convert HTML files to PDF using a real browser engine. CSS, fonts, and layout are preserved perfectly.',
+    description: 'Convert HTML files to PDF right in your browser. Fonts, colors, and layout are captured as a snapshot.',
     shortDesc: 'Convert HTML files to PDF',
     category: 'convert-to',
     iconColor: '#F97316',
@@ -212,8 +212,8 @@ export const TOOLS: Tool[] = [
   {
     slug: 'bg-remover',
     name: 'BG Remover',
-    description: 'Remove image backgrounds instantly with AI. Runs 100% in your browser — no uploads, no signup, no watermarks. Supports batch processing.',
-    shortDesc: 'AI background remover, runs in browser',
+    description: 'Remove image backgrounds instantly with AI. Free, no signup, no watermarks. Your image is processed and discarded immediately — never stored.',
+    shortDesc: 'AI background remover, nothing stored',
     category: 'image',
     iconColor: '#10B981',
     iconBg: '#ECFDF5',
