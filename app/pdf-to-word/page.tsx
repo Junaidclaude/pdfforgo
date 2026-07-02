@@ -79,8 +79,8 @@ export default function PdfToWordPage() {
               picture of text, so it needs OCR (optical character recognition) rather than a structural
               conversion — this tool extracts existing text and won&apos;t produce useful output on a
               scan. If you need to pull text out of a scanned PDF, {' '}
-              <Link href="/pdf-editor" className="text-primary hover:underline">PDF Editor</Link>&apos;s
-              Extract Text feature runs OCR directly in your browser.
+              <Link href="/ocr-pdf" className="text-primary hover:underline">OCR PDF</Link> runs OCR
+              directly in your browser and gives you the extracted text or a searchable PDF back.
             </p>
             <p>
               If your result looks close but not perfect, it&apos;s usually faster to fix spacing/formatting
@@ -132,7 +132,7 @@ const HOW_TO_STEPS = [
 
 const FAQS = [
   { q: 'How accurate is PDF to Word conversion?', a: 'Accuracy depends on the PDF type. Text-based PDFs (created by Word, Excel, Google Docs, etc.) convert accurately. Tables and complex multi-column layouts may need minor adjustments after conversion.' },
-  { q: 'Can I convert a scanned PDF to Word?', a: 'Not with this tool — a scan is just a picture of text, and this converter only extracts text that already exists in the PDF. If you need to pull text out of a scanned document, use PDF Editor\'s Extract Text feature, which runs OCR directly in your browser.' },
+  { q: 'Can I convert a scanned PDF to Word?', a: 'Not with this tool — a scan is just a picture of text, and this converter only extracts text that already exists in the PDF. If you need to pull text out of a scanned document, use OCR PDF, which runs OCR directly in your browser.' },
   { q: 'Is my PDF safe when converting to Word?', a: 'Yes. Conversion runs entirely in your browser using JavaScript — your file is never uploaded anywhere, so there\'s nothing to transmit or store on our end.' },
   { q: 'What is the maximum PDF size for conversion?', a: 'There\'s no server upload cap — conversion runs entirely in your browser, so the practical limit is your device\'s memory. Files up to 50 MB are handled comfortably on modern hardware.' },
   { q: 'Will the converted Word file preserve fonts?', a: 'The output uses a standard, clean font rather than attempting to match the original PDF\'s exact fonts. Overall structure — headings, paragraphs, and spacing — is preserved.' },

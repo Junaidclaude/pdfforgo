@@ -999,7 +999,9 @@ export default function PdfEditorTool() {
 
         // Convert to PNG data-URL — most reliable ImageLike across browser engines
         const imgUrl = canvas.toDataURL('image/png')
-        const { data } = await worker.recognize(imgUrl)
+        // Tesseract.js only populates data.blocks (needed for per-line bounding
+        // boxes) when explicitly requested via the output-format options.
+        const { data } = await worker.recognize(imgUrl, {}, { blocks: true })
 
         type TWord = { text: string; confidence: number; bbox: { x0: number; y0: number; x1: number; y1: number } }
         type TLine = { text: string; confidence: number; bbox: { x0: number; y0: number; x1: number; y1: number } }

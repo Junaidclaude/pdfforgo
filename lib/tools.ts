@@ -151,6 +151,15 @@ export const TOOLS: Tool[] = [
     iconColor: '#16A34A',
     iconBg: '#F0FDF4',
   },
+  {
+    slug: 'ocr-pdf',
+    name: 'OCR PDF',
+    description: 'Extract text from scanned PDFs using OCR. Copy the text, download a .txt file, or get a searchable PDF.',
+    shortDesc: 'Extract text from scanned PDFs',
+    category: 'convert-from',
+    iconColor: '#6366F1',
+    iconBg: '#EEF2FF',
+  },
 
   // ── EDIT PDF ─────────────────────────────────────────────
   {
