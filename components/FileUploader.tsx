@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
+import { STANDARD_MAX_FILE_BYTES } from '@/lib/limits'
 
 interface FileUploaderProps {
   accept?: string
@@ -9,7 +10,7 @@ interface FileUploaderProps {
   onFilesSelected: (files: File[]) => void
 }
 
-const LARGE_FILE_BYTES = 50 * 1024 * 1024 // 50 MB
+const LARGE_FILE_BYTES = STANDARD_MAX_FILE_BYTES
 
 export default function FileUploader({
   accept = '.pdf',

@@ -16,14 +16,14 @@ const ExcelToPdfTool = dynamic(() => import('./ExcelToPdfTool'), {
 export const metadata: Metadata = {
   title: 'Excel to PDF – Convert XLSX & XLS to PDF Free Online',
   description:
-    'Convert Excel spreadsheets (.xlsx, .xls, .csv) to PDF online for free. Preserves formatting, charts, and merged cells. No signup. Powered by CloudConvert.',
+    'Convert Excel spreadsheets (.xlsx, .xls, .csv) to PDF online for free. Preserves formatting, charts, and merged cells. No signup. Runs entirely in your browser.',
   alternates: {
     canonical: '/excel-to-pdf',
   },
   openGraph: {
     title: 'Excel to PDF – Convert XLSX to PDF Free | PDFForge',
     description:
-      'Convert Excel .xlsx, .xls, and .csv files to PDF. Formatting, charts, and all sheets preserved. Free, no signup. Powered by CloudConvert.',
+      'Convert Excel .xlsx, .xls, and .csv files to PDF. Formatting, charts, and all sheets preserved. Free, no signup, 100% browser-based.',
     url: '/excel-to-pdf',
     type: 'website',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
@@ -53,7 +53,7 @@ export default function ExcelToPdfPage() {
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 rounded-full px-3 py-1.5 mb-4 text-xs text-green-700 font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block animate-pulse" />
-            XLSX · XLS · CSV · Powered by CloudConvert
+            XLSX · XLS · CSV · Runs 100% in your browser
           </div>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-4 leading-tight text-ink">
             Convert Excel to PDF Online
@@ -139,22 +139,22 @@ export default function ExcelToPdfPage() {
 const HOW_TO_STEPS = [
   {
     title: 'Upload Your Spreadsheet',
-    body: 'Drag and drop an .xlsx, .xls, or .csv file, or click to browse. The file is transmitted securely to CloudConvert for server-side conversion.',
+    body: 'Drag and drop an .xlsx, .xls, or .csv file, or click to browse. Nothing is uploaded — parsing happens right in your browser.',
   },
   {
     title: 'Accurate Conversion',
-    body: 'CloudConvert uses LibreOffice under the hood for Excel conversion, preserving cell formatting, column widths, merged cells, charts, and conditional formatting.',
+    body: 'Your spreadsheet is parsed and rendered as a formatted table, preserving cell formatting, column widths, and merged cells, then turned into a PDF locally.',
   },
   {
     title: 'Download the PDF',
-    body: 'Your converted PDF is ready in seconds. Download it directly — it is automatically deleted from the conversion server after the job completes.',
+    body: 'Your converted PDF is ready in seconds. Download it directly — your file never left your device, so there\'s nothing to clean up on any server.',
   },
 ]
 
 const FAQS = [
   {
     q: 'Does Excel to PDF preserve formatting, charts, and merged cells?',
-    a: 'Yes. CloudConvert uses LibreOffice for the conversion, which faithfully renders cell formatting (fonts, colors, borders), merged cells, charts, conditional formatting, and print area settings.',
+    a: 'Cell formatting (fonts, colors, borders) and merged cells are preserved by rendering each sheet as an HTML table before converting to PDF. Native Excel charts are not currently rendered — they won\'t appear in the output PDF.',
   },
   {
     q: 'Are all worksheets included in the PDF?',
@@ -170,15 +170,15 @@ const FAQS = [
   },
   {
     q: 'What is the maximum file size for Excel to PDF conversion?',
-    a: 'The maximum upload size is 4 MB, due to Vercel\'s free tier request body limit. Most Excel files are under 2 MB. Files with many embedded images or complex charts may be larger — consider compressing images in Excel first.',
+    a: 'There\'s no server upload cap — conversion runs entirely in your browser, so the practical limit is your device\'s memory. Files up to 50 MB are handled comfortably on modern hardware.',
   },
   {
     q: 'Is my spreadsheet data kept private?',
-    a: 'Your file is transmitted securely to CloudConvert over HTTPS for conversion and is automatically deleted after the job completes. PDFForge never stores your file. For highly sensitive data, consider using a desktop application like Microsoft Excel\'s built-in "Export to PDF" feature.',
+    a: 'Yes. Conversion runs entirely in your browser using JavaScript — your file is never uploaded anywhere, so there\'s nothing to transmit or store on our end.',
   },
   {
-    q: 'How many free conversions can I do per day?',
-    a: 'The free CloudConvert plan provides 25 conversion minutes per day. An Excel to PDF conversion typically uses well under 1 minute, allowing around 25 free conversions daily.',
+    q: 'How many conversions can I do per day?',
+    a: 'As many as you like — there\'s no daily limit or quota. Since conversion happens locally in your browser, there\'s no server-side usage to ration.',
   },
 ]
 
@@ -192,17 +192,17 @@ const SCHEMA = {
       operatingSystem: 'Web Browser',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       description:
-        'Free online Excel to PDF converter. Convert XLSX, XLS, and CSV files to PDF. Formatting and charts preserved. No signup. Powered by CloudConvert.',
+        'Free online Excel to PDF converter. Convert XLSX, XLS, and CSV files to PDF. Formatting preserved. No signup, runs entirely in your browser.',
       url: 'https://pdfforge.io/excel-to-pdf',
     },
     {
       '@type': 'HowTo',
       name: 'How to Convert Excel to PDF Online',
-      description: 'Convert an Excel spreadsheet to PDF using PDFForge — free, powered by CloudConvert.',
+      description: 'Convert an Excel spreadsheet to PDF using PDFForge — free, 100% browser-based.',
       totalTime: 'PT1M',
       step: [
         { '@type': 'HowToStep', position: 1, name: 'Upload Excel File', text: 'Drop your .xlsx, .xls, or .csv file onto the upload area or click to browse.' },
-        { '@type': 'HowToStep', position: 2, name: 'Convert', text: 'CloudConvert processes the spreadsheet and renders it as a PDF with all formatting intact.' },
+        { '@type': 'HowToStep', position: 2, name: 'Convert', text: 'Your browser parses the spreadsheet and renders it as a PDF with formatting intact.' },
         { '@type': 'HowToStep', position: 3, name: 'Download', text: 'Download the converted PDF file.' },
       ],
     },

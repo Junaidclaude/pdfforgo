@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import AdSlot from '@/components/AdSlot'
+import { STANDARD_MAX_FILE_BYTES, STANDARD_MAX_FILE_LABEL } from '@/lib/limits'
 
 type Status = 'idle' | 'converting' | 'done' | 'error'
 
@@ -24,8 +25,8 @@ export default function ExcelToPdfTool() {
       setStatus('error')
       return
     }
-    if (file.size > 50 * 1024 * 1024) {
-      setErrorMsg('File too large. Maximum size is 50 MB.')
+    if (file.size > STANDARD_MAX_FILE_BYTES) {
+      setErrorMsg(`File too large. Maximum size is ${STANDARD_MAX_FILE_LABEL}.`)
       setStatus('error')
       return
     }

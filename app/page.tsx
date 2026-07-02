@@ -293,8 +293,8 @@ export default function HomePage() {
           <ol className="grid grid-cols-1 md:grid-cols-3 gap-5 stagger" data-reveal>
             {[
               { num: '01', color: 'bg-royal', title: 'Pick your tool', body: 'Choose from ' + TOOLS.length + ' focused PDF and image tools. Each one does one thing and does it cleanly.' },
-              { num: '02', color: 'bg-ruby',  title: 'Drop your file', body: 'Drag and drop, or browse. Files up to 4 MB upload securely over HTTPS.' },
-              { num: '03', color: 'bg-ink',   title: 'Download the result', body: 'Most conversions finish in under six seconds. The source file is wiped immediately after.' },
+              { num: '02', color: 'bg-ruby',  title: 'Drop your file', body: 'Drag and drop, or browse. Most tools process files up to 50 MB right in your browser — nothing to upload.' },
+              { num: '03', color: 'bg-ink',   title: 'Download the result', body: 'Most conversions finish in under six seconds. Nothing is kept afterward — your file never leaves your device to begin with.' },
             ].map((step) => (
               <li key={step.num} className="rounded-2xl bg-white border border-line p-7 shadow-card hover:shadow-lift transition-shadow">
                 <div className="flex items-center gap-3 mb-5">

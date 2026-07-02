@@ -15,11 +15,11 @@ const WordToPdfTool = dynamic(() => import('./WordToPdfTool'), {
 export const metadata: Metadata = {
   title: 'Word to PDF – Convert DOCX to PDF Free Online',
   description:
-    'Convert Word documents to PDF online for free. Preserves formatting, fonts, and images. Upload .docx or .doc files up to 4 MB. Powered by CloudConvert. No signup required.',
+    'Convert Word documents to PDF online for free. Preserves headings, formatting, tables, and images. Runs entirely in your browser — no upload, no signup required.',
   alternates: { canonical: '/word-to-pdf' },
   openGraph: {
     title: 'Word to PDF – Convert DOCX Free Online | PDFForge',
-    description: 'Convert .docx and .doc files to PDF with perfect formatting. Powered by CloudConvert. Free, no signup.',
+    description: 'Convert .docx and .doc files to PDF with formatting preserved. 100% browser-based. Free, no signup.',
     url: '/word-to-pdf', type: 'website',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
@@ -37,10 +37,10 @@ export default function WordToPdfPage() {
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-3 py-1.5 mb-4 text-xs text-blue-700 font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block animate-pulse" />
-            Powered by CloudConvert · Secure · Fast
+            Runs 100% in your browser · Private · Fast
           </div>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-4 leading-tight text-ink">Convert Word to PDF Online</h1>
-          <p className="text-mute text-lg max-w-xl mx-auto">Upload your .docx or .doc file and get a pixel-perfect PDF back in seconds. Fonts, images, and layout are preserved exactly.</p>
+          <p className="text-mute text-lg max-w-xl mx-auto">Drop in your .docx or .doc file and get a clean PDF back in seconds. Headings, formatting, tables, and images are preserved, and your file never leaves your device.</p>
         </div>
       </section>
       <WordToPdfTool />
@@ -91,23 +91,23 @@ export default function WordToPdfPage() {
 }
 
 const HOW_TO_STEPS = [
-  { title: 'Upload Your Word File', body: 'Drop your .docx or .doc file onto the upload area or click to browse. Files up to 4 MB are supported.' },
-  { title: 'Wait for Conversion', body: 'CloudConvert processes your document server-side, preserving fonts, images, tables, and all formatting. This usually takes 5–15 seconds.' },
-  { title: 'Download Your PDF', body: 'Click Download PDF to save your converted document. It is automatically deleted from CloudConvert servers after download.' },
+  { title: 'Upload Your Word File', body: 'Drop your .docx or .doc file onto the upload area or click to browse. Nothing is uploaded — it\'s read straight into your browser.' },
+  { title: 'Automatic Conversion', body: 'Your browser parses the document and rebuilds it as a formatted PDF, preserving headings, images, tables, and text styling. This usually takes just a few seconds.' },
+  { title: 'Download Your PDF', body: 'Click Download PDF to save your converted document. Since it was never uploaded, there\'s nothing left on any server afterward.' },
 ]
 
 const FAQS = [
-  { q: 'Does Word to PDF preserve formatting?', a: 'Yes. CloudConvert uses LibreOffice and Microsoft-compatible conversion, preserving fonts, images, tables, headers, footers, and page layout with high accuracy.' },
-  { q: 'What is the maximum Word file size?', a: 'The maximum file size is 4 MB, due to Vercel\'s request body limit on the free plan. For larger files, consider using Microsoft Word or LibreOffice directly.' },
-  { q: 'Is my Word document safe to convert online?', a: 'Your file is transmitted securely over HTTPS to CloudConvert for conversion. CloudConvert automatically deletes converted files within 24 hours. PDFForge does not store any copies of your files.' },
-  { q: 'Do I need a CloudConvert account?', a: 'No. PDFForge uses CloudConvert\'s API on your behalf. You get 25 free conversions per day without creating an account.' },
+  { q: 'Does Word to PDF preserve formatting?', a: 'Yes for the common cases — headings, bold/italic text, lists, tables, and images all carry over. Very complex layouts (multi-column sections, precise pixel-level positioning) may render slightly differently than in Word, since conversion rebuilds the document as clean HTML rather than doing a pixel-for-pixel copy.' },
+  { q: 'What is the maximum Word file size?', a: 'There\'s no server upload cap — conversion runs entirely in your browser, so the practical limit is your device\'s memory. Files up to 50 MB are handled comfortably on modern hardware.' },
+  { q: 'Is my Word document safe to convert online?', a: 'Yes. Conversion runs entirely in your browser using JavaScript — your file is never uploaded anywhere, so there\'s nothing to transmit or store on our end.' },
+  { q: 'Do I need an account or is there a daily limit?', a: 'No account, no daily limit. Since conversion happens locally in your browser rather than on a server, there\'s no usage quota to ration — convert as many files as you like.' },
   { q: 'Can I convert a .doc file (older Word format)?', a: 'Yes. Both .doc (Word 97–2003) and .docx (modern format) are supported.' },
 ]
 
 const SCHEMA = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'SoftwareApplication', name: 'Word to PDF — PDFForge', applicationCategory: 'UtilitiesApplication', operatingSystem: 'Web Browser', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, description: 'Free online Word to PDF converter powered by CloudConvert. No signup required.', url: 'https://pdfforge.io/word-to-pdf' },
-    { '@type': 'HowTo', name: 'How to Convert Word to PDF Online', totalTime: 'PT30S', step: [{ '@type': 'HowToStep', position: 1, name: 'Upload', text: 'Drop your .docx or .doc file.' }, { '@type': 'HowToStep', position: 2, name: 'Convert', text: 'CloudConvert processes the file.' }, { '@type': 'HowToStep', position: 3, name: 'Download', text: 'Download your PDF.' }] },
+    { '@type': 'SoftwareApplication', name: 'Word to PDF — PDFForge', applicationCategory: 'UtilitiesApplication', operatingSystem: 'Web Browser', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, description: 'Free online Word to PDF converter that runs entirely in your browser. No signup, no upload required.', url: 'https://pdfforge.io/word-to-pdf' },
+    { '@type': 'HowTo', name: 'How to Convert Word to PDF Online', totalTime: 'PT30S', step: [{ '@type': 'HowToStep', position: 1, name: 'Upload', text: 'Drop your .docx or .doc file.' }, { '@type': 'HowToStep', position: 2, name: 'Convert', text: 'Your browser converts the file locally.' }, { '@type': 'HowToStep', position: 3, name: 'Download', text: 'Download your PDF.' }] },
   ],
 }

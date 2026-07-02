@@ -16,16 +16,16 @@ export default function PrivacyPage() {
         <section>
           <h2 className="font-display font-bold text-lg text-ink mb-2">How your files are handled</h2>
           <p className="text-mute">
-            Most tools on PDFForge — merge, split, compress, rotate, protect, unlock, image editing,
-            background removal, and all the image/video/social tools — run entirely in your browser
-            using JavaScript and WebAssembly. Your file is never uploaded or transmitted anywhere; it
-            never leaves your device.
+            Nearly every tool on PDFForge — merge, split, compress, rotate, protect, unlock, image
+            editing, Word↔PDF, Excel→PDF, HTML→PDF, and all the image/video/social tools — runs entirely
+            in your browser using JavaScript and WebAssembly. Your file is never uploaded or transmitted
+            anywhere; it never leaves your device.
           </p>
           <p className="text-mute mt-3">
-            A small number of conversions (Word↔PDF, Excel→PDF, HTML→PDF) require a real document/rendering
-            engine that can&apos;t run in a browser. For these specific tools, your file is transmitted over
-            HTTPS to our conversion provider and automatically deleted immediately after your result is
-            generated. We do not retain, read, or share the contents of your files.
+            One tool is the exception: <strong>BG Remover</strong> (and the Remove Background mode inside
+            the image editor) uses an AI model too heavy to run efficiently in a browser, so that specific
+            image is uploaded over HTTPS to our server for processing. It is used only to generate your
+            result and is discarded immediately afterward — never stored, logged, or shared.
           </p>
         </section>
 
@@ -71,7 +71,6 @@ export default function PrivacyPage() {
             <li>Google AdSense — advertising</li>
             <li>Stripe — payment processing (only if you subscribe to Pro)</li>
             <li>Clerk — authentication (only if you create an account)</li>
-            <li>CloudConvert — server-side document conversion (only for Word/Excel/HTML tools)</li>
           </ul>
         </section>
 

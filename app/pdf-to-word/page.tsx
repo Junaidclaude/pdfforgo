@@ -15,11 +15,11 @@ const PdfToWordTool = dynamic(() => import('./PdfToWordTool'), {
 export const metadata: Metadata = {
   title: 'PDF to Word – Convert PDF to DOCX Free Online',
   description:
-    'Convert PDF to editable Word documents (.docx) online for free. Preserves text, images, and formatting. Upload PDFs up to 4 MB. Powered by CloudConvert. No signup required.',
+    'Convert PDF to editable Word documents (.docx) online for free. Preserves text and formatting. Runs entirely in your browser — no upload, no signup required.',
   alternates: { canonical: '/pdf-to-word' },
   openGraph: {
     title: 'PDF to Word – Convert PDF to DOCX Free Online | PDFForge',
-    description: 'Convert PDF files to editable Word documents. Preserves formatting. Powered by CloudConvert. Free, no signup.',
+    description: 'Convert PDF files to editable Word documents. Preserves formatting. 100% browser-based. Free, no signup.',
     url: '/pdf-to-word', type: 'website',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
@@ -37,10 +37,10 @@ export default function PdfToWordPage() {
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 rounded-full px-3 py-1.5 mb-4 text-xs text-green-700 font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block animate-pulse" />
-            Powered by CloudConvert · Secure · Fast
+            Runs 100% in your browser · Private · Fast
           </div>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-4 leading-tight text-ink">Convert PDF to Word Online</h1>
-          <p className="text-mute text-lg max-w-xl mx-auto">Turn any PDF into an editable Word document (.docx). Text, images, tables, and layout are preserved as accurately as possible.</p>
+          <p className="text-mute text-lg max-w-xl mx-auto">Turn any text-based PDF into an editable Word document (.docx). Text and layout are reconstructed as paragraphs, right in your browser.</p>
         </div>
       </section>
       <PdfToWordTool />
@@ -73,10 +73,14 @@ export default function PdfToWordPage() {
             </p>
             <p>
               The conversion works best on PDFs that were originally created from a word processor —
-              contracts, reports, resumes exported from Word or Google Docs. Complex multi-column layouts,
-              PDFs built from design software (magazines, brochures), and scanned documents are the harder
-              cases: scans in particular contain no real text at all, just a picture of text, so they need
-              OCR (optical character recognition) rather than a straight structural conversion.
+              contracts, reports, resumes exported from Word or Google Docs. Complex multi-column layouts
+              and PDFs built from design software (magazines, brochures) are harder cases. Scanned
+              documents are a different problem entirely: a scan contains no real text at all, just a
+              picture of text, so it needs OCR (optical character recognition) rather than a structural
+              conversion — this tool extracts existing text and won&apos;t produce useful output on a
+              scan. If you need to pull text out of a scanned PDF, {' '}
+              <Link href="/pdf-editor" className="text-primary hover:underline">PDF Editor</Link>&apos;s
+              Extract Text feature runs OCR directly in your browser.
             </p>
             <p>
               If your result looks close but not perfect, it&apos;s usually faster to fix spacing/formatting
@@ -121,23 +125,23 @@ export default function PdfToWordPage() {
 }
 
 const HOW_TO_STEPS = [
-  { title: 'Upload Your PDF', body: 'Drop your PDF onto the upload area or click to browse. Files up to 4 MB are supported.' },
-  { title: 'Wait for Conversion', body: 'CloudConvert extracts text, images, and layout from your PDF and converts it to a .docx file. This takes 10–20 seconds.' },
+  { title: 'Upload Your PDF', body: 'Drop your PDF onto the upload area or click to browse. Nothing is uploaded — it\'s read straight into your browser.' },
+  { title: 'Automatic Conversion', body: 'Your browser extracts the text and layout from your PDF and rebuilds it as a .docx file. This takes just a few seconds.' },
   { title: 'Download Your Word File', body: 'Click Download Word File to save your .docx. You can then edit it in Microsoft Word, Google Docs, or LibreOffice.' },
 ]
 
 const FAQS = [
-  { q: 'How accurate is PDF to Word conversion?', a: 'Accuracy depends on the PDF type. Text-based PDFs (created by Word, Excel, etc.) convert very accurately. Scanned PDFs may require OCR and will convert with lower accuracy. Tables and complex layouts may need minor adjustments after conversion.' },
-  { q: 'Can I convert a scanned PDF to Word?', a: 'Yes, but the result depends on CloudConvert\'s OCR capability. Scanned PDFs are images of text, not actual text, so the accuracy is lower than with digital PDFs. For best results, use a high-resolution scan.' },
-  { q: 'Is my PDF safe when converting to Word?', a: 'Your file is transmitted securely over HTTPS to CloudConvert. CloudConvert automatically deletes files within 24 hours. PDFForge does not store any copies of your files.' },
-  { q: 'What is the maximum PDF size for conversion?', a: 'The maximum file size is 4 MB, due to Vercel\'s request body limit on the free plan. For larger files, consider using Adobe Acrobat or a desktop converter.' },
-  { q: 'Will the converted Word file preserve fonts?', a: 'Common fonts are preserved. Unusual or embedded fonts may be substituted with similar alternatives. Overall formatting including margins, headings, and paragraph spacing is maintained.' },
+  { q: 'How accurate is PDF to Word conversion?', a: 'Accuracy depends on the PDF type. Text-based PDFs (created by Word, Excel, Google Docs, etc.) convert accurately. Tables and complex multi-column layouts may need minor adjustments after conversion.' },
+  { q: 'Can I convert a scanned PDF to Word?', a: 'Not with this tool — a scan is just a picture of text, and this converter only extracts text that already exists in the PDF. If you need to pull text out of a scanned document, use PDF Editor\'s Extract Text feature, which runs OCR directly in your browser.' },
+  { q: 'Is my PDF safe when converting to Word?', a: 'Yes. Conversion runs entirely in your browser using JavaScript — your file is never uploaded anywhere, so there\'s nothing to transmit or store on our end.' },
+  { q: 'What is the maximum PDF size for conversion?', a: 'There\'s no server upload cap — conversion runs entirely in your browser, so the practical limit is your device\'s memory. Files up to 50 MB are handled comfortably on modern hardware.' },
+  { q: 'Will the converted Word file preserve fonts?', a: 'The output uses a standard, clean font rather than attempting to match the original PDF\'s exact fonts. Overall structure — headings, paragraphs, and spacing — is preserved.' },
 ]
 
 const SCHEMA = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'SoftwareApplication', name: 'PDF to Word — PDFForge', applicationCategory: 'UtilitiesApplication', operatingSystem: 'Web Browser', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, description: 'Free online PDF to Word converter powered by CloudConvert. No signup required.', url: 'https://pdfforge.io/pdf-to-word' },
-    { '@type': 'HowTo', name: 'How to Convert PDF to Word Online', totalTime: 'PT30S', step: [{ '@type': 'HowToStep', position: 1, name: 'Upload', text: 'Drop your PDF onto the tool.' }, { '@type': 'HowToStep', position: 2, name: 'Convert', text: 'CloudConvert processes the file.' }, { '@type': 'HowToStep', position: 3, name: 'Download', text: 'Download your .docx Word file.' }] },
+    { '@type': 'SoftwareApplication', name: 'PDF to Word — PDFForge', applicationCategory: 'UtilitiesApplication', operatingSystem: 'Web Browser', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, description: 'Free online PDF to Word converter that runs entirely in your browser. No signup, no upload required.', url: 'https://pdfforge.io/pdf-to-word' },
+    { '@type': 'HowTo', name: 'How to Convert PDF to Word Online', totalTime: 'PT30S', step: [{ '@type': 'HowToStep', position: 1, name: 'Upload', text: 'Drop your PDF onto the tool.' }, { '@type': 'HowToStep', position: 2, name: 'Convert', text: 'Your browser converts the file locally.' }, { '@type': 'HowToStep', position: 3, name: 'Download', text: 'Download your .docx Word file.' }] },
   ],
 }

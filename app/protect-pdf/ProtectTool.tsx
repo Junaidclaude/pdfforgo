@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import AdSlot from '@/components/AdSlot'
+import { PROTECT_MAX_FILE_BYTES, PROTECT_MAX_FILE_LABEL } from '@/lib/limits'
 
 type Status = 'idle' | 'loading' | 'ready' | 'processing' | 'done' | 'error'
 
@@ -47,8 +48,8 @@ export default function ProtectTool() {
       setStatus('error')
       return
     }
-    if (file.size > 100 * 1024 * 1024) {
-      setErrorMsg('File is too large. Please upload a PDF under 100 MB.')
+    if (file.size > PROTECT_MAX_FILE_BYTES) {
+      setErrorMsg(`File is too large. Please upload a PDF under ${PROTECT_MAX_FILE_LABEL}.`)
       setStatus('error')
       return
     }

@@ -16,11 +16,11 @@ const HtmlToPdfTool = dynamic(() => import('./HtmlToPdfTool'), {
 export const metadata: Metadata = {
   title: 'HTML to PDF – Convert HTML Files to PDF Free Online | PDFForge',
   description:
-    'Hi. Convert HTML files to PDF using a real browser engine. CSS, fonts, flexbox, and layout are preserved perfectly. Free, no signup, no watermarks.',
+    'Convert HTML files to PDF right in your browser. Fonts, colors, and layout are rendered as a snapshot of the page. Free, no signup, no watermarks.',
   alternates: { canonical: '/html-to-pdf' },
   openGraph: {
     title: 'HTML to PDF – Free Online Converter | PDFForge',
-    description: 'Convert HTML files to perfect PDFs. Real browser rendering, free, no signup.',
+    description: 'Convert HTML files to PDF, 100% browser-based. Free, no signup.',
     url: '/html-to-pdf',
     type: 'website',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'HTML to PDF – Free Online | PDFForge',
-    description: 'Convert HTML to PDF with perfect CSS rendering. Free, no signup.',
+    description: 'Convert HTML to PDF right in your browser. Free, no signup.',
   },
 }
 
@@ -44,13 +44,13 @@ export default function HtmlToPdfPage() {
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-200 rounded-full px-3 py-1.5 mb-4 text-xs text-orange-700 font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-orange-500 inline-block" />
-            Real browser rendering · CSS preserved perfectly
+            Runs 100% in your browser · Private · Free
           </div>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-4 leading-tight text-ink">
             HTML to PDF <span className="text-orange-600">Converter</span>
           </h1>
           <p className="text-mute text-lg max-w-xl mx-auto">
-            Convert HTML files to PDF using a full browser engine. Fonts, flexbox, grid, gradients — everything renders exactly as designed.
+            Convert HTML files to PDF using your own browser to render the page. Most CSS — fonts, colors, flexbox, gradients — comes through in the snapshot.
           </p>
         </div>
       </section>
@@ -109,16 +109,16 @@ export default function HtmlToPdfPage() {
 }
 
 const HOW_TO_STEPS = [
-  { title: 'Upload your HTML file', body: 'Click or drag your .html file into the uploader. The file is sent securely for browser-based rendering.' },
-  { title: 'Convert instantly', body: 'A real headless Chromium browser renders your HTML exactly as it looks in Chrome — fonts, CSS, and layout all preserved.' },
-  { title: 'Download your PDF', body: 'The converted PDF downloads automatically. All styles, images, and formatting are embedded in the output file.' },
+  { title: 'Upload your HTML file', body: 'Click or drag your .html file into the uploader. Nothing is uploaded — it\'s read straight into your browser.' },
+  { title: 'Convert instantly', body: 'Your own browser renders the page and captures it as a snapshot, which is tiled across A4 pages to build the PDF.' },
+  { title: 'Download your PDF', body: 'The converted PDF downloads automatically, with the page\'s fonts, colors, and layout embedded as rendered.' },
 ]
 
 const FAQS = [
-  { q: 'What CSS features are supported?', a: 'All standard CSS including flexbox, grid, custom fonts, gradients, animations (as static renders), and media queries. The conversion uses a real Chromium engine, so anything that works in Chrome works here.' },
-  { q: 'Can I use @page rules to control paper size?', a: 'Yes. Add @page { size: A4; margin: 2cm; } to your CSS and the PDF will respect those dimensions.' },
-  { q: 'Are external fonts and images loaded?', a: 'External resources (Google Fonts, CDN images) are fetched during conversion if they are publicly accessible. Self-hosted or localhost resources will not be available.' },
-  { q: 'What is the file size limit?', a: 'HTML files up to 4 MB are supported. This covers most pages — if your file is larger, try inlining images as base64 or reducing embedded assets.' },
+  { q: 'What CSS features are supported?', a: 'Most standard CSS renders well — fonts, colors, flexbox, gradients, and box layout. Since this uses a canvas snapshot of the rendered page rather than a true print engine, some advanced effects (backdrop filters, certain CSS transforms, iframes) may not capture perfectly.' },
+  { q: 'Can I use @page rules to control paper size?', a: 'No — @page is a print-stylesheet feature meant for browser print dialogs and dedicated print-to-PDF engines, and this tool doesn\'t read it. Output is always tiled to standard A4 pages.' },
+  { q: 'Are external fonts and images loaded?', a: 'Images and fonts hosted on servers that allow cross-origin requests (most CDNs and Google Fonts) are typically loaded. Resources on localhost, or blocked by CORS policy, may not appear in the output.' },
+  { q: 'What is the file size limit?', a: 'There\'s no server upload cap — conversion runs entirely in your browser, so the practical limit is your device\'s memory. HTML files up to 50 MB are supported.' },
 ]
 
 const SCHEMA = {
@@ -128,5 +128,6 @@ const SCHEMA = {
   applicationCategory: 'UtilitiesApplication',
   operatingSystem: 'Web Browser',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  description: 'Free online HTML to PDF converter that runs entirely in your browser. No signup, no upload required.',
   url: 'https://pdfforge.io/html-to-pdf',
 }
