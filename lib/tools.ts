@@ -207,6 +207,15 @@ export const TOOLS: Tool[] = [
     iconColor: '#EA580C',
     iconBg: '#FFF7ED',
   },
+  {
+    slug: 'sign-pdf',
+    name: 'Sign PDF',
+    description: 'Sign a PDF by drawing, typing, or uploading your signature, then drag it into place.',
+    shortDesc: 'Add your signature to a PDF',
+    category: 'edit',
+    iconColor: '#2563EB',
+    iconBg: '#EFF6FF',
+  },
 
   // ── IMAGE TOOLS ──────────────────────────────────────────
   {

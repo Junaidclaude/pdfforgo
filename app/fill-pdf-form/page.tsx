@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
 }
 
-const RELATED_SLUGS = ['pdf-editor', 'ocr-pdf', 'protect-pdf']
+const RELATED_SLUGS = ['sign-pdf', 'pdf-editor', 'protect-pdf']
 
 export default function FillPdfFormPage() {
   const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug))
