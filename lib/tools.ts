@@ -160,6 +160,15 @@ export const TOOLS: Tool[] = [
     iconColor: '#6366F1',
     iconBg: '#EEF2FF',
   },
+  {
+    slug: 'compare-pdf',
+    name: 'Compare PDF',
+    description: 'Compare two PDFs and see exactly what text was added, removed, or changed, page by page.',
+    shortDesc: 'Find differences between two PDFs',
+    category: 'convert-from',
+    iconColor: '#0D9488',
+    iconBg: '#F0FDFA',
+  },
 
   // ── EDIT PDF ─────────────────────────────────────────────
   {
