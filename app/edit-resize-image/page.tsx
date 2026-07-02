@@ -34,7 +34,7 @@ export default function ResizeImagePage() {
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-violet-100 border border-violet-200 rounded-full px-3 py-1.5 mb-4 text-xs text-violet-700 font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-violet-500 inline-block" />
-            100% private · Files never leave your browser
+            Private by default · Only Remove Background uploads to our server
           </div>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-4 leading-tight text-ink">
             Resize Images <span className="text-violet-600">Online Free</span>
@@ -92,7 +92,7 @@ export default function ResizeImagePage() {
 
 const HOW_TO_STEPS = [
   { title: 'Set Target Size', body: 'Choose "By Pixels" to enter exact width and height, or "By Percentage" to scale up or down proportionally. Lock the aspect ratio to prevent distortion.' },
-  { title: 'Upload Images', body: 'Drop one or multiple images onto the upload area. All images get the same target dimensions. Processing happens entirely in your browser.' },
+  { title: 'Upload Images', body: 'Drop one or multiple images onto the upload area. All images get the same target dimensions. Resizing happens entirely in your browser — only the Remove Background mode sends your image to our server.' },
   { title: 'Download Resized Images', body: 'Download each resized image individually or grab all as a ZIP. Output format matches the original file type.' },
 ]
 

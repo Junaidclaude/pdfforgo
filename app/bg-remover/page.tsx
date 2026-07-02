@@ -16,11 +16,11 @@ const RemoveBackgroundTool = dynamic(() => import('./RemoveBackgroundTool'), {
 export const metadata: Metadata = {
   title: 'BG Remover – Free AI Background Remover Online | PDFForge',
   description:
-    'Remove image backgrounds instantly with AI. 100% free, no signup, runs entirely in your browser — your images never leave your device. Supports JPG, PNG, WebP.',
+    'Remove image backgrounds instantly with AI. 100% free, no signup, no watermark. Your image is processed and discarded immediately — never stored. Supports JPG, PNG, WebP.',
   alternates: { canonical: '/bg-remover' },
   openGraph: {
     title: 'BG Remover – Free AI-Powered Background Remover | PDFForge',
-    description: 'Instantly remove backgrounds from photos. AI runs in your browser, completely private. Free, no signup.',
+    description: 'Instantly remove backgrounds from photos with AI. Nothing stored, no signup, free.',
     url: '/bg-remover',
     type: 'website',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'BG Remover Free Online | PDFForge',
-    description: 'AI background remover. Runs in your browser — no uploads, no signup.',
+    description: 'AI background remover. Nothing stored, no signup required.',
   },
 }
 
@@ -44,13 +44,13 @@ export default function RemoveBackgroundPage() {
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 rounded-full px-3 py-1.5 mb-4 text-xs text-green-700 font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block animate-pulse" />
-            AI runs in your browser · Zero uploads · 100% private
+            AI-powered · Nothing stored · 100% free
           </div>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-4 leading-tight text-ink">
             BG Remover <span className="text-green-600">Free</span>
           </h1>
           <p className="text-mute text-lg max-w-xl mx-auto">
-            Instantly remove backgrounds from photos, products, portraits, and logos using on-device AI. No account, no uploads, no watermarks.
+            Instantly remove backgrounds from photos, products, portraits, and logos using AI. No account, no watermarks, and your image is discarded immediately after processing.
           </p>
         </div>
       </section>
@@ -96,12 +96,13 @@ export default function RemoveBackgroundPage() {
           <h2 className="font-display text-2xl md:text-3xl font-bold text-ink mb-6">How This Actually Works, and When It Struggles</h2>
           <div className="space-y-4 text-mute text-sm md:text-base leading-relaxed">
             <p>
-              Background removal here runs a segmentation model directly in your browser — the same
-              category of AI that powers portrait mode on phone cameras, just running on-device instead of
-              in a data center. It looks at every pixel and estimates how likely it is to belong to the
-              main subject versus the background, then builds a soft alpha mask from those estimates rather
-              than a hard cutout line. That soft edge is what makes hair and fur look natural instead of
-              looking pasted on.
+              Background removal here runs a segmentation model — the same category of AI that powers
+              portrait mode on phone cameras — that looks at every pixel and estimates how likely it is to
+              belong to the main subject versus the background, then builds a soft alpha mask from those
+              estimates rather than a hard cutout line. That soft edge is what makes hair and fur look
+              natural instead of looking pasted on. This particular model is heavy enough that it runs on
+              our server rather than in your browser tab; your image is processed for that one operation and
+              discarded immediately afterward — it&apos;s never written to storage or kept around.
             </p>
             <p>
               It does best on the case it was built for: one clear subject — a person, product, or animal —
@@ -120,9 +121,11 @@ export default function RemoveBackgroundPage() {
               portraits that need a plain backdrop without actually re-shooting them.
             </p>
             <p>
-              Everything happens locally — the model downloads once to your browser and every image after
-              that is processed without a network round-trip, which is also why the second and third image
-              in a batch process noticeably faster than the first.
+              Processing happens on our server rather than your device, so each image does require an
+              upload — but nothing is retained afterward. If you&apos;re specifically looking for a tool
+              that never sends your file anywhere, most other tools on this site (merge, compress, image
+              editing, and more) run 100% in your browser; this one trades that off for a more accurate,
+              heavier AI model than what&apos;s practical to run on-device today.
             </p>
           </div>
         </div>
@@ -164,13 +167,13 @@ export default function RemoveBackgroundPage() {
 
 const HOW_TO_STEPS = [
   { title: 'Upload your image', body: 'Drop or click to select a JPG, PNG, or WebP. You can process multiple images at once.' },
-  { title: 'AI removes the background', body: 'The on-device AI model analyses your image and cleanly cuts out the subject in seconds.' },
+  { title: 'AI removes the background', body: 'Our AI model analyses your image and cleanly cuts out the subject in seconds, then discards it.' },
   { title: 'Download your PNG', body: 'Get a transparent PNG, or pick a solid background colour before downloading.' },
 ]
 
 const FEATURES = [
-  { icon: '🔒', title: '100% Private', body: 'The AI model runs entirely in your browser using WebAssembly. Your images are never uploaded to any server.' },
-  { icon: '⚡', title: 'Instant Results', body: 'After the model loads once, subsequent images process in seconds — even offline.' },
+  { icon: '🔒', title: 'Nothing Stored', body: 'Your image is processed for this one operation and discarded immediately afterward — never saved or retained.' },
+  { icon: '⚡', title: 'Fast Results', body: 'Most images process in a few seconds.' },
   { icon: '🖼️', title: 'Batch Processing', body: 'Remove backgrounds from multiple images in one go. Download individually or as a ZIP.' },
   { icon: '🎨', title: 'Custom Backgrounds', body: 'Keep it transparent, or fill with white, black, or any custom colour before downloading.' },
   { icon: '✨', title: 'No Watermarks', body: 'Output PNGs are clean with no watermarks, branding, or quality reduction.' },
@@ -178,9 +181,9 @@ const FEATURES = [
 ]
 
 const FAQS = [
-  { q: 'Does my image get uploaded to a server?', a: 'No. The AI model (ONNX-based) is downloaded once to your browser and runs locally via WebAssembly. Your images never leave your device.' },
+  { q: 'Does my image get uploaded to a server?', a: 'Yes, for this specific tool — the AI model used here is heavier than what runs efficiently in a browser, so processing happens on our server. Your image is used only to generate your result and is discarded immediately afterward; it\'s never stored, logged, or shared. If you\'d rather nothing leaves your device at all, most other tools on this site (merge, compress, image editing) run 100% in your browser.' },
   { q: 'What image formats are supported?', a: 'JPG, PNG, and WebP are supported. GIFs are not supported as background removal works on static frames only.' },
-  { q: 'Why does the first image take longer?', a: 'The first run downloads the AI model (~50MB) and caches it in your browser. All subsequent images process instantly without re-downloading.' },
+  { q: 'Why does the first image sometimes take longer?', a: 'Occasionally the server needs a moment to start up before handling your first request (a "cold start"), which can add a few extra seconds. Subsequent images in the same session are typically faster.' },
   { q: 'How accurate is the background removal?', a: 'The model works well on subjects with clear edges — people, products, animals, and logos. Complex scenes with similar foreground/background colours may need refinement.' },
   { q: 'Can I use the output commercially?', a: 'Yes. The tool is free and the output images are yours. There are no watermarks or usage restrictions on the downloaded files.' },
 ]

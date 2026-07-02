@@ -756,7 +756,7 @@ export default function ResizeImageTool() {
               {editTool === 'removebg' && (
                 <>
                   <p className="text-[11px] font-bold text-mute uppercase tracking-wider">Remove Background</p>
-                  <p className="text-xs text-mute leading-relaxed">AI-powered, runs entirely in your browser. No upload required.</p>
+                  <p className="text-xs text-mute leading-relaxed">AI-powered. This step processes your image on our server and discards it immediately — every other tool on this page stays in your browser.</p>
                   {!bgDone ? (
                     <button
                       onClick={removeBackground}
@@ -1136,7 +1136,7 @@ export default function ResizeImageTool() {
               </button>
               <p className="mt-4 text-xs text-green-700 bg-green-50 border border-green-100 rounded-full px-3 py-1 inline-flex items-center gap-1.5">
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-                100% private — files never leave your browser
+                Private by default — only Remove Background uploads to our server
               </p>
               <div className="mt-6 w-full max-w-lg"><AdSlot position="header" /></div>
             </div>

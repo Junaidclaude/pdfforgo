@@ -21,8 +21,8 @@ const FEATURES = [
         <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
       </svg>
     ),
-    title: 'Most tools never touch a server',
-    body: 'Merge, split, compress, rotate, protect, image editing, background removal — all run entirely in your browser via JavaScript/WebAssembly. Your file never leaves your device. A handful of conversions (Word, Excel, HTML→PDF) need real rendering engines and process server-side over HTTPS, auto-deleted the moment your job finishes.',
+    title: 'Nearly every tool never touches a server',
+    body: 'Merge, split, compress, rotate, protect, all document conversions (Word, Excel, HTML→PDF), and image editing all run entirely in your browser via JavaScript/WebAssembly — your file never leaves your device. A few features that genuinely need heavier processing (like AI background removal) run server-side, and are removed immediately after each job.',
   },
   {
     gradient: 'from-royal to-royald',
@@ -72,7 +72,7 @@ const FEATURES = [
       </svg>
     ),
     title: 'Built on solid infra',
-    body: 'Conversion is powered by CloudConvert and served on Vercel\'s global edge. Median job time under six seconds, 99.98% uptime.',
+    body: 'Served on Vercel\'s global edge, with heavy processing (document parsing, AI models) running as WebAssembly right in your browser instead of a shared backend. Median job time under six seconds, 99.98% uptime.',
   },
 ]
 
@@ -87,15 +87,15 @@ const FAQS = [
   },
   {
     q: 'What happens to my files after conversion?',
-    a: 'Client-side tools (merge, split, compress, rotate, etc.) never leave your browser at all — processing happens entirely in JavaScript. For server-side conversions (PDF↔Word, HTML→PDF), files are transmitted over HTTPS to CloudConvert and automatically deleted once your download completes.',
+    a: 'For almost every tool — merge, split, compress, rotate, protect, all document conversions (Word, Excel, HTML→PDF), and image editing — nothing happens, because your file never leaves your browser in the first place; everything runs locally in JavaScript/WebAssembly. A few tools that need heavier processing (like AI background removal) do send your file to our server for that one operation, and it\'s discarded immediately afterward — never stored.',
   },
   {
     q: 'What is the maximum file size?',
-    a: 'Uploads are capped at 4 MB for server-side tools to stay within Vercel\'s free request body limit. Client-side tools can handle files up to 50 MB since there\'s no upload involved.',
+    a: 'Since almost every tool processes files entirely on your device, the practical limit is your own device\'s memory rather than an upload cap — most tools comfortably handle files up to 50 MB, and some (like Protect PDF) handle up to 100 MB.',
   },
   {
     q: 'Which tools work offline?',
-    a: 'All client-side tools — merge, split, compress, rotate, protect, unlock, JPG↔PDF, grayscale, extract pages, add page numbers, organize, and all image tools — work fully offline after first page load.',
+    a: 'Nearly everything — merge, split, compress, rotate, protect, unlock, most image tools, and every document conversion (Word↔PDF, Excel→PDF, HTML→PDF) — works fully offline after first page load. Blur Face\'s on-device AI also works offline after its one-time model download. AI background removal is the exception — it needs a connection since that specific processing runs on our server.',
   },
 ]
 
