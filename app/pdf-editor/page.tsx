@@ -130,14 +130,14 @@ const FEATURES = [
   { icon: '□', title: 'Shapes', body: 'Insert rectangles and ellipses with custom stroke and fill colors.' },
   { icon: '→', title: 'Lines & Arrows', body: 'Draw straight lines and arrows to point out or connect content.' },
   { icon: '▐', title: 'Highlight', body: 'Highlight text or areas with a semi-transparent color overlay.' },
-  { icon: '■', title: 'Whiteout / Redact', body: 'Cover sensitive content with a white box to visually redact it from the document.' },
+  { icon: '■', title: 'Whiteout', body: 'Cover sensitive content with a white box. Visual-only — the original text stays in the PDF underneath, so this isn\'t a substitute for true redaction.' },
   { icon: '↖', title: 'Select & Move', body: 'Click any annotation to select, reposition, or delete it.' },
   { icon: '🔍', title: 'Zoom In/Out', body: 'Zoom from 50% to 300% for precision work on fine details.' },
   { icon: '📄', title: 'Multi-Page Support', body: 'Navigate all pages via the sidebar. Add annotations to any page independently.' },
 ]
 
 const FAQS = [
-  { q: 'Does this edit the actual PDF text?', a: 'This editor adds annotations on top of the existing PDF content. It does not modify the original text — for that, a full OCR or text-extraction reflow engine is required. To cover text, use the Whiteout tool.' },
+  { q: 'Does this edit the actual PDF text?', a: 'This editor adds annotations on top of the existing PDF content — it does not modify or remove the original text underneath. The Whiteout tool covers content visually with a white box, but the original text remains in the file and can still be recovered (e.g. by selecting/copying text), so it should not be used for legal or compliance redaction.' },
   { q: 'Is my PDF uploaded to a server?', a: 'No. Everything runs in your browser using PDF.js (for rendering) and pdf-lib (for export). Your file never leaves your device.' },
   { q: 'Can I edit scanned PDFs?', a: 'Yes — you can add text, shapes, and annotations on top of scanned pages. The underlying content is a raster image, so you cannot edit its text directly.' },
   { q: 'Are annotations saved permanently?', a: 'When you download the PDF, annotations are permanently embedded in the output file using pdf-lib. The original file is not modified.' },
