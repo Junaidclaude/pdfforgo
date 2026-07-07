@@ -51,21 +51,30 @@ export default function MergeVideoTool() {
   }, [])
 
   const initFF = async () => {
-    if (ffRef.current) return  // guard against React StrictMode double-invoke
+    if (ffRef.current) return
     setFfLoading(true)
+    setError(null)
     try {
-      // v0.11 API — runs in main thread, no Worker URL issues with Next.js/webpack
-      const { createFFmpeg } = await import('@ffmpeg/ffmpeg')
-      const ff = createFFmpeg({
-        corePath: '/ffmpeg/ffmpeg-core.js',
-        log: false,
-      })
+      // 1. Verify the core file is actually reachable
+      const probe = await fetch('/ffmpeg/ffmpeg-core.js', { method: 'HEAD' })
+      if (!probe.ok) throw new Error(`FFmpeg core file not found (HTTP ${probe.status}). Run: node scripts/copy-ffmpeg.js`)
+
+      // 2. Dynamic import — handle both ESM and CJS interop
+      const mod: any = await import('@ffmpeg/ffmpeg')
+      const createFFmpeg: any = mod.createFFmpeg ?? mod.default?.createFFmpeg
+      if (typeof createFFmpeg !== 'function') {
+        throw new Error('createFFmpeg not exported from @ffmpeg/ffmpeg. Check package version.')
+      }
+
+      // 3. Load the WASM core (24 MB local file)
+      const ff = createFFmpeg({ corePath: '/ffmpeg/ffmpeg-core.js', log: false })
       await ff.load()
+
       ffRef.current = ff
       setFfLoaded(true)
-    } catch (e) {
-      console.error('[FFmpeg load]', e)
-      setError('Failed to load video engine. Reload the page and try again.')
+    } catch (e: any) {
+      console.error('[FFmpeg init]', e)
+      setError(e?.message ?? 'Failed to load video engine.')
     }
     setFfLoading(false)
   }
@@ -220,6 +229,34 @@ export default function MergeVideoTool() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
+
+      {/* Engine status bar — always visible */}
+      <div className={`flex items-center gap-2 text-xs font-medium rounded-xl px-3.5 py-2.5 mb-4 border ${
+        ffLoaded ? 'bg-green-50 border-green-200 text-green-700'
+        : ffLoading ? 'bg-blue-50 border-blue-200 text-blue-700'
+        : 'bg-red-50 border-red-200 text-red-700'
+      }`}>
+        {ffLoaded ? (
+          <>
+            <span className="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0" />
+            Video engine ready — Merge button is enabled
+          </>
+        ) : ffLoading ? (
+          <>
+            <svg className="w-3.5 h-3.5 animate-spin shrink-0" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+            Loading video engine (24 MB)… please wait
+          </>
+        ) : (
+          <>
+            <span className="w-2 h-2 rounded-full bg-red-500 inline-block shrink-0" />
+            Engine failed to load — {error || 'unknown error'}
+            <button onClick={() => { setError(null); setFfLoaded(false); initFF() }}
+              className="ml-auto underline hover:no-underline font-semibold shrink-0">
+              Retry
+            </button>
+          </>
+        )}
+      </div>
 
       {/* Drop zone (empty state) */}
       {videos.length === 0 && (
