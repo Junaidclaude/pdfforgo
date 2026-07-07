@@ -55,19 +55,22 @@ export default function MergeVideoTool() {
     setFfLoading(true)
     setError(null)
     try {
-      // 1. Verify the core file is actually reachable
-      const probe = await fetch('/ffmpeg/ffmpeg-core.js', { method: 'HEAD' })
-      if (!probe.ok) throw new Error(`FFmpeg core file not found (HTTP ${probe.status}). Run: node scripts/copy-ffmpeg.js`)
-
-      // 2. Dynamic import — handle both ESM and CJS interop
       const mod: any = await import('@ffmpeg/ffmpeg')
       const createFFmpeg: any = mod.createFFmpeg ?? mod.default?.createFFmpeg
       if (typeof createFFmpeg !== 'function') {
-        throw new Error('createFFmpeg not exported from @ffmpeg/ffmpeg. Check package version.')
+        throw new Error('createFFmpeg not found in @ffmpeg/ffmpeg package.')
       }
 
-      // 3. Load the WASM core (24 MB local file)
-      const ff = createFFmpeg({ corePath: '/ffmpeg/ffmpeg-core.js', log: false })
+      // Try local files first; fall back to CDN if they are not served
+      // (COOP/COEP headers removed so cross-origin WASM works without SharedArrayBuffer)
+      const localUrl = `${window.location.origin}/ffmpeg/ffmpeg-core.js`
+      let corePath = 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
+      try {
+        const probe = await fetch(localUrl, { method: 'HEAD' })
+        if (probe.ok) corePath = localUrl
+      } catch {}
+
+      const ff = createFFmpeg({ corePath, log: false })
       await ff.load()
 
       ffRef.current = ff
