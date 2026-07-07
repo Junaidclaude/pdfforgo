@@ -51,16 +51,16 @@ export default function MergeVideoTool() {
   }, [])
 
   const initFF = async () => {
-    if (ffRef.current) return  // guard against double-invoke (React StrictMode)
+    if (ffRef.current) return  // guard against React StrictMode double-invoke
     setFfLoading(true)
     try {
-      const { FFmpeg } = await import('@ffmpeg/ffmpeg')
-      const ff = new FFmpeg()
-      // Local files served from public/ffmpeg/ — same-origin, no COOP/COEP needed
-      await ff.load({
-        coreURL: '/ffmpeg/ffmpeg-core.js',
-        wasmURL: '/ffmpeg/ffmpeg-core.wasm',
+      // v0.11 API — runs in main thread, no Worker URL issues with Next.js/webpack
+      const { createFFmpeg } = await import('@ffmpeg/ffmpeg')
+      const ff = createFFmpeg({
+        corePath: '/ffmpeg/ffmpeg-core.js',
+        log: false,
       })
+      await ff.load()
       ffRef.current = ff
       setFfLoaded(true)
     } catch (e) {
@@ -145,7 +145,7 @@ export default function MergeVideoTool() {
   }
   const onDragEnd = () => { setDragIdx(null); setDragOverIdx(null) }
 
-  // ── FFmpeg merge ──
+  // ── FFmpeg merge (v0.11 API — ffmpeg.FS / ffmpeg.run) ──
   const merge = async () => {
     if (!ffRef.current || videos.length < 2 || merging) return
     setMerging(true); setProgress(0); setError(null); setResultUrl(null)
@@ -155,43 +155,45 @@ export default function MergeVideoTool() {
     const ext = (name: string) => name.split('.').pop()?.toLowerCase() || 'mp4'
 
     try {
-      ff.on('progress', ({ progress: p }: { progress: number }) => {
-        setProgress(Math.min(98, Math.round(p * 100)))
+      // v0.11 progress callback
+      ff.setProgress(({ ratio }: { ratio: number }) => {
+        setProgress(Math.min(98, Math.round(ratio * 100)))
       })
 
       setStatusMsg('Reading files…')
       for (let i = 0; i < videos.length; i++) {
         const v = videos[i]
         const buf = new Uint8Array(await v.file.arrayBuffer())
-        await ff.writeFile(`in${i}.${ext(v.name)}`, buf)
+        ff.FS('writeFile', `in${i}.${ext(v.name)}`, buf)
       }
 
       const list = videos.map((v, i) => `file 'in${i}.${ext(v.name)}'`).join('\n')
-      await ff.writeFile('list.txt', new TextEncoder().encode(list))
+      ff.FS('writeFile', 'list.txt', new TextEncoder().encode(list))
 
       setStatusMsg('Merging…')
 
-      // Try stream copy first (lossless, fast — works when all videos share codec)
+      // Try stream copy first (lossless — works when all videos share codec)
       let ok = false
       try {
-        await ff.exec(['-f', 'concat', '-safe', '0', '-i', 'list.txt', '-c', 'copy', 'output.mp4'])
+        await ff.run('-f', 'concat', '-safe', '0', '-i', 'list.txt', '-c', 'copy', 'output.mp4')
         ok = true
       } catch {
-        try { await ff.deleteFile('output.mp4') } catch {}
-        // Fallback: re-encode to H.264 + AAC (different codecs / containers)
-        await ff.exec([
+        try { ff.FS('unlink', 'output.mp4') } catch {}
+        // Fallback: re-encode to H.264 + AAC
+        await ff.run(
           '-f', 'concat', '-safe', '0', '-i', 'list.txt',
           '-c:v', 'libx264', '-c:a', 'aac', '-preset', 'fast', '-crf', '18',
-          'output.mp4',
-        ])
+          'output.mp4'
+        )
         ok = true
       }
 
       if (ok) {
         setStatusMsg('Preparing download…')
-        const data = await ff.readFile('output.mp4')
-        const safeData = data instanceof Uint8Array ? new Uint8Array(data.buffer instanceof ArrayBuffer ? data.buffer : (data as any)) : data
-        const blob = new Blob([safeData as BlobPart], { type: 'video/mp4' })
+        const raw = ff.FS('readFile', 'output.mp4') as Uint8Array
+        // Ensure buffer is a plain ArrayBuffer (not SharedArrayBuffer) for Blob
+        const data = new Uint8Array(raw) // copies into a new plain ArrayBuffer
+        const blob = new Blob([data.buffer as ArrayBuffer], { type: 'video/mp4' })
         const url = URL.createObjectURL(blob)
         resultRef.current = url
         setResultUrl(url)
@@ -201,10 +203,10 @@ export default function MergeVideoTool() {
 
       // Cleanup FFmpeg virtual FS
       for (let i = 0; i < videos.length; i++) {
-        try { await ff.deleteFile(`in${i}.${ext(videos[i].name)}`) } catch {}
+        try { ff.FS('unlink', `in${i}.${ext(videos[i].name)}`) } catch {}
       }
-      try { await ff.deleteFile('list.txt') } catch {}
-      try { await ff.deleteFile('output.mp4') } catch {}
+      try { ff.FS('unlink', 'list.txt') } catch {}
+      try { ff.FS('unlink', 'output.mp4') } catch {}
 
     } catch (e: any) {
       setError(e?.message ?? 'Merge failed. Videos may have incompatible formats. Try converting to MP4 first.')
