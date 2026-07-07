@@ -51,20 +51,21 @@ export default function MergeVideoTool() {
   }, [])
 
   const initFF = async () => {
+    if (ffRef.current) return  // guard against double-invoke (React StrictMode)
     setFfLoading(true)
     try {
       const { FFmpeg } = await import('@ffmpeg/ffmpeg')
-      const { toBlobURL } = await import('@ffmpeg/util')
       const ff = new FFmpeg()
-      const base = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd'
+      // Local files served from public/ffmpeg/ — same-origin, no COOP/COEP needed
       await ff.load({
-        coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, 'text/javascript'),
-        wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, 'application/wasm'),
+        coreURL: '/ffmpeg/ffmpeg-core.js',
+        wasmURL: '/ffmpeg/ffmpeg-core.wasm',
       })
       ffRef.current = ff
       setFfLoaded(true)
-    } catch {
-      setError('Failed to load video engine. Check your connection and reload.')
+    } catch (e) {
+      console.error('[FFmpeg load]', e)
+      setError('Failed to load video engine. Reload the page and try again.')
     }
     setFfLoading(false)
   }
