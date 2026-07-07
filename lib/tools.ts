@@ -303,6 +303,15 @@ export const TOOLS: Tool[] = [
 
   // ── VIDEO TOOLS ──────────────────────────────────────────
   {
+    slug: 'merge-video',
+    name: 'Merge Video',
+    description: 'Combine multiple videos into one file. Upload, drag to reorder, merge in one click — same quality as the originals. 100% browser-based.',
+    shortDesc: 'Combine multiple videos into one',
+    category: 'video',
+    iconColor: '#7C3AED',
+    iconBg: '#EDE9FE',
+  },
+  {
     slug: 'youtube-transcript',
     name: 'YouTube Transcript',
     description: 'Get the full transcript of any YouTube video with existing captions. Paste a link, view timestamped text, copy or download as TXT/SRT.',

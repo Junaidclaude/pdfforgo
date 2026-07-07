@@ -1,5 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async headers() {
+    return [
+      {
+        // FFmpeg.wasm needs SharedArrayBuffer → requires COOP + COEP
+        source: '/merge-video',
+        headers: [
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
+        ],
+      },
+    ]
+  },
+
   async redirects() {
     return [
       // /remove-background was renamed to /bg-remover — 301 so existing
