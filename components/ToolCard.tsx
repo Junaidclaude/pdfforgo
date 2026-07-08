@@ -7,8 +7,19 @@ interface ToolCardProps {
 }
 
 export default function ToolCard({ tool, featured = false }: ToolCardProps) {
+  // Tools marked hardNav need a full page load so the server sends COOP/COEP
+  // headers (e.g. Edit Video requires SharedArrayBuffer via cross-origin isolation).
+  // Next.js <Link> does a soft client-side navigation that never re-fetches headers.
+  const Wrapper = tool.hardNav
+    ? ({ children }: { children: React.ReactNode }) => (
+        <a href={`/${tool.slug}`} className="group block h-full">{children}</a>
+      )
+    : ({ children }: { children: React.ReactNode }) => (
+        <Link href={`/${tool.slug}`} className="group block h-full">{children}</Link>
+      )
+
   return (
-    <Link href={`/${tool.slug}`} className="group block h-full">
+    <Wrapper>
       <article
         className={[
           'relative h-full flex flex-col rounded-2xl bg-white p-6 border border-gray-100',
@@ -78,7 +89,7 @@ export default function ToolCard({ tool, featured = false }: ToolCardProps) {
           </svg>
         </div>
       </article>
-    </Link>
+    </Wrapper>
   )
 }
 

@@ -1,5 +1,35 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async headers() {
+    return [
+      // SharedArrayBuffer (required by @ffmpeg/core) is only available on
+      // cross-origin isolated pages. Scope headers to merge-video only so the
+      // rest of the site is not affected by COEP restrictions.
+      {
+        source: '/edit-video',
+        headers: [
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
+        ],
+      },
+      {
+        source: '/merge-video',
+        headers: [
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
+        ],
+      },
+      // The WASM files served from /ffmpeg/ must declare they can be loaded
+      // by a COEP page (require-corp blocks resources without this header).
+      {
+        source: '/ffmpeg/:file*',
+        headers: [
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+        ],
+      },
+    ]
+  },
+
   async redirects() {
     return [
       // /remove-background was renamed to /bg-remover — 301 so existing
@@ -7,6 +37,11 @@ const nextConfig = {
       {
         source: '/remove-background',
         destination: '/bg-remover',
+        permanent: true,
+      },
+      {
+        source: '/merge-video',
+        destination: '/edit-video',
         permanent: true,
       },
     ]

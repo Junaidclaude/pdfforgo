@@ -6,6 +6,8 @@ export interface Tool {
   category: 'organize' | 'optimize' | 'convert-to' | 'convert-from' | 'edit' | 'security' | 'image' | 'video' | 'social'
   iconColor: string
   iconBg: string
+  /** Force a full page load so COOP/COEP headers are applied by the server */
+  hardNav?: boolean
 }
 
 export const TOOLS: Tool[] = [
@@ -303,13 +305,14 @@ export const TOOLS: Tool[] = [
 
   // ── VIDEO TOOLS ──────────────────────────────────────────
   {
-    slug: 'merge-video',
-    name: 'Merge Video',
-    description: 'Combine multiple videos into one file. Upload, drag to reorder, merge in one click — same quality as the originals. 100% browser-based.',
-    shortDesc: 'Combine multiple videos into one',
+    slug: 'edit-video',
+    name: 'Edit Video',
+    description: 'Edit, trim, cut and merge multiple videos. Upload clips, drag to reorder, apply transitions, trim, adjust speed and volume — 100% browser-based.',
+    shortDesc: 'Edit, trim, cut and merge videos',
     category: 'video',
     iconColor: '#7C3AED',
     iconBg: '#EDE9FE',
+    hardNav: true,
   },
   {
     slug: 'youtube-transcript',
